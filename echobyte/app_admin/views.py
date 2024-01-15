@@ -27,3 +27,5 @@ def admin_home(request):
 def admin_logout(request):
     logout(request)
     return redirect('admin_login')
+def a(request):
+    return render(request, 'a.html')

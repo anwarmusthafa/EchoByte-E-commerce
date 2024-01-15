@@ -22,6 +22,9 @@
                         <label for="password" class="form-label">Password:</label>
                         <input type="password" id="password" name="password" class="form-control" required>
                     </div>
+                    {% if error_message %}
+                    <p class="text-danger text-center">{{ error_message }}</p>
+                    {% endif %}
                     <button type="submit" class="btn btn-primary w-100">Sign In</button>
                 </form>
             </div>

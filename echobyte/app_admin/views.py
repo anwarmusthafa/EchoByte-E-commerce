@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
+
 @never_cache
 def admin_login(request):
     error_message = None
@@ -27,5 +28,4 @@ def admin_home(request):
 def admin_logout(request):
     logout(request)
     return redirect('admin_login')
-def a(request):
-    return render(request, 'a.html')
+

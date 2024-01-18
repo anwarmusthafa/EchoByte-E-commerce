@@ -2,6 +2,12 @@
 {% load static %}
 {% block title%}Signup{% endblock %}
 {% block content %}
+{% if error_message %}
+    <div class="alert alert-danger text-center " role="alert">
+      {{ error_message }}
+    </div>
+  {% endif %}
+
 
 
         <!--====== App Content ======-->
@@ -57,7 +63,7 @@
                                 <div class="l-f-o">
                                     <div class="l-f-o__pad-box">
                                         <h1 class="gl-h1">PERSONAL INFORMATION</h1>
-                                        <form class="l-f-o__form" method="post" action="">
+                                        <form class="l-f-o__form" method="post" action=" {% url "signup" %} ">
                                             {% csrf_token %}
                                             <div class="gl-s-api">
                                                 <div class="u-s-m-b-15">
@@ -71,15 +77,15 @@
                                             </div>
                                             <div class="u-s-m-b-30">
                                                 <label class="gl-label" for="reg-fname">NAME *</label>
-                                                <input name="username" class="input-text input-text--primary-style" type="text" id="reg-fname" placeholder="Enter Your Name">
+                                                <input name="name" class="input-text input-text--primary-style" type="text" value="{{last_typed_values.name}}" id="reg-fname" placeholder="Enter Your Name">
                                             </div>
                                             <div class="u-s-m-b-30">
                                                 <label class="gl-label" for="reg-email">E-MAIL *</label>
-                                                <input name="email" class="input-text input-text--primary-style" type="email" id="reg-email" placeholder="Enter Your E-mail Address">
+                                                <input name="email" class="input-text input-text--primary-style" type="email" value="{{last_typed_values.email}}" id="reg-email" placeholder="Enter Your E-mail Address">
                                             </div>
                                             <div class="u-s-m-b-30">
                                                 <label class="gl-label" for="reg-email">PHONE NUMBER *</label>
-                                                <input name="phone" class="input-text input-text--primary-style" type="text" id="reg-email" placeholder="Enter Your PHONE NUMBER">
+                                                <input name="phone" class="input-text input-text--primary-style" type="text" value="{{last_typed_values.phone}}" id="reg-email" placeholder="Enter Your PHONE NUMBER">
                                             </div>
                                             <div class="u-s-m-b-30">
                                                 <label class="gl-label" for="reg-password">PASSWORD *</label>
@@ -87,7 +93,7 @@
                                             </div>
                                             <div class="u-s-m-b-30">
                                                 <label class="gl-label" for="reg-password">CONFIRM PASSWORD *</label>
-                                                <input name="password2" class="input-text input-text--primary-style" type="password" id="reg-password" placeholder="Re-Enter Password">
+                                                <input name="password2" class="input-text input-text--primary-style" type="text" id="reg-password" placeholder="Re-Enter Password">
                                             </div>
                                             <div class="u-s-m-b-15">
                                                 <div class="u-s-m-b-15">
@@ -108,4 +114,5 @@
             <!--====== End - Section 2 ======-->
         </div>
         <!--====== End - App Content ======-->
+    
 {% endblock %}

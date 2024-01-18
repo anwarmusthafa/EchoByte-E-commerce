@@ -1,7 +1,12 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title%}A PSGE {% endblock %}
+{% block title%}Sign In {% endblock %}
 {% block content %}
+{% if error_message %}
+    <div class="alert alert-danger text-center " role="alert">
+      {{ error_message }}
+    </div>
+  {% endif %}
 
 
         <!--====== App Content ======-->
@@ -77,8 +82,8 @@
                                                 </div>
                                             </div>
                                             <div class="u-s-m-b-30">
-                                                <label class="gl-label" for="login-email">E-MAIL *</label>
-                                                <input name="username" class="input-text input-text--primary-style" type="text" id="login-email" placeholder="Enter E-mail">
+                                                <label class="gl-label" for="login-email">E-MAIL / PHONE NUMBER *</label>
+                                                <input name="login_identifier" class="input-text input-text--primary-style" type="text" id="login-email" placeholder="Enter E-mail Or Phone Number">
                                             </div>
                                             <div class="u-s-m-b-30">
                                                 <label class="gl-label" for="login-password">PASSWORD *</label>

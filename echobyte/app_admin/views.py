@@ -10,9 +10,9 @@ def admin_login(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
-        if user:
-            login(request, user)
-            return redirect('admin_home')
+        if user and user.is_staff:
+                login(request, user)
+                return redirect('admin_home')
         else:
             error_message = "Invalid Credentials"
     context = {'error_message': error_message}

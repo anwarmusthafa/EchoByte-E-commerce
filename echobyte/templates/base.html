@@ -45,9 +45,11 @@
 
                         <!--====== Main Logo ======-->
 
-                        <a class="main-logo" href=" {% url 'home' %} ">
-
-                            <img src="{% static 'images/logo/logo-1.png' %}" alt=""></a>
+                        <a class="main-logo" href="{% url 'home' %}" style="color: black; text-decoration: none; font-family: 'Arial', sans-serif; font-weight: bold;">
+                            <h2 style="margin: 0;">EchoByte</h2>
+                        </a>
+                        
+                        
                         <!--====== End - Main Logo ======-->
 
 
@@ -89,12 +91,12 @@
                                                     <span>Account</span></a></li>
                                             <li>
 
-                                                <a href="signup.html"><i class="fas fa-user-plus u-s-m-r-6"></i>
+                                                <a href="{% url "signup" %}"><i class="fas fa-user-plus u-s-m-r-6"></i>
 
                                                     <span>Signup</span></a></li>
                                             <li>
 
-                                                <a href="signin.html"><i class="fas fa-lock u-s-m-r-6"></i>
+                                                <a href="{% url "signin" %}"><i class="fas fa-lock u-s-m-r-6"></i>
 
                                                     <span>Signin</span></a></li>
                                             <li>
@@ -935,7 +937,7 @@
                                 <ul class="ah-list ah-list--design2 ah-list--link-color-secondary">
                                     <li>
 
-                                        <a href=" {% url "all_products" %}">ALL PRODUCTS</a></li>
+                                        <a href=" {% url "all_products" %}"> ALL PRODUCTS</a></li>
                                     <li>
 
                                         <a href="">MOBILES</a></li>

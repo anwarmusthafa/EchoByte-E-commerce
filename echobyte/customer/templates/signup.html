@@ -2,13 +2,17 @@
 {% load static %}
 {% block title%}Signup{% endblock %}
 {% block content %}
-{% if error_message %}
-    <div class="alert alert-danger text-center " role="alert">
-      {{ error_message }}
+{% if success_message %}
+    <div class="alert alert-success text-center" role="alert">
+        {{ success_message }} , <span><a href="{% url "signin" %}">Click here to login</a></span>
     </div>
-  {% endif %}
+{% endif %}
 
-
+{% if error_message %}
+    <div class="alert alert-danger text-center" role="alert">
+        {{ error_message }}
+    </div>
+{% endif %}
 
         <!--====== App Content ======-->
         <div class="app-content">
@@ -77,19 +81,44 @@
                                             </div>
                                             <div class="u-s-m-b-30">
                                                 <label class="gl-label" for="reg-fname">NAME *</label>
-                                                <input name="name" class="input-text input-text--primary-style" type="text" value="{{last_typed_values.name}}" id="reg-fname" placeholder="Enter Your Name">
+                                                <input 
+                                                    name="name" 
+                                                    minlength="4" 
+                                                    maxlength="20" 
+                                                    class="input-text input-text--primary-style" 
+                                                    type="text" 
+                                                    value="{{last_typed_values.name}}" 
+                                                    id="reg-fname" 
+                                                    placeholder="Enter Your Name"
+                                                    pattern="[A-Za-z\s]{4,20}"
+                                                    title="Name must contain only letters and be between 4 and 20 characters long."
+                                                    required
+                                                >
+                                                <small class="text-muted">Name must contain only letters and be between 4 and 20 characters long.</small>
                                             </div>
+                                            
                                             <div class="u-s-m-b-30">
                                                 <label class="gl-label" for="reg-email">E-MAIL *</label>
                                                 <input name="email" class="input-text input-text--primary-style" type="email" value="{{last_typed_values.email}}" id="reg-email" placeholder="Enter Your E-mail Address">
                                             </div>
                                             <div class="u-s-m-b-30">
                                                 <label class="gl-label" for="reg-email">PHONE NUMBER *</label>
-                                                <input name="phone" class="input-text input-text--primary-style" type="text" value="{{last_typed_values.phone}}" id="reg-email" placeholder="Enter Your PHONE NUMBER">
+                                                <input name="phone" minlength="10" maxlength="13" class="input-text input-text--primary-style" type="text" value="{{last_typed_values.phone}}" id="reg-email" placeholder="Enter Your PHONE NUMBER">
                                             </div>
                                             <div class="u-s-m-b-30">
                                                 <label class="gl-label" for="reg-password">PASSWORD *</label>
-                                                <input name="password1" class="input-text input-text--primary-style" type="password" id="reg-password" placeholder="Enter Password">
+                                                <input 
+                                                    name="password1" 
+                                                    minlength="6" 
+                                                    class="input-text input-text--primary-style" 
+                                                    type="password" 
+                                                    id="reg-password" 
+                                                    placeholder="Enter Password"
+                                                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}"
+                                                    title="Password must contain at least one number, one lowercase and one uppercase letter, and be at least 6 characters long."
+                                                    required
+                                                >
+                                                <small class="text-muted">Password must contain at least one number, one lowercase and one uppercase letter, and be at least 6 characters long.</small>
                                             </div>
                                             <div class="u-s-m-b-30">
                                                 <label class="gl-label" for="reg-password">CONFIRM PASSWORD *</label>

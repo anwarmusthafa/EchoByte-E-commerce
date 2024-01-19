@@ -83,28 +83,30 @@
                                         <!--====== Dropdown ======-->
 
                                         <span class="js-menu-toggle"></span>
-                                        <ul style="width:120px">
-                                            <li>
-
-                                                <a href="dashboard.html"><i class="fas fa-user-circle u-s-m-r-6"></i>
-
-                                                    <span>Account</span></a></li>
-                                            <li>
-
-                                                <a href="{% url "signup" %}"><i class="fas fa-user-plus u-s-m-r-6"></i>
-
-                                                    <span>Signup</span></a></li>
-                                            <li>
-
-                                                <a href="{% url "signin" %}"><i class="fas fa-lock u-s-m-r-6"></i>
-
-                                                    <span>Signin</span></a></li>
-                                            <li>
-
-                                                <a href="{% url "signout" %}"><i class="fas fa-lock-open u-s-m-r-6"></i>
-
-                                                    <span>Signout</span></a></li>
+                                        <ul style="width: 120px">
+                                            {% if user.is_authenticated %}
+                                                <!-- User is authenticated, show account and signout links -->
+                                                <li>
+                                                    <a href="dashboard.html"><i class="fas fa-user-circle u-s-m-r-6"></i>
+                                                        <span>Account</span></a>
+                                                </li>
+                                                <li>
+                                                    <a href="{% url 'signout' %}"><i class="fas fa-lock-open u-s-m-r-6"></i>
+                                                        <span>Signout</span></a>
+                                                </li>
+                                            {% else %}
+                                                <!-- User is not authenticated, show signup and signin links -->
+                                                <li>
+                                                    <a href="{% url 'signup' %}"><i class="fas fa-user-plus u-s-m-r-6"></i>
+                                                        <span>Signup</span></a>
+                                                </li>
+                                                <li>
+                                                    <a href="{% url 'signin' %}"><i class="fas fa-lock u-s-m-r-6"></i>
+                                                        <span>Signin</span></a>
+                                                </li>
+                                            {% endif %}
                                         </ul>
+                                        
                                         <!--====== End - Dropdown ======-->
                                     </li>
                                     <li class="has-dropdown" data-tooltip="tooltip" data-placement="left" title="Settings">

@@ -65,18 +65,15 @@
     <title>OTP Verification</title>
 </head>
 <body>
-  
     <div class="otp-container">
-        {% if error_message %}
-    <div class="alert">
-        {{ error_message }}
-        {% if "already verified" in error_message|lower %}  {# Check if the error message contains "already verified" #}
-            <p><a href="{% url 'signin' %}">Sign In</a></p>
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
         {% endif %}
-    </div>
-{% endif %}
 
-    
         <form method="post" action="{% url 'otp_verification' pk=pk %}">
             {% csrf_token %}
             <fieldset>
@@ -92,4 +89,5 @@
         </form>
     </div>
 </body>
+
 </html>

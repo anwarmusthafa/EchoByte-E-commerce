@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect
 from django.conf import settings
+from .signals import send_otp
 
 
 
@@ -26,11 +27,16 @@ def signin(request):
 
         user = authenticate(request, username=login_identifier, password=password)
         if user and not user.is_staff:
-            login(request, user)
-            return redirect('home')
+            if user.customer.is_verified:
+                login(request, user)
+                return redirect('home')
+            else:
+                print("customer is not verified")
+                messages.error(request,"verify your email")
+                send_otp(user.customer)
+                return redirect('otp_verification', pk=user.customer.pk)
         else:
             error_message = "Invalid Credentials"
-
     context = {"error_message": error_message}
     return render(request, 'signin.html', context)
 
@@ -97,22 +103,18 @@ def signout(request):
 def otp_verification(request, pk):
 
     try:
+        
         if pk:
+
             context={
-                    'pk':pk
+                    'pk':pk,
                 }
             if request.method == 'POST':
                 user_otp = request.POST['otp']
-                print("user_opt = ", user_otp)
-                
-                
                 tb_user = get_object_or_404(Customer, pk=pk)
-                print("tb_user",tb_user)
-                print("otp from db",tb_user.otp)
                 db_otp = tb_user.otp 
             
                 if  user_otp == str(db_otp):
-                    print("otp verified")
                     if tb_user.is_verified:
                         print("user is verified")
                         return render(request, 'signin',{'pk':pk})
@@ -120,12 +122,11 @@ def otp_verification(request, pk):
                         print(tb_user.otp , user_otp)
                         tb_user.is_verified = True
                         tb_user.save()
-                        request.session['users'] = tb_user.user.username
-                        return redirect('home')
+                        sucess_message = "registration is succesfuul , Please Sign in"
+                        return redirect('signin')
                 else:
                     messages.error(request,"Invalid otp Try again!")
-                    return redirect('otp_verification',pk = pk)
-        
+                    return redirect('otp_verification',pk = pk,)
     except Exception as e:
         print(e)
     return render(request, 'otp_verification.html', context)

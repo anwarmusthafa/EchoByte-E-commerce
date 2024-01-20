@@ -1,9 +1,15 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.models import User
 from .models import Customer
+from django.contrib import messages
+from django.core.mail import send_mail
+from django.shortcuts import render, redirect
+from django.conf import settings
+
+
 
 @never_cache
 def signin(request):
@@ -64,7 +70,9 @@ def signup(request):
         except User.DoesNotExist:
             # If the user does not exist, create a new user and log them in
             user = User.objects.create_user(username=email, password=password1)
-            Customer.objects.create(user=user, name=name, phone=phone)
+            user1 = Customer.objects.create(user=user, name=name, phone=phone)
+
+            return redirect('otp_verification',user1.id )
             success_message = 'Registration is successful'
         except Exception as e:
             request.session['signup_last_typed_values'] = last_typed_values
@@ -85,3 +93,61 @@ def signup(request):
 def signout(request):
     logout(request)
     return redirect('signin')
+
+def otp_verification(request, pk):
+
+    try:
+        if pk:
+            context={
+                    'pk':pk
+                }
+            if request.method == 'POST':
+                user_otp = request.POST['otp']
+                print("user_opt = ", user_otp)
+                
+                
+                tb_user = get_object_or_404(Customer, pk=pk)
+                print("tb_user",tb_user)
+                print("otp from db",tb_user.otp)
+                db_otp = tb_user.otp 
+            
+                if  user_otp == str(db_otp):
+                    print("otp verified")
+                    if tb_user.is_verified:
+                        print("user is verified")
+                        return render(request, 'signin',{'pk':pk})
+                    else:
+                        print(tb_user.otp , user_otp)
+                        tb_user.is_verified = True
+                        tb_user.save()
+                        request.session['users'] = tb_user.user.username
+                        return redirect('home')
+                else:
+                    messages.error(request,"Invalid otp Try again!")
+                    return redirect('otp_verification',pk = pk)
+        
+    except Exception as e:
+        print(e)
+    return render(request, 'otp_verification.html', context)
+
+#### views.py
+# from django.contrib import messages
+# from django.core.mail import send_mail
+# from django.shortcuts import render, redirect
+# from django.conf import settings
+# from subscriptions.forms import SubscribeForm
+
+
+# def subscribe(request):
+#     form = SubscribeForm()
+#     if request.method == 'POST':
+#         form = SubscribeForm(request.POST)
+#         if form.is_valid():
+#             subject = 'Code Band'
+#             message = 'Sending Email through Gmail'
+#             recipient = form.cleaned_data.get('email')
+#             send_mail(subject, 
+#               message, settings.EMAIL_HOST_USER, [recipient], fail_silently=False)
+#             messages.success(request, 'Success!')
+#             return redirect('subscribe')
+#     return render(request, 'subscriptions/home.html', {'form': form})

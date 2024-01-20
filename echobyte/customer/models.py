@@ -11,6 +11,8 @@ class Customer(models.Model):
     delete_status = models.IntegerField(choices=DELETE_CHOICES, default=LIVE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    otp = models.IntegerField(null = True, blank = True)
+    is_verified = models.BooleanField(default = False)
 
 class Address(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='addresses', null = True)  # Added related_name

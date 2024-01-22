@@ -23,8 +23,8 @@ def send_otp(user):
         otp1 = int(otp1)
         user.otp = otp1   
         user.save()
-        subject = 'Welcome to shopzy this is for otp verification'
-        message = f"your otp is: {otp1}"
+        subject = 'EchoByte otp verification'
+        message = f"Welcome to EchoByte your otp is: {otp1}"
         from_email = "echobyte24@gmail.com"
         to_email = [user.user.username]
         send_mail(subject,message,from_email,to_email)

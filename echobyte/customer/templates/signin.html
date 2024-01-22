@@ -7,6 +7,11 @@
       {{ error_message }}
     </div>
   {% endif %}
+  {% if success_message %}
+    <div class="alert alert-success text-center" role="alert">
+        {{ success_message }}
+    </div>
+{% endif %}
 
 
         <!--====== App Content ======-->

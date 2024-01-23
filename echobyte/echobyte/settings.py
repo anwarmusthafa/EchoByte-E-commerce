@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'order',
     'banner',
     'user_home',
-    'product_management'
 
 ]
 

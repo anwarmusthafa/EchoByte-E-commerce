@@ -1,12 +1,8 @@
 from django.db import models
 from django.utils.translation import gettext as _
-class Brand(models.Model):
-    brand = models.CharField(_("brand"), max_length=50)
-    is_listed = models.BooleanField(_(""), default = True)
-    def __str__(self):
-        return self.brand
-    
+from category.models import Brand, ProcessorBrand
 
+    
 class Product(models.Model):
     LIVE = 1
     DELETE = 0
@@ -16,10 +12,16 @@ class Product(models.Model):
     title = models.CharField(max_length=50)
     description = models.TextField()
     category = models.CharField(max_length= 10, choices = CATEGORY_CHOICES, default = 'all')
-    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, null = True)
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, null = True,related_name='products')
+    processor_brand = models.ForeignKey(ProcessorBrand, on_delete=models.CASCADE, null = True)
+    display = models.CharField( max_length=50, null = True)
+    front_camera = models.CharField(max_length=50, null= True, blank = True)
+    back_camera = models.CharField(max_length=50, null = True, blank = True)
+    processor = models.CharField(max_length=50, null = True)
     priority = models.IntegerField(default = 0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    battery_capacity = models.CharField( max_length=50, null = True)  
     def __str__(self):
         return self.title
 class ProductVariant(models.Model):
@@ -39,7 +41,7 @@ class ProductVariant(models.Model):
         ('1TB', '1TB'),
         ('2TB', '2TB'),
      )
-     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variants')
      varient_name = models.CharField(_("Variant Name"), max_length=50)
      ram = models.CharField(_("RAM"), choices=RAM_CHOICES)
      storage = models.CharField(_("Internal Storage"), choices=STORAGE_CHOICES)
@@ -50,16 +52,8 @@ class ProductVariant(models.Model):
      def __str__(self):
         return f"{self.product.title} - {self.varient_name}"
 class ProductImage(models.Model):
-    product = models.ForeignKey(Product,verbose_name=_("Product Images"), on_delete=models.CASCADE)
+    product = models.ForeignKey(Product,verbose_name=_("Product Images"), on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(_("Product Image"), upload_to="media/product images", height_field=None, width_field=None, max_length=None)
     image_order = models.PositiveIntegerField(_("Image order"))
     def __str__(self):
         return f"{self.product.title} - Image {self.image_order}"
-
-
-
-
-    
-
-    
-

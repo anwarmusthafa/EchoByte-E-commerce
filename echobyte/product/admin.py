@@ -12,7 +12,3 @@ class ProductVariantAdmin(admin.ModelAdmin):
 @admin.register(ProductImage)
 class ProductImageAdmin(admin.ModelAdmin):
     pass
-
-@admin.register(Brand)
-class BrandAdmin(admin.ModelAdmin):
-    pass

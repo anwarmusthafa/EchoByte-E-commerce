@@ -973,19 +973,19 @@
                                     </div>
                                 </div>
                                 <div class="shop-p__collection">
+                                    {% for variant in variants %}
                                     <div class="row is-list-active">
-                                        {% for variant in variants %}
+                                        
+                                       
                                         <div class="col-lg-4 col-md-6 col-sm-6">
                                             <div class="product-m">
                                                 
                                                 <div class="product-m__thumb">
-                                                    {% if variant.product.image.all %}
-                                                    {% for image in variant.product.images.all %}
 
                                                     <a class="aspect aspect--bg-grey aspect--square u-d-block" href="product-detail.html">
-                                                        <img class="aspect__img" src="{{image.image.url}}" alt="product image"></a>
-                                                         {% endfor %}
-                                                        {% endif %}
+                                                        {% if  variant.product.images.all %}
+                                                        <img class="aspect__img" src="{% if variant.product.images.all %}{{ variant.product.images.first.image.url }}{% endif %}" alt="product image">
+                                                    {% endif %}
                                                 <div class="product-m__quick-look">
 
                                                         <a class="fas fa-search" data-modal="modal" data-modal-id="#quick-look" data-tooltip="tooltip" data-placement="top" title="Quick Look"></a></div>
@@ -999,13 +999,13 @@
                                                         <a href="shop-side-version-2.html">Electronics</a></div>
                                                     <div class="product-m__name">
 
-                                                        <a href="product-detail.html">{{variant.product.title}}  ({{variant.varient_name}})</a></div>
+                                                        <a href="product-detail.html">{{variant.product.brand}} {{variant.product.title}}  ({{variant.varient_name}}) </a></div>
                                                     <div class="product-m__rating gl-rating-style"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i><i class="far fa-star"></i><i class="far fa-star"></i>
 
                                                         <span class="product-m__review">(23)</span></div>
-                                                    <div class="product-m__price">$125.00
+                                                    <div class="product-m__price">{{ variant.selling_price|floatformat:"0" }}
 
-                                                        <span class="product-m__discount">$22.00</span></div>
+                                                        <span class="product-m__discount">{{variant.original_price}}</span></div>
                                                     <div class="product-m__hover">
                                                         {% comment %} <div class="product-m__preview-description">
 
@@ -1015,7 +1015,7 @@
                                                                 <li>{{variant.product.display}} Display</li>
                                                                 <li>{{variant.product.back_camera}} | {{variant.product.front_camera}} Front Camera</li>
                                                                 <li>{{ variant.product.processor_brand}} {{variant.product.processor}} Processor</li>
-                                                                <li>Lorem ipsum</li>
+                                                                <li>{{variant.product.battery_capacity}} mAh</li>
                                                               </ul>
                                                         <div class="product-m__wishlist">
 
@@ -1026,8 +1026,8 @@
                                         </div>
                                     </div>
                                     {% endfor %}
-
                                 </div>
+                                
                                 <div class="u-s-p-y-60">
 
                                     <!--====== Pagination ======-->

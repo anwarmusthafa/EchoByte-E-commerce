@@ -147,3 +147,8 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'echobyte24@gmail.com'
 EMAIL_HOST_PASSWORD = 'dhsg jhvv zehv irne'
+
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR,"media")
+

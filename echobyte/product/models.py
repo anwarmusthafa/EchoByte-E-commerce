@@ -53,7 +53,7 @@ class ProductVariant(models.Model):
         return f"{self.product.title} - {self.varient_name}"
 class ProductImage(models.Model):
     product = models.ForeignKey(Product,verbose_name=_("Product Images"), on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(_("Product Image"), upload_to="media/product images", height_field=None, width_field=None, max_length=None)
+    image = models.ImageField(_("Product Image"), upload_to="product images/", height_field=None, width_field=None, max_length=None)
     image_order = models.PositiveIntegerField(_("Image order"))
     def __str__(self):
         return f"{self.product.title} - Image {self.image_order}"

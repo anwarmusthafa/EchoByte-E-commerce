@@ -30,7 +30,7 @@
               <td>
                 <form action="{% url "delete_status" pk=customer.pk  %}" method="post" onsubmit="return confirm('Are you sure you want to change the status?');">
                   {% csrf_token %}
-                {% if customer.customer.delete_status == 0 %}
+                {% if product.delete_status == 0 %}
                     <button value="1" name = "delete_status" class="btn btn-success">Unblock</button>
                 {% else %}
                     <button value="0" name = "delete_status" class="btn btn-danger">Block</button>

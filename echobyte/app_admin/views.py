@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.models import User
 from customer.models import Customer
+from product.models import Product,ProductVariant
 @never_cache
 def admin_login(request):
     error_message = None
@@ -50,6 +51,21 @@ def delete_status(request, pk):
             user.delete_status = 1
         user.save()
     return redirect('customers_list')
+def list_product(request):
+    products = Product.objects.all()
+    context = {'products':products}
+    return render(request,'list_product.html', context)
+def product_delete(request,pk):
+    if request.POST:
+        delete_status = int(request.POST.get('delete_status'))
+        print(delete_status)
+        product = get_object_or_404(Product,pk=pk)
+        if delete_status == 0:
+            product.delete_status = 0
+        else:
+            product.delete_status = 1
+        product.save()
+    return redirect('list_product')
 
 
 

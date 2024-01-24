@@ -982,7 +982,7 @@
                                                 
                                                 <div class="product-m__thumb">
 
-                                                    <a class="aspect aspect--bg-grey aspect--square u-d-block" href="product-detail.html">
+                                                    <a class="aspect aspect--bg-grey aspect--square u-d-block" href="{% url "product_detail" variant.id %}">
                                                         {% if  variant.product.images.all %}
                                                         <img class="aspect__img" src="{% if variant.product.images.all %}{{ variant.product.images.first.image.url }}{% endif %}" alt="product image">
                                                     {% endif %}
@@ -996,10 +996,10 @@
                                                 <div class="product-m__content">
                                                     <div class="product-m__category">
 
-                                                        <a href="shop-side-version-2.html">Electronics</a></div>
+                                                        <a href="shop-side-version-2.html">{{variant.product.category | title}}</a></div>
                                                     <div class="product-m__name">
 
-                                                        <a href="product-detail.html">{{variant.product.brand}} {{variant.product.title}}  ({{variant.varient_name}}) </a></div>
+                                                        <a href="{% url "product_detail" variant.id %}">{{variant.product.brand}} {{variant.product.title}}  ({{variant.varient_name}}) </a></div>
                                                     <div class="product-m__rating gl-rating-style"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i><i class="far fa-star"></i><i class="far fa-star"></i>
 
                                                         <span class="product-m__review">(23)</span></div>

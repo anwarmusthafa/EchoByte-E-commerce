@@ -51,6 +51,10 @@ class ProductVariant(models.Model):
      stock = models.PositiveIntegerField(_("Stock"), default=0)
      def __str__(self):
         return f"{self.product.title} - {self.varient_name}"
+     def discount_percentage(self):
+         discount_percentage = int( ((self.original_price - self.selling_price) / self.original_price) * 100)
+         return discount_percentage
+     
 class ProductImage(models.Model):
     product = models.ForeignKey(Product,verbose_name=_("Product Images"), on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(_("Product Image"), upload_to="product images/", height_field=None, width_field=None, max_length=None)

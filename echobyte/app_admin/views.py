@@ -5,7 +5,7 @@ from django.views.decorators.cache import never_cache
 from django.contrib.auth.models import User
 from customer.models import Customer
 from category.models import Brand,ProcessorBrand
-from product.models import Product,ProductVariant
+from product.models import Product,ProductVariant, ProductImage
 @never_cache
 def admin_login(request):
     error_message = None
@@ -109,6 +109,18 @@ def add_product(request):
                 battery_capacity=battery,
                 description=description
             )
+
+            for i in range(1, 6):
+                image_file = request.FILES.get(f"image-{i}")
+                if image_file:
+                    # Save the image to the ProductImage model
+                    product_image = ProductImage.objects.create(
+                        product=adding_product,
+                        image=image_file,
+                        image_order=i
+                    )
+                else:
+                    print("image file not available")
 
             success_message = "Product added successfully!"
 

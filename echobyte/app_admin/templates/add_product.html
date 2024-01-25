@@ -14,7 +14,7 @@
     <div class="card">
       <div class="card-body">
         <h4 class="card-title">Add Product</h4>
-        <form class="forms-sample" method="post" action="{% url 'add_product' %}">
+        <form class="forms-sample" method="post" action="{% url 'add_product' %}"  enctype="multipart/form-data">
             {% csrf_token %}
              <div class="form-group">
                       <label for="exampleFormControlSelect1">Brand</label>
@@ -86,10 +86,51 @@
             <label for="exampleTextarea1">Description</label>
             <textarea class="form-control" name="description" placeholder="Description" id="exampleTextarea1" rows="4"></textarea>
           </div>
+          <div class="form-group">
+            <label for="">Image 1</label>
+            <input  name="image-1" style="padding: 5px;" type='file' onchange="readURL(this);" />
+<img  style="max-width: 100px;"id="blah" src="http://placehold.it/100" alt="your image" />
+          </div>
+          <div class="form-group">
+            <label for="">Image 2</label>
+            <input  name="image-2" style="padding: 5px;" type='file' onchange="readURL(this);" />
+<img  style="max-width: 100px;"id="blah" src="http://placehold.it/100" alt="your image" />
+          </div>
+          <div class="form-group">
+            <label for="">Image 3</label>
+            <input  name="image-3" style="padding: 5px;" type='file' onchange="readURL(this);" />
+<img  style="max-width: 100px;"id="blah" src="http://placehold.it/100" alt="your image" />
+          </div>
+          <div class="form-group">
+            <label for="">Image 4</label>
+            <input  name="image-4" style="padding: 5px;" type='file' onchange="readURL(this);" />
+<img  style="max-width: 100px;"id="blah" src="http://placehold.it/100" alt="your image" />
+          </div>
+          <div class="form-group">
+            <label for="">Image 5</label>
+            <input  name="image-5" style="padding: 5px;" type='file' onchange="readURL(this);" />
+<img  style="max-width: 100px;"id="blah" src="http://placehold.it/100" alt="your image" />
+          </div>
+          
+          
           <button type="submit" class="btn btn-gradient-primary me-2">Submit</button>
           <button class="btn btn-light">Cancel</button>
         </form>
       </div>
     </div>
   </div>
+<script>
+         function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#blah')
+                        .attr('src', e.target.result);
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+</script>
   {% endblock content %}

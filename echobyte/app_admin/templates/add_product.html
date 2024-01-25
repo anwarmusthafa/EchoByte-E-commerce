@@ -1,0 +1,95 @@
+{% extends "admin_base.html" %}
+{% block content %}
+{% if error_message %}
+    <div class="alert alert-danger" role="alert">
+        {{ error_message }}
+    </div>
+{% endif %}
+{% if success_message %}
+    <div class="alert alert-success" role="alert">
+        {{ success_message }}
+    </div>
+{% endif %}
+<div class="col-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Add Product</h4>
+        <form class="forms-sample" method="post" action="{% url 'add_product' %}">
+            {% csrf_token %}
+             <div class="form-group">
+                      <label for="exampleFormControlSelect1">Brand</label>
+                      <select name="brand" class="form-control form-control-lg" id="exampleFormControlSelect1">
+                        {% for brand in existing_brands %}
+            <option value="{{ brand.id }}">{{ brand.brand }}</option>
+        {% endfor %}
+    </select>
+                    </div>
+
+            <div class="form-group">
+                <label for="exampleFormControlSelect1">Category</label>
+                <select name="category" class="form-control form-control-lg" id="exampleFormControlSelect1">
+                    {% for value, display_text in category_choices %}
+                    <option value="{{ value }}">{{ display_text }}</option>
+                {% endfor %}
+                  
+                </select>
+              </div>
+
+         <div class="form-group">
+            <label for="exampleInputEmail3">Title</label>
+            <input name="title" type="text" class="form-control" id="exampleInputEmail3" placeholder="Title">
+          </div>
+
+          <div class="form-group">
+            <label for="exampleSelectGender">Processor Brand</label>
+            <select name="processor-brand" class="form-control" id="exampleSelectGender">
+                {% for processor_brand in existing_processor_brands %}
+                <option value="{{ processor_brand.id }}">{{ processor_brand.processor_brand_name }}</option>
+            {% endfor %}
+        </select>
+          </div>
+          <div class="form-group">
+            <label for="exampleInputEmail3">Processor</label>
+            <input name="processor" type="text" class="form-control" id="exampleInputEmail3" placeholder="Processor">
+          </div>
+          <div class="form-group">
+            <label for="exampleInputEmail3">Display</label>
+            <input name="display" type="text" class="form-control" id="exampleInputEmail3" placeholder="Display">
+          </div>
+          <div class="form-group">
+            <label for="exampleInputEmail3">Front Camera</label>
+            <input name="front-camera" type="text" class="form-control" id="exampleInputEmail3" placeholder="Front Camera">
+          </div>
+          <div class="form-group">
+            <label for="exampleInputEmail3">Back Camera</label>
+            <input name="back-camera" type="text" class="form-control" id="exampleInputEmail3" placeholder="Back Camera">
+          </div>
+          <div class="form-group">
+            <label for="exampleInputEmail3">Priority</label>
+            <input name="priority" type="number" class="form-control" id="exampleInputEmail3" placeholder="Priority">
+          </div>
+          <!-- <div class="form-group">
+            <label>File upload</label>
+            <input type="file" name="img[]" class="file-upload-default">
+            <div class="input-group col-xs-12">
+              <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image">
+              <span class="input-group-append">
+                <button class="file-upload-browse btn btn-gradient-primary" type="button">Upload</button>
+              </span>
+            </div>
+          </div> -->
+          <div class="form-group">
+            <label for="exampleInputCity1">Battery</label>
+            <input type="text" class="form-control" id="exampleInputCity1" placeholder="Battery">
+          </div>
+          <div class="form-group">
+            <label for="exampleTextarea1">Description</label>
+            <textarea class="form-control" name="description" placeholder="Description" id="exampleTextarea1" rows="4"></textarea>
+          </div>
+          <button type="submit" class="btn btn-gradient-primary me-2">Submit</button>
+          <button class="btn btn-light">Cancel</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endblock content %}

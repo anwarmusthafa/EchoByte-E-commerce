@@ -8,7 +8,7 @@ class Product(models.Model):
     DELETE = 0
     DELETE_CHOICES = ((LIVE, 'Live'), (DELETE, 'Delete'))
     delete_status = models.IntegerField(choices=DELETE_CHOICES, default=LIVE)
-    CATEGORY_CHOICES = [('mobile','Mobile'), ('laptop','laptop'),('all','All')]
+    CATEGORY_CHOICES = [('mobile','mobile'), ('laptop','laptop'),('all','All')]
     title = models.CharField(max_length=50)
     description = models.TextField()
     category = models.CharField(max_length= 10, choices = CATEGORY_CHOICES, default = 'all')
@@ -24,6 +24,8 @@ class Product(models.Model):
     battery_capacity = models.CharField( max_length=50, null = True)  
     def __str__(self):
         return self.title
+    def variant_count(self):
+        return self.variants.count()
 class ProductVariant(models.Model):
      RAM_CHOICES = (
         ('4GB', '4GB'),
@@ -42,7 +44,7 @@ class ProductVariant(models.Model):
         ('2TB', '2TB'),
      )
      product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variants')
-     varient_name = models.CharField(_("Variant Name"), max_length=50)
+     variant_name = models.CharField(_("Variant Name"), max_length=50)
      ram = models.CharField(_("RAM"), choices=RAM_CHOICES)
      storage = models.CharField(_("Internal Storage"), choices=STORAGE_CHOICES)
      colour = models.CharField(_("Product Colour"), max_length=50)

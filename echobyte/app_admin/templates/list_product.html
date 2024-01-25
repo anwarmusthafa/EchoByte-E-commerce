@@ -13,8 +13,9 @@
               <th> Id </th>
               <th> Title </th>
               <th> Category</th>
+              <th> Image </th>
               <th> Priority </th>
-              <th> Variant </th>
+              <th> Variant Count </th>
               <th> Action </th>
             </tr>
           </thead>
@@ -25,8 +26,11 @@
               <td> {{product.id}} </td>
               <td> {{product.title}} </td>
               <td> {{product.category}}</td>
+              <td> {% if  product.images.all %}
+                <img class="aspect__img" src="{% if product.images.all %}{{ product.images.first.image.url }}{% endif %}" alt="product image">
+            {% endif %}</td>
               <td>{{product.priority}}</td>
-              <td>{{product.productvariant}}</td>
+              <td>{{product.variant_count}}</td>
                <td>
                 <form action="{% url "product_delete" pk=product.pk  %}" method="post" onsubmit="return confirm('Are you sure you want to change the status?');">
                   {% csrf_token %}

@@ -11,4 +11,6 @@ urlpatterns = [
     path('product_delete/<pk>/', views.product_delete, name='product_delete'),
     path('add_product/', views.add_product, name='add_product'),
     path('add_variant/', views.add_variant, name='add_variant'),
+    path('list_variants/', views.list_variants, name='list_variants'),
+    path('variant_block/<pk>/', views.variant_block, name='variant_block'),
 ] 

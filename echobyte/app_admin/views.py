@@ -189,3 +189,19 @@ def add_variant(request):
     }
 
     return render(request, 'add_variant.html', context)
+def list_variants(request):
+    variants = ProductVariant.objects.all
+    context = {'variants': variants}
+    return render(request, 'list_variants.html', context)
+def  variant_block(request,pk):
+    if request.POST:
+        block_status = int(request.POST.get('block_status'))
+        print(block_status)
+        variant = get_object_or_404(ProductVariant,pk=pk)
+        if block_status == 0:
+            variant.is_listed = True
+        else:
+            variant.is_listed = False
+        variant.save()
+    return redirect('list_variants')
+    

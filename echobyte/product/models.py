@@ -8,13 +8,13 @@ class Product(models.Model):
     DELETE = 0
     DELETE_CHOICES = ((LIVE, 'Live'), (DELETE, 'Delete'))
     delete_status = models.IntegerField(choices=DELETE_CHOICES, default=LIVE)
-    CATEGORY_CHOICES = [('mobile','mobile'), ('laptop','laptop'),('all','All')]
+    CATEGORY_CHOICES = [('mobile','mobile'), ('laptop','laptop')]
     title = models.CharField(max_length=50)
     description = models.TextField()
-    category = models.CharField(max_length= 10, choices = CATEGORY_CHOICES, default = 'all')
-    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, null = True,related_name='products')
-    processor_brand = models.ForeignKey(ProcessorBrand, on_delete=models.CASCADE, null = True)
-    display = models.CharField( max_length=50, null = True)
+    category = models.CharField(max_length= 10, choices = CATEGORY_CHOICES,)
+    brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null = True,related_name='products')
+    processor_brand = models.ForeignKey(ProcessorBrand, on_delete=models.SET_NULL, null = True)
+    display = models.CharField( max_length=50, null = True, blank = True)
     front_camera = models.CharField(max_length=50, null= True, blank = True)
     back_camera = models.CharField(max_length=50, null = True, blank = True)
     processor = models.CharField(max_length=50, null = True)
@@ -28,6 +28,9 @@ class Product(models.Model):
         return self.variants.count()
 class ProductVariant(models.Model):
      RAM_CHOICES = (
+         ('512MB', '512MB'),
+         ('1GB', '1GB'),
+         ('2GB', '2GB'),
         ('4GB', '4GB'),
         ('6GB', '6GB'),
         ('8GB', '8GB'),
@@ -36,6 +39,9 @@ class ProductVariant(models.Model):
         ('32GB', '32GB'),
      )
      STORAGE_CHOICES = (
+         ('64GB', '64GB'),
+         ('16GB', '16GB'),
+         ('32GB', '32GB'),
         ('64GB', '64GB'),
         ('128GB', '128GB'),
         ('256GB', '256GB'),
@@ -47,10 +53,11 @@ class ProductVariant(models.Model):
      variant_name = models.CharField(_("Variant Name"), max_length=50)
      ram = models.CharField(_("RAM"), choices=RAM_CHOICES)
      storage = models.CharField(_("Internal Storage"), choices=STORAGE_CHOICES)
-     colour = models.CharField(_("Product Colour"), max_length=50)
+     colour = models.CharField(_("Product Colour"), null = True, blank =True ,max_length=50)
      original_price = models.DecimalField(_("Original Price"), max_digits=10, decimal_places=2)
      selling_price = models.DecimalField(_("Setting Price"), max_digits=10, decimal_places=2)
      stock = models.PositiveIntegerField(_("Stock"), default=0)
+     is_listed = models.BooleanField(default = True)
      def __str__(self):
         return f"{self.product.title} - {self.varient_name}"
      def discount_percentage(self):
@@ -59,7 +66,7 @@ class ProductVariant(models.Model):
      
 class ProductImage(models.Model):
     product = models.ForeignKey(Product,verbose_name=_("Product Images"), on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(_("Product Image"), upload_to="product images/", height_field=None, width_field=None, max_length=None)
+    image = models.ImageField(_("Product Image"), upload_to="product images/", height_field=None, width_field=None, max_length=None , null=True, blank=True)
     image_order = models.PositiveIntegerField(_("Image order"))
     def __str__(self):
         return f"{self.product.title} - Image {self.image_order}"

@@ -53,7 +53,7 @@ def delete_status(request, pk):
         user.save()
     return redirect('customers_list')
 def list_product(request):
-    products = Product.objects.all()
+    products = Product.objects.all().order_by('pk')
     for product in products:
         print(product.images.all())
     context = {'products':products}
@@ -204,4 +204,99 @@ def  variant_block(request,pk):
             variant.is_listed = False
         variant.save()
     return redirect('list_variants')
+
+def edit_product(request, pk):
+    # Use get_object_or_404 to handle the case where the product does not exist
+    product = get_object_or_404(Product, pk=pk)
+    images = ProductImage.objects.filter(product=product)
+    existing_brands = Brand.objects.filter(is_listed=True)
+    existing_processor_brands = ProcessorBrand.objects.filter(is_listed=True)
+    category_choices = Product.CATEGORY_CHOICES
+    error_message = None
+    success_message = None
+
+    if request.method == 'POST':
+        try:
+            brand_id = request.POST.get('brand')
+            category = request.POST.get('category')
+            title = request.POST.get('title')
+            processor_brand_id = request.POST.get('processor-brand')
+            processor = request.POST.get('processor')
+            display = request.POST.get('display')
+            front_camera = request.POST.get('front-camera')
+            back_camera = request.POST.get('back-camera')
+            priority = request.POST.get('priority')
+            battery = request.POST.get('battery')
+            description = request.POST.get('description')
+
+            # Get Brand and ProcessorBrand instances
+            brand_to_add = Brand.objects.get(pk=brand_id) if brand_id else None
+            processor_brand_to_add = ProcessorBrand.objects.get(pk=processor_brand_id) if processor_brand_id else None
+
+            # Update or create a new Product entry
+            editing_product, created = Product.objects.update_or_create(
+                pk=pk,
+                defaults={
+                    'brand': brand_to_add,
+                    'category': category,
+                    'title': title,
+                    'processor_brand': processor_brand_to_add,
+                    'processor': processor,
+                    'display': display,
+                    'front_camera': front_camera,
+                    'back_camera': back_camera,
+                    'priority': priority,
+                    'battery_capacity': battery,
+                    'description': description
+                }
+            )
+
+            # Iterate over the range of image orders (1 to 5)
+            for i in range(1, 6):
+                # Get the new image file from the request
+                image_file = request.FILES.get(f"image-{i}")
+                print(image_file, i)
+
+                if not image_file:
+                    print("Image not provided for order", i)
+                    continue
+
+                # Check if an existing image exists for the order
+                existing_image = editing_product.images.filter(image_order=i).first()
+
+                # If an existing image is found, delete it
+                if existing_image:
+                    existing_image.image.delete()
+                    existing_image.delete()
+                    print(f"Deleted existing image for order {i}")
+
+                # Create a new ProductImage
+                ProductImage.objects.create(
+                    product=editing_product,
+                    image_order=i,
+                    image=image_file
+                )
+                print(f"Created new image for order {i}")
+
+            success_message = "Product updated successfully!"
+
+        except Brand.DoesNotExist:
+            error_message = "Selected brand does not exist."
+        except ProcessorBrand.DoesNotExist:
+            error_message = "Selected processor brand does not exist."
+        except Exception as e:
+            error_message = f"An error occurred: {str(e)}"
+
+    context = {
+        'product': product,
+        'existing_brands': existing_brands,
+        'existing_processor_brands': existing_processor_brands,
+        'category_choices': category_choices,
+        'images': images,
+        'error_message': error_message,
+        'success_message': success_message
+    }
+
+    return render(request, 'edit_product.html', context)
+
     

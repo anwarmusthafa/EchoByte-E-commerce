@@ -33,7 +33,6 @@
               <td>{{product.priority}}</td>
               <td>{{product.variant_count}}</td>
                <td >
-                
                 <form action="{% url 'product_delete' pk=product.pk  %}" method="post" onsubmit="return confirm('Are you sure you want to change the status?');">
                   {% csrf_token %}
                 {% if product.delete_status == 0 %}

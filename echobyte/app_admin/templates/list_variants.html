@@ -20,6 +20,7 @@
               <th>Original Price</th>
               <th>Selling Price</th>
               <th>Stock</th>
+              <th>List<th>
               <th> Action </th>
             </tr>
           </thead>
@@ -44,6 +45,7 @@
                 {% endif %}
               </form> 
             </td> 
+            <td><a href="{% url 'edit_variant' variant.pk %}"><button value="1" name = "delete_status" class="btn btn-primary">Edit</button></a></td>
               {% endfor %}
               {% endif %}
 

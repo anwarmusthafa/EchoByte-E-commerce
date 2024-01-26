@@ -59,7 +59,7 @@ class ProductVariant(models.Model):
      stock = models.PositiveIntegerField(_("Stock"), default=0)
      is_listed = models.BooleanField(default = True)
      def __str__(self):
-        return f"{self.product.title} - {self.varient_name}"
+        return f"{self.product.title} - {self.variant_name}"
      def discount_percentage(self):
          discount_percentage = int( ((self.original_price - self.selling_price) / self.original_price) * 100)
          return discount_percentage

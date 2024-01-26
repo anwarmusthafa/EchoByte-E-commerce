@@ -298,5 +298,55 @@ def edit_product(request, pk):
     }
 
     return render(request, 'edit_product.html', context)
+def edit_variant(request,pk):
+    variant = ProductVariant.objects.get(pk=pk)
+    existing_products = Product.objects.filter(delete_status=1)
+    ram_choices = ProductVariant.RAM_CHOICES
+    storage_choices = ProductVariant.STORAGE_CHOICES
+    error_message = None
+    success_message = None
+
+    if request.method == 'POST':
+        try:
+            product_id = request.POST.get('product')  
+            variant_name = request.POST.get('variant-name')
+            ram = request.POST.get('ram')
+            internal_storage = request.POST.get('internal-storage')
+            colour = request.POST.get('colour')
+            original_price = request.POST.get('original-price')  
+            selling_price = request.POST.get('selling-price')
+            stock = request.POST.get('stock')
+
+            product = Product.objects.get(pk=product_id)  # Retrieve the selected product
+
+            # Create a new ProductVariant entry
+            variant.product = product
+            variant.variant_name = variant_name
+            variant.ram = ram
+            variant.storage = internal_storage
+            variant.colour = colour
+            variant.original_price = original_price
+            variant.selling_price = selling_price
+            variant.stock = stock
+
+            variant.save() 
+
+            success_message = "Variant updated successfully!"
+
+        except Product.DoesNotExist:
+            error_message = "Selected product does not exist."
+        except Exception as e:
+            error_message = f"An error occurred: {str(e)}"
+
+
+    context = {
+        'variant':variant,
+        'existing_products': existing_products,
+        'ram_choices': ram_choices,
+        'storage_choices': storage_choices,
+        'error_message': error_message,
+        'success_message': success_message,
+    }
+    return render(request, 'edit_variant.html',context)
 
     

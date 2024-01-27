@@ -90,28 +90,33 @@
           </div>
           <div class="form-group">
             <label for="">Image 1</label>
-            <input  name="image-1" style="padding: 5px;" type='file' onchange="readURL(this , 'blah1');" />
-<img  style="max-width: 100px;"id="blah1" src="http://placehold.it/100" alt="your image" />
-          </div>
+            <input name="image-1" style="padding: 5px;" type='file' onchange="readURL(this, 'blah1');" />
+            <img style="max-width: 100px;" id="blah1" src="http://placehold.it/100" alt="your image" />
+            <button type="button" class="remove-button" style="display: none;" onclick="removeImage('blah1')">Remove</button>
+        </div>
           <div class="form-group">
             <label for="">Image 2</label>
             <input  name="image-2" style="padding: 5px;" type='file' onchange="readURL(this , 'blah2');" />
 <img  style="max-width: 100px;"id="blah2" src="http://placehold.it/100" alt="your image" />
+<button type="button" class="remove-button" style="display: none;" onclick="removeImage('blah2')">Remove</button>
           </div>
           <div class="form-group">
             <label for="">Image 3</label>
             <input  name="image-3" style="padding: 5px;" type='file' onchange="readURL(this , 'blah3');" />
 <img  style="max-width: 100px;"id="blah3" src="http://placehold.it/100" alt="your image" />
+<button type="button" class="remove-button" style="display: none;" onclick="removeImage('blah3')">Remove</button>
           </div>
           <div class="form-group">
             <label for="">Image 4</label>
             <input  name="image-4" style="padding: 5px;" type='file' onchange="readURL(this , 'blah4');" />
 <img  style="max-width: 100px;"id="blah4" src="http://placehold.it/100" alt="your image" />
+<button type="button" class="remove-button" style="display: none;" onclick="removeImage('blah4')">Remove</button>
           </div>
           <div class="form-group">
             <label for="">Image 5</label>
             <input  name="image-5" style="padding: 5px;" type='file' onchange="readURL(this , 'blah5');" />
 <img  style="max-width: 100px;"id="blah5" src="http://placehold.it/100" alt="your image" />
+<button type="button" class="remove-button" style="display: none;" onclick="removeImage('blah5')">Remove</button>
           </div>
           
           
@@ -134,5 +139,36 @@
               reader.readAsDataURL(input.files[0]);
           }
       }
+      function readURL(input, imageId) {
+        var imageElement = document.getElementById(imageId);
+        var removeButton = imageElement.nextElementSibling;
+
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                imageElement.src = e.target.result;
+                removeButton.style.display = 'inline-block'; // Display remove button when an image is selected
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function removeImage(imageId) {
+        var imageElement = document.getElementById(imageId);
+        var removeButton = imageElement.nextElementSibling;
+
+        // Reset the image source and hide the remove button
+        imageElement.src = 'http://placehold.it/100';
+        removeButton.style.display = 'none';
+
+        // You might also want to clear the corresponding file input
+        var inputElement = document.querySelector('[name="' + imageId + '"]');
+        inputElement.value = '';
+
+        // If you want to perform additional actions when removing an image, you can add them here.
+    }
+
   </script>
   {% endblock content %}

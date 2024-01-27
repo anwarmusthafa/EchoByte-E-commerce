@@ -21,6 +21,13 @@
     <link rel="shortcut icon" href="  {% static 'images/favicon.png' %}" />
   </head>
   <body>
+    <style>
+      .nav-item a:active,
+      .nav-item a.active {
+          background-color: white;
+          color: blue;
+}
+    </style>
     <div class="container-scroller">
       <!-- partial: partials/_navbar.html -->
       <nav class="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">

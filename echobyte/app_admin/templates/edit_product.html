@@ -17,25 +17,28 @@
         {% if product %}
         <form class="forms-sample" method="post" action="{% url 'edit_product' product.pk %}"  enctype="multipart/form-data">
             {% csrf_token %}
-             <div class="form-group">
-                      <label for="exampleFormControlSelect1">Brand</label>
-                      <select  required name="brand" class="form-control form-control-lg" id="exampleFormControlSelect1">
-                        <option value="" disabled selected>Choose...</option>
-                        {% for brand in existing_brands %}
-            <option  value="{{ brand.id }}">{{ brand.brand }}</option>
-        {% endfor %}
-    </select>
-                    </div>
-
             <div class="form-group">
-                <label for="exampleFormControlSelect1">Category</label>
-                <select name="category" required class="form-control form-control-lg" id="exampleFormControlSelect1">
-                  <option value="" disabled selected>Choose...</option>  
-                  {% for value, display_text in category_choices %}
-                    <option value="{{ value }}">{{ display_text }}</option>
-                {% endfor %}
-                </select>
-              </div>
+              <label for="exampleFormControlSelect1">Brand</label>
+              <select required name="brand" class="form-control form-control-lg" id="exampleFormControlSelect1">
+                  <option value="" disabled {% if not product.brand %}selected{% endif %}>Choose...</option>
+                  {% for brand in existing_brands %}
+                      <option value="{{ brand.id }}" {% if product.brand.id == brand.id %}selected{% endif %}>
+                          {{ brand.brand }}
+                      </option>
+                  {% endfor %}
+              </select>
+          </div>
+              <div class="form-group">
+                      <label for="exampleFormControlSelect1">Category</label>
+                      <select name="category" required class="form-control form-control-lg" id="exampleFormControlSelect1">
+                          <option value="" disabled {% if not product.category %}selected{% endif %}>Choose...</option>
+                          {% for value, display_text in category_choices %}
+                              <option value="{{ value }}" {% if product.category == value %}selected{% endif %}>
+                                  {{ display_text }}
+                              </option>
+                          {% endfor %}
+                      </select>
+                  </div>
 
          <div class="form-group">
             <label for="exampleInputEmail3">Title</label>
@@ -47,7 +50,7 @@
             <select required name="processor-brand" class="form-control" id="exampleSelectGender">
                 <option value="" disabled {% if not product.processor_brand %}selected{% endif %}>Choose..</option>
                 {% for processor_brand in existing_processor_brands %}
-                    <option value="{{ processor_brand.id }}" {% if product.processor_brand == processor_brand.id %}selected{% endif %}>
+                    <option value="{{ processor_brand.id }}" {% if product.processor_brand.id == processor_brand.id %}selected{% endif %}>
                         {{ processor_brand.processor_brand_name }}
                     </option>
                 {% endfor %}
@@ -92,45 +95,24 @@
             <textarea value="" required  class="form-control" name="description" placeholder="Description" id="exampleTextarea1" rows="4">{{product.description}}</textarea>
           </div>
           {% if images %}
-{% for image in images %}
-<div class="form-group">
-    <label for="">Image {{image.image_order}}</label>
-    <input  name="image-{{image.image_order}}" style="padding: 5px;" type='file' onchange="readURL(this , 'blah{{image.image_order}}');" />
-<img  style="max-width: 100px;"id="blah{{image.image_order}}" src="{{image.image.url}}" alt="your image" />
-  </div>
-  
+  {% for image in images %}
+    <div class="form-group">
+      <label for="">Image {{ image.image_order }}</label>
+      <input name="image-{{ image.image_order }}" style="padding: 5px;" type='file' onchange="handleImageChange(this, 'blah{{ image.image_order }}', 'removeButton{{ image.image_order }}');" />
+      <img style="max-width: 100px;" id="blah{{ image.image_order }}" src="{{ image.image.url }}" alt="your image" />
+      <button type="button" class="remove-button" id="removeButton{{ image.image_order }}" onclick="removeImage('blah{{ image.image_order }}', 'removeButton{{ image.image_order }}')">Remove</button>
+    </div>
   {% endfor %}
-  {% else %}
-  <div class="form-group">
-    <label for="">Image 1</label>
-    <input  name="image-1" style="padding: 5px;" type='file' onchange="readURL(this , 'blah1');" />
-<img  style="max-width: 100px;"id="blah1" src="" alt="your image" />
-  </div>
-  <div class="form-group">
-    <label for="">Image 2 </label>
-    <input  name="image-2" style="padding: 5px;" type='file' onchange="readURL(this , 'blah2');" />
-<img  style="max-width: 100px;"id="blah2" src="" alt="your image" />
-  </div>
- 
-  <div class="form-group">
-    <label for="">Image 3 </label>
-    <input  name="image-3" style="padding: 5px;" type='file' onchange="readURL(this , 'blah3');" />
-<img  style="max-width: 100px;"id="blah3" src="" alt="your image" />
-  </div>
-  <div class="form-group">
-    <label for="">Image 4 </label>
-    <input  name="image-4" style="padding: 5px;" type='file' onchange="readURL(this , 'blah4');" />
-<img  style="max-width: 100px;"id="blah4" src="" alt="your image" />
-  </div>
-  <div class="form-group">
-    <label for="">Image 5 </label>
-    <input  name="image-5" style="padding: 5px;" type='file' onchange="readURL(this , 'blah5');" />
-<img  style="max-width: 100px;"id="blah5" src="" alt="your image" />
-  </div>
-  
-  {% endif %}
-
-          
+{% else %}
+  {% for i in 1..5 %}
+    <div class="form-group">
+      <label for="">Image {{ i }}</label>
+      <input name="image-{{ i }}" style="padding: 5px;" type='file' onchange="handleImageChange(this, 'blah{{ i }}', 'removeButton{{ i }}');" />
+      <img style="max-width: 100px;" id="blah{{ i }}" src="" alt="your image" />
+      <button type="button" class="remove-button" id="removeButton{{ i }}" style="display: none;" onclick="removeImage('blah{{ i }}', 'removeButton{{ i }}')">Remove</button>
+    </div>
+  {% endfor %}
+{% endif %}
           
           <button type="submit" class="btn btn-gradient-primary me-2">Submit</button>
           <button class="btn btn-light">Cancel</button>
@@ -151,6 +133,37 @@
   
               reader.readAsDataURL(input.files[0]);
           }
+      }
+
+      function handleImageChange(input, imageId, removeButtonId) {
+        var imageElement = document.getElementById(imageId);
+        var removeButton = document.getElementById(removeButtonId);
+    
+        if (input.files && input.files[0]) {
+          var reader = new FileReader();
+    
+          reader.onload = function (e) {
+            imageElement.src = e.target.result;
+            removeButton.style.display = 'inline-block'; // Display remove button when an image is selected
+          };
+    
+          reader.readAsDataURL(input.files[0]);
+        }
+      }
+    
+      function removeImage(imageId, removeButtonId) {
+        var imageElement = document.getElementById(imageId);
+        var removeButton = document.getElementById(removeButtonId);
+    
+        // Reset the image source and hide the remove button
+        imageElement.src = '';
+        removeButton.style.display = 'none';
+    
+        // You might also want to clear the corresponding file input
+        var inputElement = document.querySelector('[name="' + imageId.replace('blah', 'image') + '"]');
+        inputElement.value = '';
+    
+        // If you want to perform additional actions when removing an image, you can add them here.
       }
   </script>
   {% endblock content %}

@@ -88,7 +88,7 @@ def add_product(request):
             front_camera = request.POST.get('front-camera')
             back_camera = request.POST.get('back-camera')
             priority = request.POST.get('priority')
-            battery = request.POST.get('battery')
+            battery_capacity = request.POST.get('battery')
             description = request.POST.get('description')  # Corrected typo in 'description'
 
             # Get Brand and ProcessorBrand instances
@@ -106,7 +106,7 @@ def add_product(request):
                 front_camera=front_camera,
                 back_camera=back_camera,
                 priority=priority,
-                battery_capacity=battery,
+                battery_capacity=battery_capacity,
                 description=description
             )
 

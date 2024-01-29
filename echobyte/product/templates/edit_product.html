@@ -44,18 +44,6 @@
             <label for="exampleInputEmail3">Title</label>
             <input required name="title" value="{{product.title}}" type="text" class="form-control" id="exampleInputEmail3" placeholder="Title">
           </div>
-
-          <div class="form-group">
-            <label for="exampleSelectGender">Processor Brand</label>
-            <select required name="processor-brand" class="form-control" id="exampleSelectGender">
-                <option value="" disabled {% if not product.processor_brand %}selected{% endif %}>Choose..</option>
-                {% for processor_brand in existing_processor_brands %}
-                    <option value="{{ processor_brand.id }}" {% if product.processor_brand.id == processor_brand.id %}selected{% endif %}>
-                        {{ processor_brand.processor_brand_name }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
           <div class="form-group">
             <label for="exampleInputEmail3">Processor</label>
             <input required value="{{product.processor}}" name="processor" type="text" class="form-control" id="exampleInputEmail3" placeholder="Processor">

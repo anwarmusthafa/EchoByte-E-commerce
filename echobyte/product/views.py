@@ -32,9 +32,7 @@ def product_delete(request,pk):
     return redirect('list_product')
 def add_product(request):
     existing_brands = Brand.objects.filter(is_listed=True)
-    existing_processor_brands = ProcessorBrand.objects.filter(is_listed=True)
     category_choices = Product.CATEGORY_CHOICES
-
     error_message = None
     success_message = None
 
@@ -43,7 +41,6 @@ def add_product(request):
             brand_id = request.POST.get('brand')
             category = request.POST.get('category')  # Corrected typo in 'category'
             title = request.POST.get('title')
-            processor_brand_id = request.POST.get('processor-brand')
             processor = request.POST.get('processor')
             display = request.POST.get('display')
             front_camera = request.POST.get('front-camera')
@@ -61,7 +58,6 @@ def add_product(request):
                 brand=brand_to_add,
                 category=category,
                 title=title,
-                processor_brand=processor_brand_to_add,
                 processor=processor,
                 display=display,
                 front_camera=front_camera,
@@ -86,15 +82,12 @@ def add_product(request):
 
         except Brand.DoesNotExist:
             error_message = "Selected brand does not exist."
-        except ProcessorBrand.DoesNotExist:
-            error_message = "Selected processor brand does not exist."
         except Exception as e:
             error_message = f"An error occurred: {str(e)}"
 
     context = {
         'category_choices': category_choices,
         'existing_brands': existing_brands,
-        'existing_processor_brands': existing_processor_brands,
         'error_message': error_message,
         'success_message': success_message,
     }
@@ -169,7 +162,6 @@ def edit_product(request, pk):
     product = get_object_or_404(Product, pk=pk)
     images = ProductImage.objects.filter(product=product)
     existing_brands = Brand.objects.filter(is_listed=True)
-    existing_processor_brands = ProcessorBrand.objects.filter(is_listed=True)
     category_choices = Product.CATEGORY_CHOICES
     error_message = None
     success_message = None
@@ -179,7 +171,6 @@ def edit_product(request, pk):
             brand_id = request.POST.get('brand')
             category = request.POST.get('category')
             title = request.POST.get('title')
-            processor_brand_id = request.POST.get('processor-brand')
             processor = request.POST.get('processor')
             display = request.POST.get('display')
             front_camera = request.POST.get('front-camera')
@@ -190,8 +181,6 @@ def edit_product(request, pk):
 
             # Get Brand and ProcessorBrand instances
             brand_to_add = Brand.objects.get(pk=brand_id) if brand_id else None
-            processor_brand_to_add = ProcessorBrand.objects.get(pk=processor_brand_id) if processor_brand_id else None
-
             # Update or create a new Product entry
             editing_product, created = Product.objects.update_or_create(
                 pk=pk,
@@ -199,7 +188,6 @@ def edit_product(request, pk):
                     'brand': brand_to_add,
                     'category': category,
                     'title': title,
-                    'processor_brand': processor_brand_to_add,
                     'processor': processor,
                     'display': display,
                     'front_camera': front_camera,
@@ -238,15 +226,12 @@ def edit_product(request, pk):
 
         except Brand.DoesNotExist:
             error_message = "Selected brand does not exist."
-        except ProcessorBrand.DoesNotExist:
-            error_message = "Selected processor brand does not exist."
         except Exception as e:
             error_message = f"An error occurred: {str(e)}"
 
     context = {
         'product': product,
         'existing_brands': existing_brands,
-        'existing_processor_brands': existing_processor_brands,
         'category_choices': category_choices,
         'images': images,
         'error_message': error_message,
@@ -284,16 +269,13 @@ def edit_variant(request,pk):
             variant.original_price = original_price
             variant.selling_price = selling_price
             variant.stock = stock
-
             variant.save() 
-
             success_message = "Variant updated successfully!"
 
         except Product.DoesNotExist:
             error_message = "Selected product does not exist."
         except Exception as e:
             error_message = f"An error occurred: {str(e)}"
-
 
     context = {
         'variant':variant,

@@ -24,5 +24,21 @@ def edit_category(request,pk):
         category_instance.save()
         return redirect('categories')
     return render(request, 'edit_category.html')
+def add_brand(request):
+    if request.POST:
+        brand_name = request.POST.get('brand_name')
+        adding_brand = Brand.objects.create(brand = brand_name)
+        return redirect('brands') 
+    return render(request, 'add_brand.html')
+def edit_brand(request,pk):
+    if request.POST:
+        brand_name = request.POST.get('brand_name')
+        print(brand_name)
+        brand_instance = Brand.objects.get(pk=pk)
+        brand_instance.brand = brand_name
+        brand_instance.save()
+        return redirect('brands')
+    return render(request, 'edit_brand.html') 
+
 
 

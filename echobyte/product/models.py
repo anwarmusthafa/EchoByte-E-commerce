@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext as _
-from category.models import Brand, ProcessorBrand
+from category.models import Brand,Category
 
     
 class Product(models.Model):
@@ -8,12 +8,10 @@ class Product(models.Model):
     DELETE = 0
     DELETE_CHOICES = ((LIVE, 'Live'), (DELETE, 'Delete'))
     delete_status = models.IntegerField(choices=DELETE_CHOICES, default=LIVE)
-    CATEGORY_CHOICES = [('mobile','mobile'), ('laptop','laptop')]
     title = models.CharField(max_length=50)
     description = models.TextField()
-    category = models.CharField(max_length= 10, choices = CATEGORY_CHOICES,)
+    sub_category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank = True)
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null = True,related_name='products')
-    processor_brand = models.ForeignKey(ProcessorBrand, on_delete=models.SET_NULL, null = True)
     display = models.CharField( max_length=50, null = True, blank = True)
     front_camera = models.CharField(max_length=50, null= True, blank = True)
     back_camera = models.CharField(max_length=50, null = True, blank = True)
@@ -21,7 +19,8 @@ class Product(models.Model):
     priority = models.IntegerField(default = 0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    battery_capacity = models.CharField( max_length=50, null = True)  
+    battery_capacity = models.CharField( max_length=50, null = True)
+    is_listed = models.BooleanField(default = True) 
     def __str__(self):
         return self.title
     def variant_count(self):
@@ -39,6 +38,8 @@ class ProductVariant(models.Model):
         ('32GB', '32GB'),
      )
      STORAGE_CHOICES = (
+         ('8GB', '8GB'),
+         ('32GB', '32GB'),
          ('64GB', '64GB'),
          ('16GB', '16GB'),
          ('32GB', '32GB'),

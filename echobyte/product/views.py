@@ -17,14 +17,12 @@ def product_detail(request, pk):
 
 def list_product(request):
     products = Product.objects.all().order_by('pk')
-    for product in products:
-        print(product.images.all())
     context = {'products':products}
     return render(request,'list_product.html', context)
 def product_delete(request,pk):
     if request.POST:
         delete_status = int(request.POST.get('delete_status'))
-        print(delete_status)
+        
         product = get_object_or_404(Product,pk=pk)
         if delete_status == 0:
             product.delete_status = 0
@@ -82,8 +80,7 @@ def add_product(request):
                         image=image_file,
                         image_order=i
                     )
-                else:
-                    print("image file not available")
+                
 
             success_message = "Product added successfully!"
 
@@ -159,7 +156,6 @@ def list_variants(request):
 def  variant_block(request,pk):
     if request.POST:
         block_status = int(request.POST.get('block_status'))
-        print(block_status)
         variant = get_object_or_404(ProductVariant,pk=pk)
         if block_status == 0:
             variant.is_listed = True
@@ -218,10 +214,8 @@ def edit_product(request, pk):
             for i in range(1, 6):
                 # Get the new image file from the request
                 image_file = request.FILES.get(f"image-{i}")
-                print(image_file, i)
 
                 if not image_file:
-                    print("Image not provided for order", i)
                     continue
 
                 # Check if an existing image exists for the order
@@ -231,7 +225,7 @@ def edit_product(request, pk):
                 if existing_image:
                     existing_image.image.delete()
                     existing_image.delete()
-                    print(f"Deleted existing image for order {i}")
+                    
 
                 # Create a new ProductImage
                 ProductImage.objects.create(
@@ -239,7 +233,6 @@ def edit_product(request, pk):
                     image_order=i,
                     image=image_file
                 )
-                print(f"Created new image for order {i}")
 
             success_message = "Product updated successfully!"
 

@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.db.models import Q
-from category.models import Brand,ProcessorBrand
+from category.models import Brand,Category
 from product.models import Product,ProductVariant, ProductImage
 
 
@@ -32,14 +32,14 @@ def product_delete(request,pk):
     return redirect('list_product')
 def add_product(request):
     existing_brands = Brand.objects.filter(is_listed=True)
-    category_choices = Product.CATEGORY_CHOICES
+    existing_categories = Category.objects.filter(is_listed=True)
     error_message = None
     success_message = None
 
     if request.method == 'POST':
         try:
             brand_id = request.POST.get('brand')
-            category = request.POST.get('category')  # Corrected typo in 'category'
+            category_id = request.POST.get('category')  # Corrected typo in 'category'
             title = request.POST.get('title')
             processor = request.POST.get('processor')
             display = request.POST.get('display')
@@ -47,16 +47,18 @@ def add_product(request):
             back_camera = request.POST.get('back-camera')
             priority = request.POST.get('priority')
             battery_capacity = request.POST.get('battery')
+            print(battery_capacity)
             description = request.POST.get('description')  # Corrected typo in 'description'
+            print("category id",category_id)
 
             # Get Brand and ProcessorBrand instances
             brand_to_add = Brand.objects.get(pk=brand_id) if brand_id else None
-            processor_brand_to_add = ProcessorBrand.objects.get(pk=processor_brand_id) if processor_brand_id else None
+            category_to_add = Category.objects.get(pk=category_id) if category_id else None
 
             # Create a new Product entry
             adding_product = Product.objects.create(
                 brand=brand_to_add,
-                category=category,
+                category=category_to_add,
                 title=title,
                 processor=processor,
                 display=display,
@@ -86,8 +88,8 @@ def add_product(request):
             error_message = f"An error occurred: {str(e)}"
 
     context = {
-        'category_choices': category_choices,
         'existing_brands': existing_brands,
+        'existing_categories':existing_categories,
         'error_message': error_message,
         'success_message': success_message,
     }
@@ -162,7 +164,6 @@ def edit_product(request, pk):
     product = get_object_or_404(Product, pk=pk)
     images = ProductImage.objects.filter(product=product)
     existing_brands = Brand.objects.filter(is_listed=True)
-    category_choices = Product.CATEGORY_CHOICES
     error_message = None
     success_message = None
 
@@ -232,7 +233,6 @@ def edit_product(request, pk):
     context = {
         'product': product,
         'existing_brands': existing_brands,
-        'category_choices': category_choices,
         'images': images,
         'error_message': error_message,
         'success_message': success_message

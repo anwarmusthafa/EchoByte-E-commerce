@@ -10,7 +10,7 @@ class Product(models.Model):
     delete_status = models.IntegerField(choices=DELETE_CHOICES, default=LIVE)
     title = models.CharField(max_length=50)
     description = models.TextField()
-    sub_category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank = True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank = True)
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null = True,related_name='products')
     display = models.CharField( max_length=50, null = True, blank = True)
     front_camera = models.CharField(max_length=50, null= True, blank = True)

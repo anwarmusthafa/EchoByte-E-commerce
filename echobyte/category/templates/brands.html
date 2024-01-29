@@ -27,12 +27,12 @@
             <tr>
               <td>{{ brand.brand }}</td>
               <td>
-                <form action="" method="post" onsubmit="return confirm('Are you sure you want to change the status?');">
+                <form action="{% url 'block_brand' brand.pk %}" method="post" onsubmit="return confirm('Are you sure you want to change the status?');">
                   {% csrf_token %}
-                  {% if product.delete_status == 0 %}
-                      <button value="1" name="delete_status" class="btn btn-success mr-2">List</button>
+                  {% if brand.is_listed == False %}
+                      <button value="True" name="status" class="btn btn-success mr-2">List</button>
                   {% else %}
-                      <button value="0" name="delete_status" class="btn btn-danger mr-2">Unlist</button>
+                      <button value="False" name="status" class="btn btn-danger mr-2">Unlist</button>
                   {% endif %}
                 </form>
               </td>

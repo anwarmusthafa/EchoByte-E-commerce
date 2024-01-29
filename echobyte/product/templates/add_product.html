@@ -30,8 +30,8 @@
                 <label for="exampleFormControlSelect1">Category</label>
                 <select name="category" required class="form-control form-control-lg" id="exampleFormControlSelect1">
                   <option value="" disabled selected>Choose...</option>  
-                  {% for value, display_text in category_choices %}
-                    <option value="{{ value }}">{{ display_text }}</option>
+                  {% for category in existing_categories %}
+                    <option value="{{ category.pk }}">{{ category }}</option>
                 {% endfor %}
                 </select>
               </div>
@@ -72,7 +72,7 @@
           </div> -->
           <div class="form-group">
             <label for="exampleInputCity1">Battery</label>
-            <input type="text" class="form-control" id="exampleInputCity1" placeholder="Battery">
+            <input name ="battery" type="text" class="form-control" id="exampleInputCity1" placeholder="Battery">
           </div>
           <div class="form-group">
             <label  for="exampleTextarea1">Description</label>

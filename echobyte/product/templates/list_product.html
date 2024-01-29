@@ -20,14 +20,8 @@
               <th>Brand</th>
               <th> Title </th>
               <th> Category</th>
-              <th>Processor</th>
-              <th>Display</th>
-              <th>Front Camera</th>
-              <th>Back Camera</th>
-              <th>Battery Capacity</th>
               <th> Image </th>
               <th> Priority </th>
-              <th> Variant Count </th>
               <th> List </th>
               <th> Action </th>
             </tr>
@@ -40,11 +34,6 @@
               <td> {{product.brand}} </td>
               <td> {{product.title}} </td>
               <td> {{product.category}}</td>
-              <td> {{product.processor_brand}} {{product.processor}}</td>
-              <td>{{product.display}} </td>
-              <td>{{product.front_camera}} </td>
-              <td>{{product.back_camera}} </td>
-              <td>{{product.battery_capacity}}</td>
               <td>
                 {% if product.images.all %}
                     {% for image in product.images.all %}
@@ -53,7 +42,6 @@
                 {% endif %}
             </td>
               <td>{{product.priority}}</td>
-              <td>{{product.variant_count}}</td>
                <td >
                 <form action="{% url 'product_delete' pk=product.pk  %}" method="post" onsubmit="return confirm('Are you sure you want to change the status?');">
                   {% csrf_token %}
@@ -62,9 +50,11 @@
                 {% else %}
                     <button value="0" name = "delete_status" class="btn btn-danger">Unlist</button>
                 {% endif %}
+                
               </form>
             </td> 
-            <td><a href="{% url 'edit_product' product.pk %}"><button value="1" name = "delete_status" class="btn btn-primary">Edit</button></a></td>
+            <td><a href="{% url 'edit_product' product.pk %}"><button value="1" name = "delete_status" class="btn btn-primary">Edit</button></a>
+              <a href="{% url 'edit_product' product.pk %}"><button value="0" name = "" class="btn btn-danger">Delete</button></a></td>
               {% endfor %}
               {% endif %}
 

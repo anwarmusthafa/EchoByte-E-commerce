@@ -54,11 +54,12 @@
 
 
                         <!--====== Search Form ======-->
-                        <form class="main-form">
+                        <form class="main-form" method="post" action="{% url "all_products" %}">
+                            {% csrf_token %}
 
                             <label for="main-search"></label>
 
-                            <input class="input-text input-text--border-radius input-text--style-1" type="text" id="main-search" placeholder="Search">
+                            <input name = 'search' class="input-text input-text--border-radius input-text--style-1" type="text" id="main-search" placeholder="Search">
 
                             <button class="btn btn--icon fas fa-search main-search-button" type="submit"></button></form>
                         <!--====== End - Search Form ======-->
@@ -939,13 +940,8 @@
                                 <ul class="ah-list ah-list--design2 ah-list--link-color-secondary">
                                     <li>
 
-                                        <a href=" {% url "all_products" %}"> ALL PRODUCTS</a></li>
-                                    <li>
-
-                                        <a href="">MOBILES</a></li>
-                                    <li>
-
-                                        <a href="shop-side-version-2.html">LAPTOPS</a></li>
+                                        <a href=" {% url "all_products" %}">PRODUCTS</a></li>
+                        
                                     <li>
 
                                         <a href="{% url "about" %}">ABOUT US</a></li>

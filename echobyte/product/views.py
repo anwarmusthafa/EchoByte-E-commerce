@@ -2,11 +2,20 @@ from django.shortcuts import render,redirect,get_object_or_404
 from django.db.models import Q
 from category.models import Brand,Category
 from product.models import Product,ProductVariant, ProductImage
+from django.core.paginator import Paginator
 
 
 # Create your views here.
 def all_products(request):
     variants = ProductVariant.objects.exclude(Q(product__delete_status=0) | Q(is_listed=False))
+    if request.POST:
+        query = request.POST.get('search')
+        variants = variants.filter(Q(variant_name__icontains=query) | Q(product__description__icontains=query))
+    page = 1
+    if request.GET:
+        page = request.GET.get('page',1)
+    product_paginator = Paginator(variants,8)
+    variants = product_paginator.get_page(page)
     context = {'variants' : variants}
     return render(request, 'all_products.html', context)
 def product_detail(request, pk):
@@ -17,6 +26,11 @@ def product_detail(request, pk):
 
 def list_product(request):
     products = Product.objects.all().order_by('pk')
+    page = 1
+    if request.GET:
+        page = request.GET.get('page',1)
+    product_paginator = Paginator(products,2)
+    products = product_paginator.get_page(page)
     context = {'products':products}
     return render(request,'list_product.html', context)
 def product_delete(request,pk):

@@ -1029,27 +1029,28 @@
                                 </div>
                                 
                                 <div class="u-s-p-y-60">
-
                                     <!--====== Pagination ======-->
                                     <ul class="shop-p__pagination">
-                                        <li class="is-active">
-
-                                            <a href="shop-list-left.html">1</a></li>
-                                        <li>
-
-                                            <a href="shop-list-left.html">2</a></li>
-                                        <li>
-
-                                            <a href="shop-list-left.html">3</a></li>
-                                        <li>
-
-                                            <a href="shop-list-left.html">4</a></li>
-                                        <li>
-
-                                            <a class="fas fa-angle-right" href="shop-list-left.html"></a></li>
+                                        <!-- Previous page link -->
+                                        {% if variants.has_previous %}
+                                            <li><a href="?page={{ variants.previous_page_number }}">Previous</a></li>
+                                        {% endif %}
+                                        
+                                        <!-- Page links -->
+                                        {% for num in variants.paginator.page_range %}
+                                            <li class="{% if num == variants.number %}is-active{% endif %}">
+                                                <a href="?page={{ num }}">{{ num }}</a>
+                                            </li>
+                                        {% endfor %}
+                                        
+                                        <!-- Next page link -->
+                                        {% if variants.has_next %}
+                                            <li><a href="?page={{ variants.next_page_number }}">Next</a></li>
+                                        {% endif %}
                                     </ul>
                                     <!--====== End - Pagination ======-->
                                 </div>
+                                
                             </div>
                         </div>
                     </div>

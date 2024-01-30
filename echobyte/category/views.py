@@ -39,13 +39,22 @@ def edit_brand(request,pk):
         brand_instance.save()
         return redirect('brands')
     return render(request, 'edit_brand.html')
-def block_brand(request,pk):
+def block_category(request,pk):
     if request.POST:
-        status = request.POST.get('status')
-        brand_instance = Brand.objects.get(pk=pk)
-        brand_instance.is_listed = status
-        brand_instance.save()
-        return redirect('brands')
+        if request.POST:
+            status = request.POST.get('status')
+            category_instance = Category.objects.get(pk=pk)
+            category_instance.is_listed = status
+            category_instance.save()
+            return redirect('categories')
+        
+def block_brand(request,pk):
+        if request.POST:
+            status = request.POST.get('status')
+            brand_instance = Brand.objects.get(pk=pk)
+            brand_instance.is_listed = status
+            brand_instance.save()
+            return redirect('brands')
 
 
 

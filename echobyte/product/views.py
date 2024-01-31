@@ -7,17 +7,26 @@ from django.core.paginator import Paginator
 
 # Create your views here.
 def all_products(request):
-    variants = ProductVariant.objects.exclude(Q(product__delete_status=0) | Q(is_listed=False))
-    if request.POST:
-        query = request.POST.get('search')
-        variants = variants.filter(Q(variant_name__icontains=query) | Q(product__description__icontains=query))
-    page = 1
-    if request.GET:
-        page = request.GET.get('page',1)
-    product_paginator = Paginator(variants,8)
-    variants = product_paginator.get_page(page)
-    context = {'variants' : variants}
+    query = request.GET.get('search')
+    sort_by = request.GET.get('sort')
+    if sort_by == 'latest':
+        variants = ProductVariant.objects.exclude(Q(product__delete_status=0) | Q(is_listed=False)).order_by('-product__created_at')  # Assuming you have a 'created_at' field
+    elif sort_by == 'lowest-price':
+        variants = ProductVariant.objects.exclude(Q(product__delete_status=0) | Q(is_listed=False)).order_by('selling_price')  # Assuming you have a 'selling_price' field
+    elif sort_by == 'highest-price':
+        variants = ProductVariant.objects.exclude(Q(product__delete_status=0) | Q(is_listed=False)).order_by('-selling_price')
+    elif sort_by == 'relevance':
+        variants = ProductVariant.objects.exclude(Q(product__delete_status=0) | Q(is_listed=False)).order_by('product__priority')
+    else:
+        variants = ProductVariant.objects.exclude(Q(product__delete_status=0) | Q(is_listed=False))
+    if query:
+        variants = ProductVariant.objects.exclude(Q(product__delete_status=0) | Q(is_listed=False)).filter(Q(variant_name__icontains=query) | Q(product__description__icontains=query))    
+    paginator = Paginator(variants, 8)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    context = {'variants': page_obj, 'query': query, 'sort_by': sort_by}
     return render(request, 'all_products.html', context)
+
 def product_detail(request, pk):
     product = ProductVariant.objects.get(id = pk)
     product_images = ProductImage.objects.filter(product= product.product)

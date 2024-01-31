@@ -952,24 +952,18 @@
                                             <span class="js-shop-grid-target">Grid</span>
 
                                             <span class="js-shop-list-target is-active">List</span></div>
-                                        <form>
+                                        
                                             <div class="tool-style__form-wrap">
-                                                <div class="u-s-m-b-8"><select class="select-box select-box--transparent-b-2">
-                                                        <option>Show: 8</option>
-                                                        <option selected>Show: 12</option>
-                                                        <option>Show: 16</option>
-                                                        <option>Show: 28</option>
-                                                    </select></div>
-                                                <div class="u-s-m-b-8"><select class="select-box select-box--transparent-b-2">
-                                                        <option selected>Sort By: Newest Items</option>
-                                                        <option>Sort By: Latest Items</option>
-                                                        <option>Sort By: Best Selling</option>
-                                                        <option>Sort By: Best Rating</option>
-                                                        <option>Sort By: Lowest Price</option>
-                                                        <option>Sort By: Highest Price</option>
-                                                    </select></div>
+                                                <div class="u-s-m-b-8">
+                                                    <select class="select-box select-box--transparent-b-2" name="sort" id="sort-select">
+                                                        <option value="" {% if not request.GET.sort %}selected{% endif %}>Sort By: Relevance</option>
+                                                        <option value="latest" {% if request.GET.sort == "latest" %}selected{% endif %}>Sort By: Latest Items</option>
+                                                        <option value="lowest-price" {% if request.GET.sort == "lowest-price" %}selected{% endif %}>Sort By: Lowest Price</option>
+                                                        <option value="highest-price" {% if request.GET.sort == "highest-price" %}selected{% endif %}>Sort By: Highest Price</option>
+                                                    </select>
+                                                </div>
+                                                
                                             </div>
-                                        </form>
                                     </div>
                                 </div>
                                 <div class="shop-p__collection">
@@ -1028,28 +1022,25 @@
                                     {% endfor %}
                                 </div>
                                 
-                                <div class="u-s-p-y-60">
-                                    <!--====== Pagination ======-->
-                                    <ul class="shop-p__pagination">
-                                        <!-- Previous page link -->
-                                        {% if variants.has_previous %}
-                                            <li><a href="?page={{ variants.previous_page_number }}">Previous</a></li>
-                                        {% endif %}
-                                        
-                                        <!-- Page links -->
-                                        {% for num in variants.paginator.page_range %}
-                                            <li class="{% if num == variants.number %}is-active{% endif %}">
-                                                <a href="?page={{ num }}">{{ num }}</a>
-                                            </li>
-                                        {% endfor %}
-                                        
-                                        <!-- Next page link -->
-                                        {% if variants.has_next %}
-                                            <li><a href="?page={{ variants.next_page_number }}">Next</a></li>
-                                        {% endif %}
-                                    </ul>
-                                    <!--====== End - Pagination ======-->
-                                </div>
+                                <ul class="shop-p__pagination">
+                                    <!-- Previous page link -->
+                                    {% if variants.has_previous %}
+                                        <li><a href="?page={{ variants.previous_page_number }}{% if sort_by %}&sort={{ sort_by }}{% endif %}">Previous</a></li>
+                                    {% endif %}
+                                
+                                    <!-- Page links -->
+                                    {% for num in variants.paginator.page_range %}
+                                        <li class="{% if num == variants.number %}is-active{% endif %}">
+                                            <a href="?page={{ num }}{% if sort_by %}&sort={{ sort_by }}{% endif %}">{{ num }}</a>
+                                        </li>
+                                    {% endfor %}
+                                
+                                    <!-- Next page link -->
+                                    {% if variants.has_next %}
+                                        <li><a href="?page={{ variants.next_page_number }}{% if sort_by %}&sort={{ sort_by }}{% endif %}">Next</a></li>
+                                    {% endif %}
+                                </ul>
+                                
                                 
                             </div>
                         </div>
@@ -1059,5 +1050,14 @@
             <!--====== End - Section 1 ======-->
         </div>
         <!--====== End - App Content ======-->
+        <script>
+            document.getElementById('sort-select').addEventListener('change', function() {
+                var sortValue = this.value;
+                var currentUrl = window.location.href.split('?')[0];
+                var newUrl = currentUrl + '?sort=' + sortValue;
+                window.location.href = newUrl;
+            });
+        </script>
+        
         {% endblock content %}
 

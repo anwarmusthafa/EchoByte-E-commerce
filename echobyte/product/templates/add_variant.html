@@ -21,7 +21,7 @@
                       <label for="exampleFormControlSelect1">Product</label>
                       <select name="product" class="form-control form-control-lg" id="exampleFormControlSelect1">
                         {% for product in existing_products %}
-            <option value="{{ product.id }}">{{ product.title }}</option>
+            <option value="{{ product.id }}">{{product.brand}} {{ product.title }}</option>
                 {% endfor %}
                         </select>
                     </div>

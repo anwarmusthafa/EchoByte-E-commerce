@@ -17,13 +17,13 @@ def add_category(request):
         return redirect('categories')
     return render(request, 'add_category.html')
 def edit_category(request,pk):
+    category_instance = Category.objects.get(pk=pk)
     if request.POST:
         category = request.POST.get('category')
-        category_instance = Category.objects.get(pk=pk)
         category_instance.name = category
         category_instance.save()
         return redirect('categories')
-    return render(request, 'edit_category.html')
+    return render(request, 'edit_category.html', {'category_instance': category_instance})
 def add_brand(request):
     if request.POST:
         brand_name = request.POST.get('brand_name')
@@ -31,14 +31,13 @@ def add_brand(request):
         return redirect('brands') 
     return render(request, 'add_brand.html')
 def edit_brand(request,pk):
+    brand_instance = Brand.objects.get(pk=pk)
     if request.POST:
         brand_name = request.POST.get('brand_name')
-        print(brand_name)
-        brand_instance = Brand.objects.get(pk=pk)
         brand_instance.brand = brand_name
         brand_instance.save()
         return redirect('brands')
-    return render(request, 'edit_brand.html')
+    return render(request, 'edit_brand.html', {'brand_instance':brand_instance})
 def block_category(request,pk):
     if request.POST:
         if request.POST:

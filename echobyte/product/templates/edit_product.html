@@ -32,9 +32,9 @@
                       <label for="exampleFormControlSelect1">Category</label>
                       <select name="category" required class="form-control form-control-lg" id="exampleFormControlSelect1">
                           <option value="" disabled {% if not product.category %}selected{% endif %}>Choose...</option>
-                          {% for value, display_text in category_choices %}
-                              <option value="{{ value }}" {% if product.category == value %}selected{% endif %}>
-                                  {{ display_text }}
+                          {% for category in categories %}
+                              <option value="{{ product.category }}" {% if product.category == category %}selected{% endif %}>
+                                  {{ category }}
                               </option>
                           {% endfor %}
                       </select>

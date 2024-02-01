@@ -4,28 +4,45 @@ from category.models import Brand,Category
 from product.models import Product,ProductVariant, ProductImage
 from django.core.paginator import Paginator
 
-
 # Create your views here.
 def all_products(request):
     query = request.GET.get('search')
+    category = request.GET.get('category')  # Use getlist to get multiple selected categories
     sort_by = request.GET.get('sort')
+
+    # Base queryset
+    variants = ProductVariant.objects.exclude(product__delete_status=0, is_listed=False)
+
+    # Apply sorting
     if sort_by == 'latest':
-        variants = ProductVariant.objects.exclude(Q(product__delete_status=0) | Q(is_listed=False)).order_by('-product__created_at')  # Assuming you have a 'created_at' field
+        variants = variants.order_by('-product__created_at')
     elif sort_by == 'lowest-price':
-        variants = ProductVariant.objects.exclude(Q(product__delete_status=0) | Q(is_listed=False)).order_by('selling_price')  # Assuming you have a 'selling_price' field
+        variants = variants.order_by('selling_price')
     elif sort_by == 'highest-price':
-        variants = ProductVariant.objects.exclude(Q(product__delete_status=0) | Q(is_listed=False)).order_by('-selling_price')
+        variants = variants.order_by('-selling_price')
     elif sort_by == 'relevance':
-        variants = ProductVariant.objects.exclude(Q(product__delete_status=0) | Q(is_listed=False)).order_by('product__priority')
-    else:
-        variants = ProductVariant.objects.exclude(Q(product__delete_status=0) | Q(is_listed=False))
+        variants = variants.order_by('-product__priority')
+
+    # Apply search filter
     if query:
-        variants = ProductVariant.objects.exclude(Q(product__delete_status=0) | Q(is_listed=False)).filter(Q(variant_name__icontains=query) | Q(product__description__icontains=query))    
-    paginator = Paginator(variants, 8)
+        variants = variants.filter(Q(product__title__icontains=query) | Q(product__brand__brand__icontains=query))
+
+    # Apply category filter
+    if category:
+        variants = variants.filter(product__category__name=category)
+
+    paginator = Paginator(variants, 10)
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
-    context = {'variants': page_obj, 'query': query, 'sort_by': sort_by}
+
+    context = {
+        'variants': page_obj,
+        'query': query,
+        'sort_by': sort_by,
+        'category': category  # Pass the category to the template context
+    }
     return render(request, 'all_products.html', context)
+
 
 def product_detail(request, pk):
     product = ProductVariant.objects.get(id = pk)
@@ -38,7 +55,7 @@ def list_product(request):
     page = 1
     if request.GET:
         page = request.GET.get('page',1)
-    product_paginator = Paginator(products,2)
+    product_paginator = Paginator(products,10)
     products = product_paginator.get_page(page)
     context = {'products':products}
     return render(request,'list_product.html', context)
@@ -186,7 +203,9 @@ def edit_product(request, pk):
     # Use get_object_or_404 to handle the case where the product does not exist
     product = get_object_or_404(Product, pk=pk)
     images = ProductImage.objects.filter(product=product)
+    categories = Category.objects.filter(is_listed=True)
     existing_brands = Brand.objects.filter(is_listed=True)
+
     error_message = None
     success_message = None
 
@@ -205,12 +224,13 @@ def edit_product(request, pk):
 
             # Get Brand and ProcessorBrand instances
             brand_to_add = Brand.objects.get(pk=brand_id) if brand_id else None
+            category_to_add = Category.objects.get(name = category) if category else None
             # Update or create a new Product entry
             editing_product, created = Product.objects.update_or_create(
                 pk=pk,
                 defaults={
                     'brand': brand_to_add,
-                    'category': category,
+                    'category': category_to_add,
                     'title': title,
                     'processor': processor,
                     'display': display,
@@ -258,7 +278,8 @@ def edit_product(request, pk):
         'existing_brands': existing_brands,
         'images': images,
         'error_message': error_message,
-        'success_message': success_message
+        'success_message': success_message,
+        'categories' : categories
     }
 
     return render(request, 'edit_product.html', context)

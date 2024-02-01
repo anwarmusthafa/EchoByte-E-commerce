@@ -89,7 +89,7 @@
                                                 <!-- User is authenticated, show account and signout links -->
                                                 <li>
                                                     <a href="dashboard.html"><i class="fas fa-user-circle u-s-m-r-6"></i>
-                                                        <span>Account</span></a>
+                                                        <span>{{user.customer.name}}</span></a>
                                                 </li>
                                                 <li>
                                                     <a href="{% url 'signout' %}"><i class="fas fa-lock-open u-s-m-r-6"></i>

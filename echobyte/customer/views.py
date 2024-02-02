@@ -81,7 +81,6 @@ def signup(request):
             user1 = Customer.objects.create(user=user, name=name, phone=phone)
 
             return redirect('otp_verification',user1.id )
-            success_message = 'Registration is successful'
         except Exception as e:
             request.session['signup_last_typed_values'] = last_typed_values
             request.session['signup_error_message'] = f'Error during signup: {str(e)}'

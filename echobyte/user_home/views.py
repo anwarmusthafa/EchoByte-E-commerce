@@ -5,6 +5,7 @@ from django.views.decorators.cache import never_cache
 @never_cache
 def home(request):
     user = request.user
+    print(user)
     return render(request, 'index.html',{'user':user})
 def about(request):
     return render(request, 'about.html')

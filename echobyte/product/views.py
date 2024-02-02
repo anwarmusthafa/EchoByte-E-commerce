@@ -46,8 +46,9 @@ def all_products(request):
 
 def product_detail(request, pk):
     product = ProductVariant.objects.get(id = pk)
+    variants = product.product.variants.filter(is_listed = True).order_by('selling_price')
     product_images = ProductImage.objects.filter(product= product.product)
-    context = {'product':product, 'product_images' : product_images}
+    context = {'product':product, 'product_images' : product_images, 'variants':variants}
     return render(request, 'product-detail.html', context)
 
 def list_product(request):

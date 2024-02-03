@@ -3,52 +3,83 @@ from django.db.models import Q
 from category.models import Brand,Category
 from product.models import Product,ProductVariant, ProductImage
 from django.core.paginator import Paginator
+from django.core.exceptions import ObjectDoesNotExist
 
 # Create your views here.
 def all_products(request):
-    query = request.GET.get('search')
-    category = request.GET.get('category')  # Use getlist to get multiple selected categories
-    sort_by = request.GET.get('sort')
-
-    # Base queryset
-    variants = ProductVariant.objects.exclude(product__delete_status=0, is_listed=False)
-
-    # Apply sorting
-    if sort_by == 'latest':
-        variants = variants.order_by('-product__created_at')
-    elif sort_by == 'lowest-price':
-        variants = variants.order_by('selling_price')
-    elif sort_by == 'highest-price':
-        variants = variants.order_by('-selling_price')
-    elif sort_by == 'relevance':
-        variants = variants.order_by('-product__priority')
-
-    # Apply search filter
-    if query:
-        variants = variants.filter(Q(product__title__icontains=query) | Q(product__brand__brand__icontains=query))
-
-    # Apply category filter
-    if category:
-        variants = variants.filter(product__category__name=category)
-
-    paginator = Paginator(variants, 10)
-    page_number = request.GET.get('page', 1)
-    page_obj = paginator.get_page(page_number)
-
-    context = {
-        'variants': page_obj,
-        'query': query,
-        'sort_by': sort_by,
-        'category': category  # Pass the category to the template context
-    }
+    try:
+        # Retrieve search, category, and sort parameters from the request
+        query = request.GET.get('search')
+        category = request.GET.get('category')
+        sort_by = request.GET.get('sort')
+        # Base queryset
+        variants = ProductVariant.objects.exclude(product__delete_status=0, is_listed=False)
+        # Apply sorting
+        if sort_by == 'latest':
+            variants = variants.order_by('-product__created_at')
+        elif sort_by == 'lowest-price':
+            variants = variants.order_by('selling_price')
+        elif sort_by == 'highest-price':
+            variants = variants.order_by('-selling_price')
+        elif sort_by == 'relevance':
+            variants = variants.order_by('-product__priority')
+        # Apply search filter
+        if query:
+            variants = variants.filter(Q(product__title__icontains=query) | Q(product__brand__brand__icontains=query))
+        # Apply category filter
+        if category:
+            variants = variants.filter(product__category__name=category)
+        # Paginate the queryset
+        paginator = Paginator(variants, 10)
+        page_number = request.GET.get('page', 1)
+        page_obj = paginator.get_page(page_number)
+        context = {
+            'variants': page_obj,
+            'query': query,
+            'sort_by': sort_by,
+            'category': category
+        }
+    except ObjectDoesNotExist as e:
+        context = {
+            'error_message': f"Object does not exist: {str(e)}"
+        }
+    except Exception as e:
+        context = {
+            'error_message': f"An error occurred: {str(e)}"
+        }
     return render(request, 'all_products.html', context)
 
 
 def product_detail(request, pk):
-    product = ProductVariant.objects.get(id = pk)
-    variants = product.product.variants.filter(is_listed = True).order_by('selling_price')
-    product_images = ProductImage.objects.filter(product= product.product)
-    context = {'product':product, 'product_images' : product_images, 'variants':variants}
+    try:
+        # Retrieve the product variant with the provided primary key
+        product = get_object_or_404(ProductVariant, id=pk)
+
+        # Retrieve variants of the same product that are listed and ordered by selling price
+        variants = product.product.variants.filter(is_listed=True).order_by('selling_price')
+
+        # Retrieve product images associated with the product
+        product_images = ProductImage.objects.filter(product=product.product)
+
+        # Prepare context data to pass to the template
+        context = {
+            'product': product,
+            'product_images': product_images,
+            'variants': variants
+        }
+
+    except ObjectDoesNotExist as e:
+        # Handle the case where the object does not exist
+        context = {
+            'error_message': f"Object does not exist: {str(e)}"
+        }
+
+    except Exception as e:
+        # Handle other exceptions
+        context = {
+            'error_message': f"An error occurred: {str(e)}"
+        }
+
     return render(request, 'product-detail.html', context)
 
 def list_product(request):

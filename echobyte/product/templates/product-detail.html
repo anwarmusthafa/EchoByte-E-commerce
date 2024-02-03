@@ -174,24 +174,23 @@
                                     </ul>
                                 </div>
                                 <div class="u-s-m-b-15">
-                                    <form class="pd-detail__form" action="{% url "add_to_cart" %}" method="post" enctype="multipart/form-data">
+                                    <form class="pd-detail__form" id="myForm" action="{% url 'add_to_cart' %}" method="post" enctype="multipart/form-data">
                                         {% csrf_token %}
                                         <div class="pd-detail-inline-2">
                                             <div class="u-s-m-b-15">
-                        
-
                                                 <!--====== Input Counter ======-->
-                                    
                                                 <!--====== End - Input Counter ======-->
                                             </div>
                                             <div class="u-s-m-b-15">
                                                 <input class="" type="number" value="1" min="1" max="10">
-                                                <input type="hidden" name="product-id" value="{{product.pk}}" id="">
-                                                <button class="btn btn--e-brand-b-2" type="submit">Add to Cart</button></div> 
-
+                                                <input type="hidden" name="product-id" value="{{ product.pk }}" id="">
+                                                <button class="btn btn--e-brand-b-2" type="submit">Add to Cart</button>
+                                            </div>
                                         </div>
                                     </form>
                                 </div>
+                                <div id="message" style="display: none; color: #ffffff; font-size: 18px; font-family: Arial, sans-serif; padding: 10px; margin-top: 10px; background-color: #4CAF50; border-radius: 5px; text-align: center;">Item added to cart</div>
+
                                 <div class="u-s-m-b-15">
 
                                     <span class="pd-detail__label u-s-m-b-8">Product Policy:</span>
@@ -877,6 +876,21 @@
             <!--====== End - Section 1 ======-->
         </div>
         <!--====== End - App Content ======-->
+        <script>
+        document.getElementById("myForm").addEventListener("submit", function(event) {
+            // Display the popup message after the form submission
+            var popup = document.getElementById("message");
+            popup.style.display = "block";
+        
+            // Hide the popup message after 2 seconds
+            setTimeout(function() {
+                popup.style.display = "none";
+            }, 2000);
+        
+            // Allow the form to submit after displaying the popup
+            return true;
+        });
+    </script>
         
         {% endblock %}
 

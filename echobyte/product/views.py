@@ -52,14 +52,15 @@ def all_products(request):
 
 
 def product_detail(request, pk):
-    user = request.user
     cart_item = None
-    
     try:
         # Retrieve the product variant with the provided primary key
         product = get_object_or_404(ProductVariant, id=pk)
-        if user:
-            cart_item = CartItems.objects.filter(cart__owner=user,product = product )
+
+        # Check if there is a logged-in user
+        if request.user.is_authenticated:
+            # Retrieve cart item if user is logged in
+            cart_item = CartItems.objects.filter(cart__owner=request.user, product=product)
 
         # Retrieve variants of the same product that are listed and ordered by selling price
         variants = product.product.variants.filter(is_listed=True).order_by('selling_price')
@@ -72,7 +73,7 @@ def product_detail(request, pk):
             'product': product,
             'product_images': product_images,
             'variants': variants,
-            'cart_item': cart_item
+            'cart_item': cart_item,
         }
 
     except ObjectDoesNotExist as e:
@@ -88,6 +89,7 @@ def product_detail(request, pk):
         }
 
     return render(request, 'product-detail.html', context)
+
 
 def list_product(request):
     products = Product.objects.all().order_by('pk')

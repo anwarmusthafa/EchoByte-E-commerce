@@ -174,26 +174,25 @@
                                     </ul>
                                 </div>
                                 <div class="u-s-m-b-15">
-                                    {% if cart_item %}
-                                                <a href="{% url "cart" %}"> <button class="btn btn--e-brand-b-2" type="">Go to Cart</button> </a>
-                                                {% else %}
-                                    <form class="pd-detail__form" id="myForm" action="{% url 'add_to_cart' %}" method="post" enctype="multipart/form-data">
+                                    
+                                    <form class="pd-detail__form" id="myForm" enctype="multipart/form-data">
+                                        {% if cart_item %}
+                                    <a href="{% url "cart" %}" class="btn btn--e-brand-b-2" id="">Go to Cart</a>
+                                    {% else %}
                                         {% csrf_token %}
                                         <div class="pd-detail-inline-2">
                                             <div class="u-s-m-b-15">
-                                                <!--====== Input Counter ======-->
-                                                <!--====== End - Input Counter ======-->
+                                                <input class="" name="quantity" type="number" value="1" min="1" max="10">
+                                                <input type="hidden" name="product-id" value="{{ product.pk }}" id="product-id">
                                             </div>
                                             <div class="u-s-m-b-15">
-                                                
-                                                <input class="" name="quantity" type="number" value="1" min="1" max="10">
-                                                <input type="hidden" name="product-id" value="{{ product.pk }}" id="">
-                                                <button class="btn btn--e-brand-b-2" type="submit">Add to Cart</button>
-                                                {% endif %}
+                                                <a href="#" class="btn btn--e-brand-b-2" id="addToCartBtn">Add to Cart</a>
                                             </div>
                                         </div>
                                     </form>
+                                    {% endif %}
                                 </div>
+                                
                                
                                 
 
@@ -882,6 +881,36 @@
             <!--====== End - Section 1 ======-->
         </div>
         <!--====== End - App Content ======-->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    
+        jQuery.noConflict();
+        jQuery(document).ready(function($) {
+            $('#addToCartBtn').click(function(e) {
+                e.preventDefault();
+                var formData = new FormData($('#myForm')[0]);
+                $.ajax({
+                    type: 'POST',
+                    url: '{% url "add_to_cart" %}',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        // Handle the response here
+                        window.location.href = '{% url "cart" %}';
+                        // You can update the page content or perform any other action
+                    },
+                    error: function(xhr, status, error) {
+                        // Handle errors here
+                        console.error(xhr.responseText);
+                    }
+                });
+            });
+        });
+</script>
+
      
             
         

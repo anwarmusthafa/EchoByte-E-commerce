@@ -3,6 +3,7 @@ from .models import Cart,CartItems
 from product.models import Product, ProductVariant, ProductImage
 from decimal import Decimal
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import JsonResponse
 
 # Create your views here.
 
@@ -16,19 +17,26 @@ def cart(request):
     return render(request, 'cart.html', context)
 from django.shortcuts import redirect
 
+
+
 def add_to_cart(request):
-    if request.POST:
+    
+    if request.method == 'POST':
         user = request.user
+        print(user)
         customer = user
-        quantity = request.POST.get('quantity') 
-        product_id = request.POST.get('product-id')
+        quantity = request.POST.get('quantity',1) 
+        product_id = int(request.POST.get('product-id'))
+        print(product_id)
         product = ProductVariant.objects.get(pk=product_id)
         print(quantity)
         cart_obj, created = Cart.objects.get_or_create(owner=customer, is_order_placed=False)
-        cart_item = CartItems.objects.create(product=product, cart=cart_obj, quantity=1, total_price=1)
-        success_message = True
-    context = {'success_message': success_message } 
-    return redirect(request.META.get('HTTP_REFERER', 'cart'), context)
+        cart_item = CartItems.objects.create(product=product, cart=cart_obj, quantity=quantity, total_price=product.selling_price * int(quantity))
+        success_message = 'Product added to cart successfully.'
+        return JsonResponse({'success_message': success_message})
+    else:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+
 
         
 

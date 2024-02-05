@@ -26,7 +26,9 @@ def add_to_cart(request):
         print(quantity)
         cart_obj, created = Cart.objects.get_or_create(owner=customer, is_order_placed=False)
         cart_item = CartItems.objects.create(product=product, cart=cart_obj, quantity=1, total_price=1)
-    return redirect(request.META.get('HTTP_REFERER', 'cart'))
+        success_message = True
+    context = {'success_message': success_message } 
+    return redirect(request.META.get('HTTP_REFERER', 'cart'), context)
 
         
 

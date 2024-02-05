@@ -4,6 +4,7 @@ from category.models import Brand,Category
 from product.models import Product,ProductVariant, ProductImage
 from django.core.paginator import Paginator
 from django.core.exceptions import ObjectDoesNotExist
+from order.models import CartItems, Cart
 
 # Create your views here.
 def all_products(request):
@@ -51,9 +52,14 @@ def all_products(request):
 
 
 def product_detail(request, pk):
+    user = request.user
+    cart_item = None
+    
     try:
         # Retrieve the product variant with the provided primary key
         product = get_object_or_404(ProductVariant, id=pk)
+        if user:
+            cart_item = CartItems.objects.filter(cart__owner=user,product = product )
 
         # Retrieve variants of the same product that are listed and ordered by selling price
         variants = product.product.variants.filter(is_listed=True).order_by('selling_price')
@@ -65,7 +71,8 @@ def product_detail(request, pk):
         context = {
             'product': product,
             'product_images': product_images,
-            'variants': variants
+            'variants': variants,
+            'cart_item': cart_item
         }
 
     except ObjectDoesNotExist as e:

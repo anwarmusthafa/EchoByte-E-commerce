@@ -173,25 +173,26 @@
                                             <a class="s-gplus--color-hover" href="#"><i class="fab fa-google-plus-g"></i></a></li>
                                     </ul>
                                 </div>
-                                <div class="u-s-m-b-15">
-                                    
-                                    <form class="pd-detail__form" id="myForm" enctype="multipart/form-data">
-                                        {% if cart_item %}
-                                    <a href="{% url "cart" %}" class="btn btn--e-brand-b-2" id="">Go to Cart</a>
-                                    {% else %}
-                                        {% csrf_token %}
-                                        <div class="pd-detail-inline-2">
-                                            <div class="u-s-m-b-15">
-                                                <input class="" name="quantity" type="number" value="1" min="1" max="10">
-                                                <input type="hidden" name="product-id" value="{{ product.pk }}" id="product-id">
-                                            </div>
-                                            <div class="u-s-m-b-15">
-                                                <a href="#" class="btn btn--e-brand-b-2" id="addToCartBtn">Add to Cart</a>
-                                            </div>
-                                        </div>
-                                    </form>
-                                    {% endif %}
-                                </div>
+    <div class="u-s-m-b-15">
+    <form class="pd-detail__form" id="myForm" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% if cart_item %}
+            <a href="{% url 'cart' %}" class="btn btn--e-brand-b-2">Go to Cart</a>
+        {% else %}
+            <div class="pd-detail-inline-2">
+                <div class="u-s-m-b-15">
+                    <input id="quantity" class="" name="quantity" type="number" value="1" min="1" max="10">
+                    <input type="hidden" name="product-id" value="{{ product.pk }}" id="product-id">
+                </div>
+                <div class="u-s-m-b-15">
+                    <a href="#" class="btn btn--e-brand-b-2" id="addToCartBtn">Add to Cart</a>
+                   
+                </div>
+            </div>
+        {% endif %}
+    </form>
+</div>
+
                                 
                                
                                 
@@ -899,7 +900,7 @@
                     contentType: false,
                     success: function(response) {
                         // Handle the response here
-                        window.location.href = '{% url "cart" %}';
+                        window.location.reload();
                         // You can update the page content or perform any other action
                     },
                     error: function(xhr, status, error) {

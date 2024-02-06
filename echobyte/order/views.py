@@ -1,6 +1,7 @@
-from django.shortcuts import render , redirect
+from django.shortcuts import render , redirect, get_object_or_404
 from .models import Cart,CartItems 
 from product.models import Product, ProductVariant, ProductImage
+from .models import Cart,CartItems
 from decimal import Decimal
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
@@ -23,19 +24,23 @@ def add_to_cart(request):
     
     if request.method == 'POST':
         user = request.user
-        print(user)
         customer = user
-        quantity = request.POST.get('quantity',1) 
+        quantity = int(request.POST.get('quantity',1) )
         product_id = int(request.POST.get('product-id'))
-        print(product_id)
         product = ProductVariant.objects.get(pk=product_id)
         print(quantity)
-        cart_obj, created = Cart.objects.get_or_create(owner=customer, is_order_placed=False)
-        cart_item = CartItems.objects.create(product=product, cart=cart_obj, quantity=quantity, total_price=product.selling_price * int(quantity))
+        cart_obj, created = Cart.objects.get_or_create(owner=customer)
+        cart_item = CartItems.objects.create(product=product, cart=cart_obj, quantity=quantity, total_price=product.selling_price * quantity)
         success_message = 'Product added to cart successfully.'
         return JsonResponse({'success_message': success_message})
     else:
         return JsonResponse({'error': 'Invalid request'}, status=400)
+def delete_cart_item(request,pk):
+    cart_item = get_object_or_404(CartItems, pk=pk)
+    cart_item.delete()
+    return redirect('cart')
+
+
 
 
         

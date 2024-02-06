@@ -4,9 +4,8 @@ from product.models import Product, ProductVariant
 
 # Create your models here.
 class Cart(models.Model):
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    owner = models.OneToOneField(User,on_delete=models.CASCADE)
     sub_total = models.FloatField(default = 0)
-    is_order_placed = models.BooleanField(default = False)
     def __str__(self):
             return self.owner.customer.name +"'s Cart"
     

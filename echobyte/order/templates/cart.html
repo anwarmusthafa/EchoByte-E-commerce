@@ -103,17 +103,24 @@
 
                                                 <td>
                                                     <div class="table-p__input-counter-wrap">
-
                                                         <!--====== Input Counter ======-->
                                                         <div class="input-counter">
-
-                                                            <a href="{% url "sub_cart_item_quantity" cart_item.pk %}"><span class="input-counter__minus fas fa-minus"></span></a>
-
-                                                            <input class="input-counter__text input-counter--text-primary-style" type="text" value="{{cart_item.quantity}}" data-min="1" data-max="{% if cart_item.product.stock > 10 %}10 {% else %}{{cart_item.product.stock}}{% endif %}">
-
-                                                            <a href="{% url "add_cart_item_quantity" cart_item.pk %}"><span class="input-counter__plus fas fa-plus"></span></div></a>
+                                                            <a href="{% url "sub_cart_item_quantity" cart_item.pk %}">
+                                                                <span class="input-counter__minus fas fa-minus"></span>
+                                                            </a>
+                                                            <input class="input-counter__text input-counter--text-primary-style" 
+                                                                   type="text" 
+                                                                   value="{{cart_item.quantity}}" 
+                                                                   data-min="1" 
+                                                                   data-max="{% if cart_item.product.stock > 10 %}10 {% else %}{{cart_item.product.stock}}{% endif %}"
+                                                                   readonly>
+                                                            <a href="{% url "add_cart_item_quantity" cart_item.pk %}">
+                                                                <span class="input-counter__plus fas fa-plus"></span>
+                                                            </a>
+                                                        </div>
                                                         <!--====== End - Input Counter ======-->
                                                     </div>
+                                                    
                                                 </td>
                                                 <td>
                                                     <div class="table-p__del-wrap">
@@ -122,14 +129,25 @@
                                                             
                                                         </a>
                                                     </div>
+                                                    
                                                 </td>
+                    
+
                                             </tr>
+                                            
                                             {% endfor %}
                                         
                             
                                             <!--====== End - Row ======-->
-                                            
                                         </tbody>
+                                        {% if messages %}
+    <ul class="messages text-danger text-center">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
                                     </table>
                                   
                                 </div>
@@ -199,8 +217,5 @@
           <h1 class='text-danger text-center mb-2'>Your cart is empty.</h1>
         {% endif %}
         <!--====== End - App Content ======-->
-        <script>
-            
-        </script>
         {% endblock %}
 

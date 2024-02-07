@@ -5,13 +5,15 @@ from .models import Cart,CartItems
 from decimal import Decimal
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
+from django.contrib import messages
+
 
 # Create your views here.
 
 def cart(request):
     user = request.user
     try:
-        cart_items = CartItems.objects.filter(cart__owner=user)
+        cart_items = CartItems.objects.filter(cart__owner=user).order_by('-created_at')
         cart = Cart.objects.get(owner=user)
         context = {'cart_items': cart_items,'cart':cart}
     except ObjectDoesNotExist:
@@ -37,15 +39,19 @@ def delete_cart_item(request,pk):
     return redirect('cart')
 def add_cart_item_quantity(request,pk):
     cart_item = CartItems.objects.get(pk=pk)
-    print(cart_item.quantity)
-    cart_item.quantity += 1
-    cart_item.save()
+    if cart_item.quantity >= 4:
+        messages.error(request, "Only 4 item can buy one order")
+    else: 
+        cart_item.quantity += 1
+        cart_item.save()
     return redirect('cart')
-def sub_cart_item_quantity(request,pk):
+def sub_cart_item_quantity(request, pk):
     cart_item = CartItems.objects.get(pk=pk)
-    print(cart_item.quantity)
-    cart_item.quantity -= 1
-    cart_item.save()
+    if cart_item.quantity <= 1:
+        messages.error(request, "At least one item is needed in the order.")
+    else:
+        cart_item.quantity -= 1
+        cart_item.save()
     return redirect('cart')
 
 

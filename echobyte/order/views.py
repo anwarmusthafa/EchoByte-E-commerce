@@ -12,23 +12,20 @@ def cart(request):
     user = request.user
     try:
         cart_items = CartItems.objects.filter(cart__owner=user)
-        context = {'cart_items': cart_items}
+        cart = Cart.objects.get(owner=user)
+        sub_total = cart.sub_total
+        context = {'cart_items': cart_items,'sub_total':sub_total , 'cart':cart}
     except ObjectDoesNotExist:
-        context = {'cart_items': None}  # Setting cart_items to None when cart is empty
+        context = {'cart_items': None} 
     return render(request, 'cart.html', context)
-from django.shortcuts import redirect
-
-
 
 def add_to_cart(request):
-    
     if request.method == 'POST':
         user = request.user
         customer = user
         quantity = int(request.POST.get('quantity',1) )
         product_id = int(request.POST.get('product-id'))
         product = ProductVariant.objects.get(pk=product_id)
-        print(quantity)
         cart_obj, created = Cart.objects.get_or_create(owner=customer)
         cart_item = CartItems.objects.create(product=product, cart=cart_obj, quantity=quantity, total_price=product.selling_price * quantity)
         success_message = 'Product added to cart successfully.'
@@ -38,6 +35,12 @@ def add_to_cart(request):
 def delete_cart_item(request,pk):
     cart_item = get_object_or_404(CartItems, pk=pk)
     cart_item.delete()
+    return redirect('cart')
+def add_cart_item_quantity(request,pk):
+    cart_item = CartItems.objects.get(pk=pk)
+    print(cart_item.quantity)
+    cart_item.quantity += 1
+    cart_item.save()
     return redirect('cart')
 
 

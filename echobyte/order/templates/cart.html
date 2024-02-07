@@ -55,8 +55,8 @@
                 <!--====== Section Content ======-->
                 <div class="section__content">
                     <div class="container">
-                        <div class="row">
-                            <div class="col-lg-12 col-md-12 col-sm-12 u-s-m-b-30">
+                        <div class="row" style="display:flex">
+                            <div class="col-lg-8 col-md-8 col-sm-8 u-s-m-b-30">
                                 <div class="table-responsive">
                                     <table class="table-p">
                                         <tbody>
@@ -102,24 +102,59 @@
 
                                                             <span class="input-counter__minus fas fa-minus"></span>
 
-                                                            <input class="input-counter__text input-counter--text-primary-style" type="text" value="{{cart_item.quantity}}" data-min="1" data-max="1000">
+                                                            <input class="input-counter__text input-counter--text-primary-style" type="text" value="{{cart_item.quantity}}" data-min="1" data-max="{% if cart_item.product.stock > 10 %}10 {% else %}{{cart_item.product.stock}}{% endif %}">
 
-                                                            <span class="input-counter__plus fas fa-plus"></span></div>
+                                                            <a href="{% url "add_cart_item_quantity" cart_item.pk %}"><span class="input-counter__plus fas fa-plus"></span></div></a>
                                                         <!--====== End - Input Counter ======-->
                                                     </div>
                                                 </td>
                                                 <td>
                                                     <div class="table-p__del-wrap">
-
-                                                        <a class="far fa-trash-alt table-p__delete-link" href="{% url 'delete_cart_item' cart_item.pk %}"></a></div>
+                                                        <a class="far fa-trash-alt table-p__delete-link" href="{% url 'delete_cart_item' cart_item.pk %}"
+                                                           onclick="return confirmDeleteCartItem(this);">
+                                                            
+                                                        </a>
+                                                    </div>
                                                 </td>
                                             </tr>
                                             {% endfor %}
                                         
                             
                                             <!--====== End - Row ======-->
+                                            
                                         </tbody>
                                     </table>
+                                  
+                                </div>
+                                
+                            </div>
+                            <div class="col-lg-4 col-md-6 u-s-m-b-30">
+                                <div class="f-cart__pad-box">
+                                    <div class="u-s-m-b-30">
+                                        <table class="f-cart__table">
+                                            <tbody>
+                                                <tr>
+                                                    <td>SHIPPING</td>
+                                                    <td>₹0.00</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>TAX</td>
+                                                    <td>₹0.00</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>SUBTOTAL</td>
+                                                    <td>₹{{sub_total}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>GRAND TOTAL</td>
+                                                    <td>₹{{ sub_total }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div>
+
+                                        <button class="btn btn--e-brand-b-2" type="submit"> PROCEED TO CHECKOUT</button></div>
                                 </div>
                             </div>
                         </div>
@@ -142,35 +177,7 @@
                                     <div class="row">
                                         
                                         
-                                        <div class="col-lg-4 col-md-6 u-s-m-b-30">
-                                            <div class="f-cart__pad-box">
-                                                <div class="u-s-m-b-30">
-                                                    <table class="f-cart__table">
-                                                        <tbody>
-                                                            <tr>
-                                                                <td>SHIPPING</td>
-                                                                <td>$4.00</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>TAX</td>
-                                                                <td>$0.00</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>SUBTOTAL</td>
-                                                                <td>$379.00</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>GRAND TOTAL</td>
-                                                                <td>$379.00</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                                <div>
-
-                                                    <button class="btn btn--e-brand-b-2" type="submit"> PROCEED TO CHECKOUT</button></div>
-                                            </div>
-                                        </div>
+                                        
                                     </div>
                                 </form>
                             </div>
@@ -185,5 +192,8 @@
           <h1 class='text-danger text-center mb-2'>Your cart is empty.</h1>
         {% endif %}
         <!--====== End - App Content ======-->
+        <script>
+            
+        </script>
         {% endblock %}
 

@@ -476,7 +476,8 @@
                                     <!-- Page links -->
                                     {% for num in variants.paginator.page_range %}
                                         <li class="{% if num == variants.number %}is-active{% endif %}">
-                                            <a href="?page={{ num }}{% if sort_by %}&sort={{ sort_by }}{% endif %}">{{ num }}</a>
+                                            <a href="?page={{ num }}{% if sort_by %}&sort={{ sort_by }}{% endif %}{% if query %}&query={{ query }}{% endif %}">{{ num }}</a>
+
                                         </li>
                                     {% endfor %}
                                 

@@ -151,4 +151,9 @@ def edit_profile(request):
         return redirect('profile')
     context = {'customer':customer} 
     return render(request, 'edit-profile.html', context)
+def address(request):
+    return render(request, 'address.html')
+def add_address(request):
+    return render(request, 'add-address.html')
+
 

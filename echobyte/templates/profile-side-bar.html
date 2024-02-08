@@ -9,10 +9,10 @@
                                             <ul class="dash__f-list">
                                                 <li>
 
-                                                    <a class="dash-active" href="dash-my-profile.html">My Profile</a></li>
+                                                    <a class="{% if request.path == '/profile/' %}dash-active{% endif %}" href="{% url "profile" %}">My Profile</a></li>
                                                 <li>
 
-                                                    <a href="dash-address-book.html">Address</a></li>
+                                                    <a class="{% if request.path == '/address/' %}dash-active{% endif %}" href="{% url "address" %}">Address</a></li>
                                                 
                                                 <li>
 

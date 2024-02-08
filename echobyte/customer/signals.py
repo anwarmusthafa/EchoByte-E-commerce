@@ -8,15 +8,10 @@ import random
 
 def genotp():
     return str(random.randint(1000,9999))
-
-
 @receiver(post_save, sender = Customer)
 def send_otp_signal(sender, instance,created, **kwargs):
-
     if created and instance.is_verified == False:
-        send_otp(instance)    
-        
-        
+        send_otp(instance)          
 def send_otp(user):
         otp1 = genotp()
         print(otp1)

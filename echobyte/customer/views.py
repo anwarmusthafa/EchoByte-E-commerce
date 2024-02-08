@@ -131,3 +131,11 @@ def otp_verification(request, pk):
         print(e)
     context={ 'pk':pk,'success_message' : success_message}
     return render(request, 'otp_verification.html', context)
+def profile(request):
+    user = request.user
+    customer = Customer.objects.get(user__username = user)
+    context = {'customer':customer}
+    return render(request,'profile.html', context)
+def edit_profile(request):
+    return render(request, 'edit-profile.html')
+

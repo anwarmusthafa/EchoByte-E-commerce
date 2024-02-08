@@ -181,7 +181,7 @@
         {% else %}
             <div class="pd-detail-inline-2">
                 <div class="u-s-m-b-15">
-                    <input id="quantity" name="quantity" type="number" value="1" min="1" max="{% if product.stock > 10 %}10{% else %}{{ product.stock }}{% endif %}">
+                    <input id="quantity" name="quantity" type="hidden" value="1" min="1" max="{% if product.stock > 10 %}10{% else %}{{ product.stock }}{% endif %}">
 
                     <input type="hidden" name="product-id" value="{{ product.pk }}" id="product-id">
                 </div>
@@ -886,32 +886,37 @@
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<script>
-    
-        jQuery.noConflict();
-        jQuery(document).ready(function($) {
-            $('#addToCartBtn').click(function(e) {
-                e.preventDefault();
-                var formData = new FormData($('#myForm')[0]);
-                $.ajax({
-                    type: 'POST',
-                    url: '{% url "add_to_cart" %}',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        // Handle the response here
-                        window.location.reload();
-                        // You can update the page content or perform any other action
-                    },
-                    error: function(xhr, status, error) {
-                        // Handle errors here
-                        console.error(xhr.responseText);
-                    }
+        <script>
+            jQuery.noConflict();
+            jQuery(document).ready(function($) {
+                $('#addToCartBtn').click(function(e) {
+                    e.preventDefault();
+                    var formData = new FormData($('#myForm')[0]);
+                    $.ajax({
+                        type: 'POST',
+                        url: '{% url "add_to_cart" %}',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            // Check if the response contains a redirect URL
+                            if (response.redirect_url) {
+                                // Redirect to the signin page
+                                window.location.href = response.redirect_url;
+                            } else {
+                                // Handle success response (if needed)
+                                window.location.reload();
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            // Handle errors here
+                            console.error(xhr.responseText);
+                        }
+                    });
                 });
             });
-        });
-</script>
+        </script>
+        
 
      
             

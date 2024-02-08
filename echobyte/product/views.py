@@ -14,7 +14,12 @@ def all_products(request):
         category = request.GET.get('category')
         sort_by = request.GET.get('sort')
         # Base queryset
-        variants = ProductVariant.objects.exclude(product__delete_status=0, is_listed=False)
+        variants = ProductVariant.objects.exclude(
+    Q(product__delete_status=0) |
+    Q(product__is_listed=False) |
+    Q(product__category__is_listed=False) |
+    Q(is_listed=False)
+)
         # Apply sorting
         if sort_by == 'latest':
             variants = variants.order_by('-product__created_at')
@@ -31,7 +36,7 @@ def all_products(request):
         if category:
             variants = variants.filter(product__category__name=category)
         # Paginate the queryset
-        paginator = Paginator(variants, 10)
+        paginator = Paginator(variants, 4)
         page_number = request.GET.get('page', 1)
         page_obj = paginator.get_page(page_number)
         context = {

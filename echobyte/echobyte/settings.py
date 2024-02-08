@@ -78,6 +78,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'echobyte.wsgi.application'
+LOGIN_URL = 'signin'
 
 
 # Database

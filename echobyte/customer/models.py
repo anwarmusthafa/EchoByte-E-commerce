@@ -13,6 +13,9 @@ class Customer(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     otp = models.IntegerField(null = True, blank = True)
     is_verified = models.BooleanField(default = False)
+    def __str__(self):
+        return self.name
+    
 
 class Address(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='addresses', null = True)  # Added related_name
@@ -20,7 +23,9 @@ class Address(models.Model):
     phone = models.CharField(max_length=50)
     address = models.TextField()
     pincode = models.PositiveIntegerField()
-    landmark = models.CharField(max_length=50, blank=True, null=True)
     city = models.CharField(max_length=50)
     state = models.CharField(max_length=50)
-    country = models.CharField(max_length=50)
+    def __str__(self):
+        return self.user.username+ "'s address"
+    
+    

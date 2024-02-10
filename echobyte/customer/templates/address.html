@@ -75,29 +75,23 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
+                                                    {% for address in address %}
                                                     <tr>
                                                         <td>
 
                                                             <a class="address-book-edit btn--e-transparent-platinum-b-2" href="dash-address-edit.html">Edit</a></td>
-                                                        <td>John Doe</td>
-                                                        <td>4247 Ashford Drive Virginia VA-20006 USA</td>
-                                                        <td>Virginia VA-20006 USA</td>
-                                                        <td>(+0) 900901904</td>
-                                                        <td>
+                                                        <td>{{address.name}}</td>
+                                                        <td>{{address.address}}
+                                                        </td>
+                                                        <td>{{address.state}}</td>
+                                                        <td>{{address.phone}}</td>
+                                                        {% comment %} <td>
                                                             <div class="gl-text">Default Shipping Address</div>
                                                             <div class="gl-text">Default Billing Address</div>
-                                                        </td>
+                                                        </td> {% endcomment %}
                                                     </tr>
-                                                    <tr>
-                                                        <td>
-
-                                                            <a class="address-book-edit btn--e-transparent-platinum-b-2" href="dash-address-edit.html">Edit</a></td>
-                                                        <td>Doe John</td>
-                                                        <td>1484 Abner Road</td>
-                                                        <td>Eau Claire WI - Wisconsin</td>
-                                                        <td>(+0) 7154419563</td>
-                                                        <td></td>
-                                                    </tr>
+                                                    {% endfor %}
+                                                    
                                                 </tbody>
                                             </table>
                                         </div>

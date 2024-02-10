@@ -1,6 +1,7 @@
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Cart,CartItems 
+from customer.models import Address, Customer
 from product.models import Product, ProductVariant, ProductImage
 from .models import Cart,CartItems
 from decimal import Decimal
@@ -64,6 +65,14 @@ def sub_cart_item_quantity(request, pk):
             cart_item.quantity -= 1
             cart_item.save()
         return redirect('cart')
+def checkout(request):
+    user = request.user
+    cart = Cart.objects.get(owner = user)
+    cart_items = CartItems.objects.filter(cart__owner=user).order_by('-created_at')
+    address = Address.objects.filter(user = user)
+    context = {'cart':cart, 'cart_items':cart_items, 'address':address}
+    
+    return render(request, 'checkout.html', context) 
 
 
 

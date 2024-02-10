@@ -3,12 +3,13 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.models import User
-from .models import Customer
+from .models import Customer, Address
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect
 from django.conf import settings
 from .signals import send_otp
+from django.http import HttpResponseServerError
 
 @never_cache
 def signin(request):
@@ -144,7 +145,6 @@ def edit_profile(request):
     if request.POST:
         name = request.POST.get('name')
         phone = request.POST.get('phone')
-        print(name)
         customer.name = name
         customer.phone = phone
         customer.save()
@@ -152,8 +152,41 @@ def edit_profile(request):
     context = {'customer':customer} 
     return render(request, 'edit-profile.html', context)
 def address(request):
-    return render(request, 'address.html')
+    address = Address.objects.filter(user = request.user)
+    context = {'address':address}
+    return render(request, 'address.html', context )
 def add_address(request):
-    return render(request, 'add-address.html')
+    if request.POST:
+        try:
+            user = request.user  # Directly assign the user object
+            name = request.POST.get('name')
+            phone = request.POST.get('phone')
+            address = request.POST.get('address')
+            state = request.POST.get('state')
+            city = request.POST.get('town')
+            pincode = request.POST.get('pincode')
 
+            # Wrap database operation in a try-except block
+            try:
+                address_obj = Address.objects.create(
+                    user=user,
+                    name=name,
+                    phone=phone,
+                    address=address,
+                    pincode=pincode,
+                    city=city,
+                    state=state
+                )
+                return redirect('address')
+            except Exception as e:
+                # Log the error or handle it as per your application's needs
+                return HttpResponseServerError("Failed to create address: {}".format(str(e)))
+            
+            # Optionally, you could redirect to a success page or return a success message
+            return render(request, 'add-address-success.html')
+        except Exception as e:
+            # Log the error or handle it as per your application's needs
+            return HttpResponseServerError("An error occurred: {}".format(str(e)))
+
+    return render(request, 'add-address.html')
 

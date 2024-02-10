@@ -1,0 +1,165 @@
+{% load each_cart_item_price %}
+{% load sub_total_of_cart %}
+<!DOCTYPE html><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout Page</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .card-header {
+      background-color: #007bff;
+      color: white;
+    }
+    .card {
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+    }
+    .btn-primary {
+      background-color: #007bff;
+      border-color: #007bff;
+    }
+    .btn-primary:hover {
+      background-color: #0056b3;
+      border-color: #0056b3;
+    }
+    .btn-success {
+      background-color: #28a745;
+      border-color: #28a745;
+    }
+    .btn-success:hover {
+      background-color: #218838;
+      border-color: #218838;
+    }
+    .address-box {
+      border: 1px solid #dee2e6;
+      border-radius: 5px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    .product-img {
+      max-width: 80px;
+      max-height: 80px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container mt-5">
+    <h2 class="text-center mb-4">Checkout</h2>
+    <!-- Address Section -->
+    <div class="row">
+
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header">
+            Select Address
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <!-- Address  -->
+              {% for address in address %}
+              <div class="col-md-6">
+                <div class="">
+                  <input type="radio" value="{{ address.pk }}" id="add{{ address.pk }}" name="address">
+                  <label class="" for="add{{ address.pk }}">
+                    <div class="address-box">
+                      <p>{{ address.name }}, {{ address.phone }}, {{ address.address }}, {{ address.city }}, {{ address.pincode }}, {{ address.state }}</p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            <!-- Add more address options as needed -->
+            <button class="btn btn-primary btn-block mt-3">Add New Address</button>
+          </div>
+        </div>
+      </div>
+      <!-- Coupon Section -->
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header">
+            Apply Coupon
+          </div>
+          <div class="card-body">
+            <div class="input-group mb-3">
+              <input type="text" class="form-control" placeholder="Enter coupon code">
+              <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button">Apply</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Product Information Section -->
+    <div class="card mb-4">
+      <div class="card-header">
+        Product Information
+      </div>
+      <div class="card-body" id="product-info">
+        {% for cart_item in  cart_items %}
+        <!-- Product 1 -->
+        <div class="row mb-2">
+          <div class="col-md-2">
+            <img src="{{ cart_item.product.product.images.first.image.url }}" alt="Product Image" class="img-fluid product-img">
+          </div>
+          <div class="col-md-4">
+            <p>{{cart_item.product.product.brand}} {{cart_item.product.product.title}} {{cart_item.product.variant_name}}</p> <!-- Product Name -->
+          </div>
+          <div class="col-md-2">
+            <p> {% with total_price=cart_item.product.selling_price|each_cart_item_price:cart_item.quantity %}
+              {{ total_price }}
+            {% endwith %}</p> <!-- Product Price -->
+          </div>
+          <div class="col-md-2">
+            <p>{{cart_item.quantity}}</p> <!-- Product Quantity -->
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <!-- Payment Section -->
+    <div class="row">
+      <div class="col-md-6 offset-md-3">
+        <div class="card">
+          <div class="card-header">
+            Payment Options
+          </div>
+          <div class="card-body">
+            <!-- Total Price -->
+            <p>Total: <span id="total-price">₹{{ cart|sub_total_of_cart }}</span></p>
+            <!-- Cash on Delivery Option -->
+            <div class="custom-control custom-radio mb-3">
+              <input type="radio" id="cashOnDelivery" name="paymentOption" class="custom-control-input" checked>
+              <label class="custom-control-label" for="cashOnDelivery">Cash on Delivery</label>
+            </div>
+            <!-- Razorpay Option (Placeholder) -->
+            <div class="custom-control custom-radio">
+              <input type="radio" id="razorpay" name="paymentOption" class="custom-control-input">
+              <label class="custom-control-label" for="razorpay">Razorpay</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Proceed to Checkout Button -->
+    <div class="row mt-4">
+      <div class="col-md-6 offset-md-3">
+        <button class="btn btn-success btn-block">Place Order</button>
+      </div>
+    </div>
+  </div>
+  <!-- Bootstrap JS -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <!-- Your custom JavaScript can go here -->
+</body>
+</html>

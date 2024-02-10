@@ -67,11 +67,15 @@ def sub_cart_item_quantity(request, pk):
         return redirect('cart')
 def checkout(request):
     user = request.user
+    if request.POST:
+        address = request.POST.get('address')
+        amount =  request.POST.get('amount')
+        payment_methoid = request.POST.get('paymentOption')
+
     cart = Cart.objects.get(owner = user)
     cart_items = CartItems.objects.filter(cart__owner=user).order_by('-created_at')
     address = Address.objects.filter(user = user)
     context = {'cart':cart, 'cart_items':cart_items, 'address':address}
-    
     return render(request, 'checkout.html', context) 
 
 

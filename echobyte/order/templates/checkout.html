@@ -51,9 +51,11 @@
 </head>
 <body>
   <div class="container mt-5">
+    <form action="post">
     <h2 class="text-center mb-4">Checkout</h2>
     <!-- Address Section -->
     <div class="row">
+      
 
       <div class="col-md-6 mb-4">
         <div class="card">
@@ -135,14 +137,15 @@
           <div class="card-body">
             <!-- Total Price -->
             <p>Total: <span id="total-price">₹{{ cart|sub_total_of_cart }}</span></p>
+            <input type="hidden" name="amount" value="{{ cart|sub_total_of_cart }}">
             <!-- Cash on Delivery Option -->
             <div class="custom-control custom-radio mb-3">
-              <input type="radio" id="cashOnDelivery" name="paymentOption" class="custom-control-input" checked>
+              <input  value="cod" type="radio" id="cashOnDelivery" name="paymentOption" class="custom-control-input" checked>
               <label class="custom-control-label" for="cashOnDelivery">Cash on Delivery</label>
             </div>
             <!-- Razorpay Option (Placeholder) -->
             <div class="custom-control custom-radio">
-              <input type="radio" id="razorpay" name="paymentOption" class="custom-control-input">
+              <input value="online" type="radio" id="razorpay" name="paymentOption" class="custom-control-input">
               <label class="custom-control-label" for="razorpay">Razorpay</label>
             </div>
           </div>
@@ -155,6 +158,7 @@
         <button class="btn btn-success btn-block">Place Order</button>
       </div>
     </div>
+  </form>
   </div>
   <!-- Bootstrap JS -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

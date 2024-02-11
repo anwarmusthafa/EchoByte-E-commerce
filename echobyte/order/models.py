@@ -36,13 +36,24 @@ class Order(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 class OrderItem(models.Model):
+    ORDER_CONFIRMED = 1
+    ORDER_SHIPPED = 2
+    ORDER_DELIVERED = 3
+    ORDER_CANCELLED = -1
+    ORDER_STATUS_CHOICES = (
+        (ORDER_CONFIRMED, 'Confirmed'),
+        (ORDER_SHIPPED, 'Shipped'),
+        (ORDER_DELIVERED, 'Delivered'),
+        (ORDER_CANCELLED, 'Cancelled')
+    )
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     product = models.ForeignKey(ProductVariant, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
     amount =  models.DecimalField( max_digits=10, decimal_places=2)
+    order_status = models.IntegerField(choices=ORDER_STATUS_CHOICES, default=ORDER_CONFIRMED)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return f"{self.quantity} x {self.product.name} in Order {self.order.id}"
      
 # class OrderedProduct(models.Model):
 #      ORDER_CONFIRMED = 1

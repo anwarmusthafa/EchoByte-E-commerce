@@ -10,6 +10,7 @@ from django.shortcuts import render, redirect
 from django.conf import settings
 from .signals import send_otp
 from django.http import HttpResponseServerError
+from order.models import *
 
 @never_cache
 def signin(request):
@@ -189,4 +190,8 @@ def add_address(request):
             return HttpResponseServerError("An error occurred: {}".format(str(e)))
 
     return render(request, 'add-address.html')
-
+def my_orders(request):
+    user = request.user
+    orders = OrderItem.objects.filter(order__owner = user)
+    context = {'orders': orders}
+    return render(request, 'my-order.html', context)

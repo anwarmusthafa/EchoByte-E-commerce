@@ -96,6 +96,7 @@ def checkout(request):
     context = {'cart': cart, 'cart_items': cart_items, 'address': address}
     return render(request, 'checkout.html', context)
 def order_success(request):
+    
     return render(request,'order_success.html')
 
 

@@ -16,7 +16,7 @@
                                                 
                                                 <li>
 
-                                                    <a href="dash-my-order.html">My Orders</a></li>
+                                                    <a class="{% if request.path == '/my_orders/' %}dash-active{% endif %}" href="{% url "my_orders" %}">My Orders</a></li>
                                         
                                             </ul>
                                         </div>

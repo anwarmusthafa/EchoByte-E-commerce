@@ -1,6 +1,6 @@
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import Cart,CartItems 
+from .models import Cart,CartItems,Order,OrderItem
 from customer.models import Address, Customer
 from product.models import Product, ProductVariant, ProductImage
 from .models import Cart,CartItems
@@ -9,6 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 from django.contrib import messages
 from django.urls import reverse
+from django.db import transaction
 
 
 # Create your views here.
@@ -65,18 +66,37 @@ def sub_cart_item_quantity(request, pk):
             cart_item.quantity -= 1
             cart_item.save()
         return redirect('cart')
+
+
 def checkout(request):
     user = request.user
+    cart = Cart.objects.get(owner=user)
     if request.POST:
         address = request.POST.get('address')
-        amount =  request.POST.get('amount')
-        payment_methoid = request.POST.get('paymentOption')
+        amount = request.POST.get('amount')
+        payment_method = request.POST.get('paymentOption')
+        
+        # Create the order
+        with transaction.atomic():
+            order = Order.objects.create(owner=user, cart=cart, amount=amount, payment_method=payment_method)
+            # Iterate through cart items and create order items
+            for cart_item in cart.added_cart_items.all():
+                amount = cart_item.quantity * cart_item.product.selling_price
+                # Create the order item and save price
+                OrderItem.objects.create(order=order, product=cart_item.product, quantity=cart_item.quantity, amount=amount)
+        
+        # Optionally, you can clear the cart after checkout
+        # cart.added_cart_items.all().delete()
 
-    cart = Cart.objects.get(owner = user)
+        # Redirect to order success page or any other page
+        return redirect('order_success')  # Replace 'order_success' with your actual URL name
+
     cart_items = CartItems.objects.filter(cart__owner=user).order_by('-created_at')
-    address = Address.objects.filter(user = user)
-    context = {'cart':cart, 'cart_items':cart_items, 'address':address}
-    return render(request, 'checkout.html', context) 
+    address = Address.objects.filter(user=user)
+    context = {'cart': cart, 'cart_items': cart_items, 'address': address}
+    return render(request, 'checkout.html', context)
+def order_success(request):
+    return render(request,'order_success.html')
 
 
 

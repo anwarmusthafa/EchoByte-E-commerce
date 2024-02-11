@@ -51,7 +51,8 @@
 </head>
 <body>
   <div class="container mt-5">
-    <form action="post">
+    <form method="post" action="{% url "checkout" %}">
+      {% csrf_token %}
     <h2 class="text-center mb-4">Checkout</h2>
     <!-- Address Section -->
     <div class="row">

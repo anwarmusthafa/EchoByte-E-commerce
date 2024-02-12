@@ -11,6 +11,7 @@ from django.conf import settings
 from .signals import send_otp
 from django.http import HttpResponseServerError
 from order.models import *
+from django.contrib import messages
 
 @never_cache
 def signin(request):
@@ -27,22 +28,26 @@ def signin(request):
         print(f"Attempting to authenticate with: {login_identifier} / {password}")
 
         user = authenticate(request, username=login_identifier, password=password)
-        if user and not user.is_staff:
-            if user.customer.is_verified:
-                if user.customer.delete_status == 0:
-                    error_message = "You are blocked by Admin"
+        if user:
+            if user.is_superuser:
+                error_message = "Superusers are not allowed to sign in."
+            elif not user.is_staff:
+                if user.customer.is_verified:
+                    if user.customer.delete_status == 0:
+                        error_message = "You are blocked by Admin"
+                    else:
+                        login(request, user)
+                        return redirect('home')
                 else:
-                    login(request, user)
-                    return redirect('home')
+                    print("customer is not verified")
+                    messages.error(request, "Verify your email")
+                    send_otp(user.customer)
+                    return redirect('otp_verification', pk=user.customer.pk)
             else:
-                print("customer is not verified")
-                messages.error(request,"verify your email")
-                send_otp(user.customer)
-                return redirect('otp_verification', pk=user.customer.pk)
-        else:
-            error_message = "Invalid Credentials"
-    context = {"error_message": error_message, "success_message" : success_message}
+                error_message = "Invalid Credentials"
+    context = {"error_message": error_message, "success_message": success_message}
     return render(request, 'signin.html', context)
+
 
 @never_cache
 def signup(request):

@@ -95,19 +95,29 @@ def checkout(request):
             # Create the order transactionally
             with transaction.atomic():
                 order = Order.objects.create(owner=user, cart=cart, amount=amount, payment_method=payment_method)
+                print('created order')
                 for cart_item in cart_items:
                     amount = cart_item.quantity * cart_item.product.selling_price
                     OrderItem.objects.create(order=order, product=cart_item.product, address=address_obj, quantity=cart_item.quantity, amount=amount)
+                    product = cart_item.product
+                    product.stock -= cart_item.quantity
+                    product.save()
+
+
+
                 
                 # Optionally, you can clear the cart after successful checkout
-                # cart_items.delete()
+                cart_items.delete()
+                cart.delete()
 
             # Redirect to the order success page or any other page
             return redirect('order_success')  # Replace 'order_success' with your actual URL name
         
         except Exception as e:
+            print(e)
             # Handle any other exceptions, such as database errors
             error_message = "An error occurred while processing your order. Please try again later."
+
             return render(request, 'checkout.html', {'cart': cart, 'cart_items': cart_items, 'address': address, 'error_message': error_message})
 
     return render(request, 'checkout.html', {'cart': cart, 'cart_items': cart_items, 'address': address})
@@ -133,6 +143,9 @@ def order_cancel_by_seller(request, pk):
         # Update the order status and save
         order.order_status = status
         order.save()
+        product = order.product
+        product.stock += order.quantity
+        product.save()
     
     # Redirect to the list_orders view after processing
     return redirect('list_orders')

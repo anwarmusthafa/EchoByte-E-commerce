@@ -54,6 +54,11 @@
     <form method="post" action="{% url "checkout" %}">
       {% csrf_token %}
     <h2 class="text-center mb-4">Checkout</h2>
+    {% if error_message %}
+        <div class="alert alert-danger text-center" role="alert">
+          {{ error_message }}
+        </div>
+        {% endif %}
     <!-- Address Section -->
     <div class="row">
       
@@ -65,6 +70,7 @@
           </div>
           <div class="card-body">
             <div class="row">
+              
               <!-- Address  -->
               {% for address in address %}
               <div class="col-md-6">
@@ -80,7 +86,7 @@
               {% endfor %}
             </div>
             <!-- Add more address options as needed -->
-            <button class="btn btn-primary btn-block mt-3">Add New Address</button>
+            <a href="{% url 'add_address' %}"> <p class="text-center">Add New Address</p></a>
           </div>
         </div>
       </div>

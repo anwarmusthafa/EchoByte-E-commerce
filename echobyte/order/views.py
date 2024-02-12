@@ -70,34 +70,72 @@ def sub_cart_item_quantity(request, pk):
 
 def checkout(request):
     user = request.user
-    cart = Cart.objects.get(owner=user)
-    if request.POST:
-        address = request.POST.get('address')
+    cart = get_object_or_404(Cart, owner=user)
+    cart_items = CartItems.objects.filter(cart=cart).order_by('-created_at')
+    address = Address.objects.filter(user=user)
+    
+    if request.method == 'POST':
+        address_id = request.POST.get('address')
         amount = request.POST.get('amount')
         payment_method = request.POST.get('paymentOption')
         
-        # Create the order
-        with transaction.atomic():
-            order = Order.objects.create(owner=user, cart=cart, amount=amount, payment_method=payment_method)
-            # Iterate through cart items and create order items
-            for cart_item in cart.added_cart_items.all():
-                amount = cart_item.quantity * cart_item.product.selling_price
-                # Create the order item and save price
-                OrderItem.objects.create(order=order, product=cart_item.product, quantity=cart_item.quantity, amount=amount)
+        if not address_id:
+            # Address not selected, return an error message
+            error_message = "Please select an address."
+            return render(request, 'checkout.html', {'cart': cart, 'cart_items': cart_items, 'address': address, 'error_message': error_message})
         
-        # Optionally, you can clear the cart after checkout
-        # cart.added_cart_items.all().delete()
+        try:
+            address_obj = Address.objects.get(pk=address_id)
+        except Address.DoesNotExist:
+            # Address not found, return an error message
+            error_message = "The selected address does not exist."
+            return render(request, 'checkout.html', {'cart': cart, 'cart_items': cart_items, 'address': address, 'error_message': error_message})
+        
+        try:
+            # Create the order transactionally
+            with transaction.atomic():
+                order = Order.objects.create(owner=user, cart=cart, amount=amount, payment_method=payment_method)
+                for cart_item in cart_items:
+                    amount = cart_item.quantity * cart_item.product.selling_price
+                    OrderItem.objects.create(order=order, product=cart_item.product, address=address_obj, quantity=cart_item.quantity, amount=amount)
+                
+                # Optionally, you can clear the cart after successful checkout
+                # cart_items.delete()
 
-        # Redirect to order success page or any other page
-        return redirect('order_success')  # Replace 'order_success' with your actual URL name
+            # Redirect to the order success page or any other page
+            return redirect('order_success')  # Replace 'order_success' with your actual URL name
+        
+        except Exception as e:
+            # Handle any other exceptions, such as database errors
+            error_message = "An error occurred while processing your order. Please try again later."
+            return render(request, 'checkout.html', {'cart': cart, 'cart_items': cart_items, 'address': address, 'error_message': error_message})
 
-    cart_items = CartItems.objects.filter(cart__owner=user).order_by('-created_at')
-    address = Address.objects.filter(user=user)
-    context = {'cart': cart, 'cart_items': cart_items, 'address': address}
-    return render(request, 'checkout.html', context)
+    return render(request, 'checkout.html', {'cart': cart, 'cart_items': cart_items, 'address': address})
 def order_success(request):
     
     return render(request,'order_success.html')
+def list_orders(request):
+    orders = OrderItem.objects.all().order_by('-created_at')
+    context = {'orders':orders}
+    return render(request, 'list-orders.html', context)
+def order_cancel_by_seller(request, pk):
+    # Retrieve the order object or return a 404 error if not found
+    order = get_object_or_404(OrderItem, pk=pk)
+    
+    # Check if the request method is POST
+    if request.method == 'POST':
+        # Extract the status from the form data
+        status = int(request.POST.get('status'))
+        
+        # Check if the provided status is valid (if needed)
+        # For example, you might want to check if status == -2 is a valid status
+        
+        # Update the order status and save
+        order.order_status = status
+        order.save()
+    
+    # Redirect to the list_orders view after processing
+    return redirect('list_orders')
 
 
 

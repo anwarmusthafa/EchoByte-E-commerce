@@ -188,10 +188,9 @@ def add_address(request):
         except Exception as e:
             # Log the error or handle it as per your application's needs
             return HttpResponseServerError("An error occurred: {}".format(str(e)))
-
     return render(request, 'add-address.html')
 def my_orders(request):
     user = request.user
-    orders = OrderItem.objects.filter(order__owner = user)
+    orders = OrderItem.objects.filter(order__owner = user).order_by('-created_at')
     context = {'orders': orders}
     return render(request, 'my-order.html', context)

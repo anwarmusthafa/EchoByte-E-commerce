@@ -5,15 +5,13 @@ from product.models import Product, ProductVariant
 # Create your models here.
 class Cart(models.Model):
     owner = models.OneToOneField(User,on_delete=models.CASCADE)
-    def __str__(self):
-            return self.owner.customer.name +"'s Cart"
+    
 class CartItems(models.Model):
     product = models.ForeignKey(ProductVariant, on_delete=models.CASCADE, related_name = 'added_products')
     quantity = models.PositiveIntegerField(default = 1)
     cart = models.ForeignKey(Cart,on_delete=models.CASCADE, related_name = 'added_cart_items')
     created_at = models.DateTimeField(auto_now_add=True, null = True)
-    def __str__(self):
-        return self.cart.owner.customer.name + "'s cart items"
+    
 class Order(models.Model):
     ORDER_CONFIRMED = 1
     ORDER_SHIPPED = 2
@@ -40,17 +38,20 @@ class OrderItem(models.Model):
     ORDER_SHIPPED = 2
     ORDER_DELIVERED = 3
     ORDER_CANCELLED = -1
+    ORDER_CANCELLED_BY_SELLER = -2
     ORDER_STATUS_CHOICES = (
         (ORDER_CONFIRMED, 'Confirmed'),
         (ORDER_SHIPPED, 'Shipped'),
         (ORDER_DELIVERED, 'Delivered'),
-        (ORDER_CANCELLED, 'Cancelled')
+        (ORDER_CANCELLED, 'Cancelled'),
+        (ORDER_CANCELLED_BY_SELLER, 'Seller Cancelled')
     )
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     product = models.ForeignKey(ProductVariant, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
     amount =  models.DecimalField( max_digits=10, decimal_places=2)
     order_status = models.IntegerField(choices=ORDER_STATUS_CHOICES, default=ORDER_CONFIRMED)
+    address = models.CharField( max_length=50)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True)
 

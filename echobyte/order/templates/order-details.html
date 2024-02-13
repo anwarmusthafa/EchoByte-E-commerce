@@ -77,7 +77,20 @@
 
                                                         <span class="manage-o__text">Standard</span></div>
                                                 </div>
+                                                {% if order.order_status == -1 %}
+                                                <div class="alert alert-danger" role="alert">
+                                                    <h2 class="text-center">Order Cancelled</h2>
+                                                </div>
+                                            {% elif order.order_status == -2 %}
+                                                <div class="alert alert-danger" role="alert">
+                                                    <h2 class="text-center">Seller Cancelled Order</h2>
+                                                </div>
+                                            {% else %}
+                                                 
+
+
                                                 <div class="manage-o__timeline">
+
                                                     <div class="timeline-row">
                                                         <div class="col-lg-4 u-s-m-b-30">
                                                             <div class="timeline-step" id="processingStep">
@@ -87,6 +100,7 @@
                                                                 <span class="timeline-text">Processing</span>
                                                             </div>
                                                         </div>
+
                                                         <div class="col-lg-4 u-s-m-b-30">
                                                             <div class="timeline-step" id="shippedStep">
                                                                 <div class="timeline-l-i">
@@ -105,7 +119,11 @@
                                                         </div>
                                                         
                                                     </div>
+
                                                 </div>
+                                                {% endif %}
+
+
                                                 <div class="manage-o__description">
                                                     <div class="description__container">
                                                         <div class="description__img-wrap">
@@ -128,6 +146,14 @@
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
+                                    <div class="text-center u-s-m-b-30">
+                                        {% if order.order_status == -2 or order.order_status == -1 %} 
+                                        {% else %}
+                                        
+                                        <a href="{% url "cancel_order" order.pk %}"><button class="btn btn-danger">Cancel Order</button></a>
+                                        <a href=""><button class="btn btn-primary">Return Order</button></a>
+                                        {% endif %}
                                     </div>
                                     <div class="row">
                                         <div class="col-lg-6">
@@ -205,6 +231,7 @@
             updateTimeline('shipped');
             updateTimeline('delivered');
         </script>
+        
 
 
      

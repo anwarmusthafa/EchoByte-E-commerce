@@ -166,11 +166,18 @@ def my_orders(request):
     orders = OrderItem.objects.filter(order__owner = user).order_by('-created_at')
     context = {'orders': orders}
     return render(request, 'my-order.html', context)
-
+@login_required(login_url='signin')
 def order_details(request,pk):
-    order = OrderItem.objects.get(pk =pk)
+    order = OrderItem.objects.get(pk = pk)
     context = {'order':order}
     return render(request, 'order-details.html', context)
+def cancel_order(request, pk):
+    order = OrderItem.objects.get(pk=pk)
+    order.order_status = -1
+    order.save()
+    # Redirect to the order details page after canceling the order
+    return redirect('order_details', pk=pk)
+
 
 
 

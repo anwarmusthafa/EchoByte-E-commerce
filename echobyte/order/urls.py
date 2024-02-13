@@ -13,6 +13,7 @@ urlpatterns = [
     path('order_cancel_by_seller/<pk>/', views.order_cancel_by_seller, name= "order_cancel_by_seller"),
     path('my_orders/', views.my_orders, name= "my_orders"),
     path('order_details/<pk>/', views.order_details, name= "order_details"),
+    path('cancel_order/<pk>/', views.cancel_order, name= "cancel_order"),
 
     ]
 

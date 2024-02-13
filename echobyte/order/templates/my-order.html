@@ -63,49 +63,48 @@
                                                         <option>Orders placed in 2018</option>
                                                         <option>All Orders</option>
                                                     </select></div>
-                                            </form>
-                                            <div class="m-order__list">
-                                                {% for order in orders %}
-                                                <div class="m-order__get">
-                                                    <div class="manage-o__header u-s-m-b-30">
-                                                        <div class="dash-l-r">
-                                                            <div>
-                                                                <div class="manage-o__text-2 u-c-secondary">{{order.id}}</div>
-                                                                <div class="manage-o__text u-c-silver">Placed on {{ order.created_at }}</div>
+                                                    {% for order in orders %}
+                                                    <a href="{% url 'order_details' order.pk %}">
+                                                        <div class="m-order__list">
+                                                            <div class="m-order__get">
+                                                                <div class="manage-o__header u-s-m-b-30">
+                                                                    <div class="dash-l-r">
+                                                                        <div>
+                                                                            <div class="manage-o__text-2 u-c-secondary">{{ order.id }}</div>
+                                                                            <div class="manage-o__text u-c-silver">Placed on {{ order.created_at }}</div>
+                                                                        </div>
+                                                                    
+                                                                    </div>
+                                                                </div>
+                                                                <a href="{% url 'order_details' order.pk %}">
+                                                                <div class="manage-o__description">
+                                                                    <div class="description__container">
+                                                                        <div class="description__img-wrap">
+                                                                            <img class="u-img-fluid" src="{{ order.product.product.images.first.image.url }}" alt="">
+                                                                        </div>
+                                                                        <div class="description-title">{{ order.product.product.brand }} {{ order.product.product.title }} ({{ order.product.variant_name }})</div>
+                                                                    </div>
+                                                                    <div class="description__info-wrap">
+                                                                        <div>
+                                                                            <div class="manage-o__badge badge--processing">{{ order.get_order_status_display }}</div>
+                                                                            <div>
+                                                                                <span class="manage-o__text-2 u-c-silver">Quantity:
+                                                                                    <span class="manage-o__text-2 u-c-secondary">{{ order.quantity }}</span>
+                                                                                </span>
+                                                                            </div>
+                                                                            <div>
+                                                                                <span class="manage-o__text-2 u-c-silver">Total:
+                                                                                    <span class="manage-o__text-2 u-c-secondary">{{ order.amount }}</span>
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                </a>
+
                                                             </div>
-                                                            <div>
-                                                                <div class="dash__link dash__link--brand">
-
-                                                                    <a href="{% url "order_details" order.pk %}">MANAGE</a></div>
-                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="manage-o__description">
-                                                        <div class="description__container">
-                                                            <div class="description__img-wrap">
-
-                                                                <img class="u-img-fluid" src="{{ order.product.product.images.first.image.url }}" alt=""></div>
-                                                            <div class="description-title">{{order.product.product.brand}} {{order.product.product.title}} ({{order.product.variant_name}})</div>
-                                                        </div>
-                                                        <div class="description__info-wrap">
-                                                            <div>
-                                                                <div class="manage-o__badge badge--processing">{{ order.get_order_status_display }}</div>
-
-                                                                
-                                                            <div>
-
-                                                                <span class="manage-o__text-2 u-c-silver">Quantity:
-
-                                                                    <span class="manage-o__text-2 u-c-secondary">{{order.quantity}}</span></span></div>
-                                                            <div>
-
-                                                                <span class="manage-o__text-2 u-c-silver">Total:
-
-                                                                    <span class="manage-o__text-2 u-c-secondary">{{order.amount}}</span></span></div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                </div>
+                                                    </a>
                                                 {% endfor %}
                                                 
                                                 

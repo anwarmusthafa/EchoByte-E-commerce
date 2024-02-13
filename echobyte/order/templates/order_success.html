@@ -1,11 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Placed</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome CSS for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <!-- Custom CSS -->
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .container {
+      margin-top: 100px;
+      text-align: center;
+    }
+    .order-success {
+      background-color: #fff;
+      padding: 60px;
+      border-radius: 20px;
+      box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+    }
+    .order-success h2 {
+      font-size: 48px;
+      color: #28a745;
+      margin-bottom: 30px;
+    }
+    .order-success p {
+      font-size: 24px;
+      margin-bottom: 40px;
+    }
+    .order-success .btn {
+      font-size: 24px;
+      padding: 15px 50px;
+    }
+    .btn-view-order {
+      background-color: #28a745;
+      border-color: #28a745;
+    }
+    .btn-view-order:hover {
+      background-color: #218838;
+      border-color: #1e7e34;
+    }
+    .btn-continue-shopping {
+      background-color: #007bff;
+      border-color: #007bff;
+      color: #fff;
+    }
+    .btn-continue-shopping:hover {
+      background-color: #0056b3;
+      border-color: #0056b3;
+    }
+  </style>
 </head>
 <body>
-    <h1>Order Success</h1>
+
+<div class="container">
+  <div class="order-success">
+    <i class="fas fa-check-circle fa-5x text-success mb-4"></i>
+    <h2>Order Placed Successfully!</h2>
+    <p>Your order has been placed successfully.</p>
+
+    <div class="row">
+      <div class="col-md-6">
+        <a href="{% url "my_orders" %}" class="btn btn-view-order btn-block">View Order</a>
+      </div>
+      <div class="col-md-6">
+        <a href="{% url "home" %}" class="btn btn-continue-shopping btn-block">Continue Shopping</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS and jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

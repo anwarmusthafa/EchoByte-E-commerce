@@ -70,13 +70,13 @@
                                                     <div class="manage-o__header u-s-m-b-30">
                                                         <div class="dash-l-r">
                                                             <div>
-                                                                <div class="manage-o__text-2 u-c-secondary">Order #305423126</div>
+                                                                <div class="manage-o__text-2 u-c-secondary">{{order.id}}</div>
                                                                 <div class="manage-o__text u-c-silver">Placed on {{ order.created_at }}</div>
                                                             </div>
                                                             <div>
                                                                 <div class="dash__link dash__link--brand">
 
-                                                                    <a href="dash-manage-order.html">MANAGE</a></div>
+                                                                    <a href="{% url "order_details" order.pk %}">MANAGE</a></div>
                                                             </div>
                                                         </div>
                                                     </div>

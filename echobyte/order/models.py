@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from product.models import Product, ProductVariant
 
+
 # Create your models here.
 class Cart(models.Model):
     owner = models.OneToOneField(User,on_delete=models.CASCADE)
@@ -46,7 +47,7 @@ class OrderItem(models.Model):
         (ORDER_CANCELLED, 'Cancelled'),
         (ORDER_CANCELLED_BY_SELLER, 'Seller Cancelled')
     )
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name = 'order_items')
     product = models.ForeignKey(ProductVariant, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
     amount =  models.DecimalField( max_digits=10, decimal_places=2)

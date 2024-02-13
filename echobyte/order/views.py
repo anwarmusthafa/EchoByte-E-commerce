@@ -10,6 +10,7 @@ from django.http import JsonResponse
 from django.contrib import messages
 from django.urls import reverse
 from django.db import transaction
+import uuid
 
 
 # Create your views here.
@@ -67,7 +68,7 @@ def sub_cart_item_quantity(request, pk):
             cart_item.save()
         return redirect('cart')
 
-
+@login_required(login_url='signin')
 def checkout(request):
     user = request.user
     cart = get_object_or_404(Cart, owner=user)
@@ -97,16 +98,25 @@ def checkout(request):
                 order = Order.objects.create(owner=user, cart=cart, amount=amount, payment_method=payment_method)
                 print('created order')
                 for cart_item in cart_items:
+                    def generate_unique_integer_id(length=8):
+                        """
+                        Generate a unique integer ID with the specified length.
+                        """
+                        # Generate a UUID
+                        unique_id = uuid.uuid4().int
+
+                        # Truncate or pad the integer to match the desired length
+                        unique_id_str = str(unique_id)[:length].zfill(length)
+
+                        return int(unique_id_str)
+                    unique_order_id = generate_unique_integer_id(length=8)
                     amount = cart_item.quantity * cart_item.product.selling_price
-                    OrderItem.objects.create(order=order, product=cart_item.product, address=address_obj, quantity=cart_item.quantity, amount=amount)
+                    OrderItem.objects.create(id=unique_order_id,order=order, product=cart_item.product, address=address_obj, quantity=cart_item.quantity, amount=amount)
                     product = cart_item.product
                     product.stock -= cart_item.quantity
                     product.save()
 
-
-
-                
-                # Optionally, you can clear the cart after successful checkout
+                # clear the cart after successful checkout
                 cart_items.delete()
                 cart.delete()
 
@@ -121,9 +131,10 @@ def checkout(request):
             return render(request, 'checkout.html', {'cart': cart, 'cart_items': cart_items, 'address': address, 'error_message': error_message})
 
     return render(request, 'checkout.html', {'cart': cart, 'cart_items': cart_items, 'address': address})
+@login_required(login_url='signin')
 def order_success(request):
-    
     return render(request,'order_success.html')
+@login_required(login_url='admin_login')
 def list_orders(request):
     orders = OrderItem.objects.all().order_by('-created_at')
     context = {'orders':orders}
@@ -149,6 +160,17 @@ def order_cancel_by_seller(request, pk):
     
     # Redirect to the list_orders view after processing
     return redirect('list_orders')
+@login_required(login_url='signin')
+def my_orders(request):
+    user = request.user
+    orders = OrderItem.objects.filter(order__owner = user).order_by('-created_at')
+    context = {'orders': orders}
+    return render(request, 'my-order.html', context)
+
+def order_details(request,pk):
+    order = OrderItem.objects.get(pk =pk)
+    context = {'order':order}
+    return render(request, 'order-details.html', context)
 
 
 

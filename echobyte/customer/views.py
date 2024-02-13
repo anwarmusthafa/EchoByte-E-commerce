@@ -15,8 +15,9 @@ from django.contrib import messages
 
 @never_cache
 def signin(request):
-    if request.user.is_authenticated:
-        return redirect('home')  # Redirect to the home page if the user is already authenticated
+    if request.user.is_authenticated and not request.user.is_staff:
+        return redirect('home')  # Redirect to the home page if the user is already authenticated and is not staff
+
 
     error_message = None
     success_message = None
@@ -157,10 +158,12 @@ def edit_profile(request):
         return redirect('profile')
     context = {'customer':customer} 
     return render(request, 'edit-profile.html', context)
+@login_required(login_url='signin')
 def address(request):
     address = Address.objects.filter(user = request.user)
     context = {'address':address}
     return render(request, 'address.html', context )
+@login_required(login_url='signin')
 def add_address(request):
     if request.POST:
         try:
@@ -194,8 +197,3 @@ def add_address(request):
             # Log the error or handle it as per your application's needs
             return HttpResponseServerError("An error occurred: {}".format(str(e)))
     return render(request, 'add-address.html')
-def my_orders(request):
-    user = request.user
-    orders = OrderItem.objects.filter(order__owner = user).order_by('-created_at')
-    context = {'orders': orders}
-    return render(request, 'my-order.html', context)

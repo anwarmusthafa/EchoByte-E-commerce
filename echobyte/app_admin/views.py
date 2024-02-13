@@ -35,10 +35,12 @@ def admin_logout(request):
     logout(request)
     return redirect('admin_login')
 
+@login_required(login_url='admin_login')
 def customers_list(request):
      customers = User.objects.exclude(pk = 1)
      context = {'customers': customers}
      return render(request, 'customers_list.html', context)
+@login_required(login_url='admin_login')
 def delete_status(request, pk):
     if request.POST:
         delete_status = int(request.POST.get('delete_status'))

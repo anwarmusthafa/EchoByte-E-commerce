@@ -1,6 +1,6 @@
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import Cart,CartItems,Order,OrderItem
+from .models import Cart,CartItems,Order,OrderItem, ReturnOrder
 from customer.models import Address, Customer
 from product.models import Product, ProductVariant, ProductImage
 from .models import Cart,CartItems
@@ -187,6 +187,20 @@ def delivery_list(request):
     orders = OrderItem.objects.filter(order_status = 2) 
     context = {'orders':orders}
     return render(request, 'delivery-list.html', context)
+def return_order(request,pk):
+    order = OrderItem.objects.get(pk = pk)
+    if request.POST:
+        user = request.user
+        product = order.product
+        amount = order.amount
+        reason = request.POST.get('reason')
+        return_obj = ReturnOrder.objects.create(user=user,product=product,amount_to_refund=amount,reason=reason)
+        order.order_status = 4
+        order.save
+        return redirect('order_details', pk=pk)
+    context = {'order':order}
+    return render(request, 'return-order.html', context)
+
 
 
 

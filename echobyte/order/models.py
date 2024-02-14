@@ -39,42 +39,43 @@ class OrderItem(models.Model):
     ORDER_CONFIRMED = 1
     ORDER_SHIPPED = 2
     ORDER_DELIVERED = 3
+    ORDER_RETURN_REQUESTED = 4
+    ORDER_RETURNED = 5
     ORDER_CANCELLED = -1
     ORDER_CANCELLED_BY_SELLER = -2
+
     ORDER_STATUS_CHOICES = (
         (ORDER_CONFIRMED, 'Confirmed'),
         (ORDER_SHIPPED, 'Shipped'),
         (ORDER_DELIVERED, 'Delivered'),
         (ORDER_CANCELLED, 'Cancelled'),
-        (ORDER_CANCELLED_BY_SELLER, 'Seller Cancelled')
+        (ORDER_CANCELLED_BY_SELLER, 'Cancelled by Seller'),
+        (ORDER_RETURN_REQUESTED, 'Return Requested'),
+        (ORDER_RETURNED, 'Returned')
     )
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name = 'order_items')
+
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
     product = models.ForeignKey(ProductVariant, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
-    amount =  models.DecimalField( max_digits=10, decimal_places=2)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
     order_status = models.IntegerField(choices=ORDER_STATUS_CHOICES, default=ORDER_CONFIRMED)
-    address = models.ForeignKey(Address, on_delete=models.SET_NULL, null= True, blank = True)
+    address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-     
-# class OrderedProduct(models.Model):
-#      ORDER_CONFIRMED = 1
-#      ORDER_SHIPPED = 2
-#      ORDER_DELIVERED = 3
-#      ORDER_CANCELLED = -1
-#      ORDER_STATUS_CHOICES = ((ORDER_CONFIRMED, 'ORDER_CONFIRMED'),
-#                              (ORDER_SHIPPED, 'ORDER_SHIPPED'),
-#                              (ORDER_DELIVERED, 'ORDER_DELIVERED'),
-#                              (ORDER_CANCELLED, 'ORDER_CANCELLED'))
-#      owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank = True, related_name = 'ordered_products')
-#      product = models.ForeignKey(ProductVariant, on_delete=models.SET_NULL, null=True, blank = True, related_name = 'orders')
-#      quantity = models.PositiveIntegerField()
-#      amount =  models.DecimalField( max_digits=10, decimal_places=2)
-#      order_status = models.IntegerField(choices=ORDER_STATUS_CHOICES, default=ORDER_CONFIRMED)
-#      order = models.ForeignKey(Order,  on_delete=models.CASCADE)
-#      created_at = models.DateTimeField(auto_now_add=True, null = True)
-#      updated_at = models.DateTimeField(auto_now=True)
+
+class ReturnOrder(models.Model):
+    RETURN_REQUESTED = 1
+    RETURNED = 2
+    STATUS_CHOICES = ((RETURN_REQUESTED, 'Return Requested'),
+        (RETURNED,'Returned'))
+    user = models.ForeignKey(User,on_delete=models.SET_NULL, null = True, blank = True)
+    product = models.ForeignKey(ProductVariant,on_delete=models.SET_NULL, blank = True, null = True)
+    reason = models.TextField()
+    amount_to_refund = models.DecimalField( max_digits=10, decimal_places=2)
+    return_status = models.IntegerField(choices=STATUS_CHOICES, default=RETURN_REQUESTED)
+    created_at = models.DateTimeField(auto_now_add=True)
+
 
      
      

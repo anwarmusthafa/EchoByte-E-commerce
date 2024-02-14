@@ -5,7 +5,7 @@
 <div class="col-lg-12 grid-margin stretch-card">
     <div class="card">
       <div class="card-body">
-        <h4 class="card-title text-center">Order List</h4>
+        <h4 class="card-title text-center">Deliver List</h4>
         {% comment %} <p class="card-description "> Add class <code>.table-striped</code> {% endcomment %}
         </p>
         <table class="table table-striped text-center">
@@ -18,7 +18,7 @@
               <th> Date </th>
               <th> Amount </th>
               <th>Status</th>
-            <th>Action</th> 
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -28,7 +28,7 @@
               <td> {{order.pk}} </td>
               <td> {{order.order.owner.username}} </td>
               <td> {{order.product.product.brand}} {{order.product.product.title}} ({{order.product.variant_name}})</td>
-              <td> <p>{{order.address.name}}<br> {{order.address.phone}}</p> </td>
+              <td> <p>{{order.address.name}} <br> {{order.address.phone}}</p> </td>
               <td>{{order.created_at |date:"d-m-Y" }}</td>
               <td>{{order.amount}}</td>
               <td>{{ order.get_order_status_display }}</td>
@@ -36,11 +36,10 @@
                <td>
                 <form action="{% url 'change_order_status' order.pk %}" method="post" onsubmit="return confirm('Are you sure you want to change the status?');">
                   {% csrf_token %}
-                {% if order.order_status == 1 %}
-                <button value="2" name = "status" class="btn btn-success"> Ship Order </button>
+                
+                <button value="3" name = "status" class="btn btn-success"> Deliver Order </button>
                 <button value="-2" name = "status" type="submit" class="btn btn-danger">Cancel Order</button>
 
-                {% endif %}
               </form>
             </td> 
               {% endfor %}

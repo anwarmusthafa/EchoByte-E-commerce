@@ -70,7 +70,7 @@
                                                                 <div class="manage-o__header u-s-m-b-30">
                                                                     <div class="dash-l-r">
                                                                         <div>
-                                                                            <div class="manage-o__text-2 u-c-secondary">{{ order.id }}</div>
+                                                                            <div class="manage-o__text-2 u-c-secondary">Order id : {{ order.id }}</div>
                                                                             <div class="manage-o__text u-c-silver">Placed on {{ order.created_at }}</div>
                                                                         </div>
                                                                     
@@ -86,7 +86,7 @@
                                                                     </div>
                                                                     <div class="description__info-wrap">
                                                                         <div>
-                                                                            <div class="manage-o__badge badge--processing">{{ order.get_order_status_display }}</div>
+                                                                            <div class="manage-o__badge  {% if order.order_status < 0 %}badge--delivered {% else %} badge--processing{% endif %}  ">{{ order.get_order_status_display }}</div>
                                                                             <div>
                                                                                 <span class="manage-o__text-2 u-c-silver">Quantity:
                                                                                     <span class="manage-o__text-2 u-c-secondary">{{ order.quantity }}</span>

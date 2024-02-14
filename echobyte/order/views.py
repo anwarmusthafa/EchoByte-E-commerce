@@ -11,6 +11,7 @@ from django.contrib import messages
 from django.urls import reverse
 from django.db import transaction
 import uuid
+from django.db.models import Q
 
 
 # Create your views here.
@@ -139,7 +140,7 @@ def list_orders(request):
     orders = OrderItem.objects.all().order_by('-created_at')
     context = {'orders':orders}
     return render(request, 'list-orders.html', context)
-def order_cancel_by_seller(request, pk):
+def change_order_status(request, pk):
     # Retrieve the order object or return a 404 error if not found
     order = get_object_or_404(OrderItem, pk=pk)
     
@@ -154,12 +155,13 @@ def order_cancel_by_seller(request, pk):
         # Update the order status and save
         order.order_status = status
         order.save()
-        product = order.product
-        product.stock += order.quantity
-        product.save()
-    
+        #update the stock if order is cancelled by seller
+        if status == -2:
+            product = order.product
+            product.stock += order.quantity
+            product.save()
     # Redirect to the list_orders view after processing
-    return redirect('list_orders')
+    return redirect(request.META.get('HTTP_REFERER', '/'))
 @login_required(login_url='signin')
 def my_orders(request):
     user = request.user
@@ -175,8 +177,16 @@ def cancel_order(request, pk):
     order = OrderItem.objects.get(pk=pk)
     order.order_status = -1
     order.save()
+    #update the stock if order is cancelled
+    product = order.product
+    product.stock += order.quantity
+    product.save()
     # Redirect to the order details page after canceling the order
     return redirect('order_details', pk=pk)
+def delivery_list(request):
+    orders = OrderItem.objects.filter(order_status = 2) 
+    context = {'orders':orders}
+    return render(request, 'delivery-list.html', context)
 
 
 

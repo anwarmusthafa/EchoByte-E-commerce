@@ -10,10 +10,11 @@ urlpatterns = [
     path('checkout/', views.checkout, name= "checkout"),
     path('order_success/', views.order_success, name= "order_success"),
     path('list_orders/', views.list_orders, name= "list_orders"),
-    path('order_cancel_by_seller/<pk>/', views.order_cancel_by_seller, name= "order_cancel_by_seller"),
+    path('change_order_status/<pk>/', views.change_order_status, name= "change_order_status"),
     path('my_orders/', views.my_orders, name= "my_orders"),
     path('order_details/<pk>/', views.order_details, name= "order_details"),
     path('cancel_order/<pk>/', views.cancel_order, name= "cancel_order"),
+    path('delivery_list/', views.delivery_list, name= "delivery_list"),
 
     ]
 

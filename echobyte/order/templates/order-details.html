@@ -160,11 +160,11 @@
                                             <div class="dash__box dash__box--bg-white dash__box--shadow u-s-m-b-30">
                                                 <div class="dash__pad-3">
                                                     <h2 class="dash__h2 u-s-m-b-8">Shipping Address</h2>
-                                                    <h2 class="dash__h2 u-s-m-b-8">John Doe</h2>
+                                                    <h2 class="dash__h2 u-s-m-b-8">{{order.address.name}}</h2>
 
-                                                    <span class="dash__text-2">4247 Ashford Drive Virginia - VA-20006 - USA</span>
+                                                    <span class="dash__text-2">{{order.address.address}}</span>
 
-                                                    <span class="dash__text-2">(+0) 900901904</span>
+                                                    <span class="dash__text-2">{{order.address.phone}}</span>
                                                 </div>
                                             </div>
                                             
@@ -227,9 +227,11 @@
             // Example usage
             // Call updateTimeline function with appropriate status: processing, shipped, or delivered
             // For example:
-            updateTimeline('processing');
-            updateTimeline('shipped');
-            updateTimeline('delivered');
+            {% if order.order_status == 1 %} updateTimeline('processing');{% endif %}
+            {% if order.order_status == 2 %} updateTimeline('shipped');{% endif %}
+            {% if order.order_status == 3 %} updateTimeline('delivered');{% endif %}
+            
+            
         </script>
         
 

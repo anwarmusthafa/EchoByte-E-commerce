@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from product.models import Product, ProductVariant
+from customer.models import Address
 
 
 # Create your models here.
@@ -52,7 +53,7 @@ class OrderItem(models.Model):
     quantity = models.PositiveIntegerField()
     amount =  models.DecimalField( max_digits=10, decimal_places=2)
     order_status = models.IntegerField(choices=ORDER_STATUS_CHOICES, default=ORDER_CONFIRMED)
-    address = models.CharField( max_length=50)
+    address = models.ForeignKey(Address, on_delete=models.SET_NULL, null= True, blank = True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True)
 

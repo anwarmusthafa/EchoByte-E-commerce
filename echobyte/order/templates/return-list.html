@@ -1,0 +1,69 @@
+{% extends "admin_base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="col-lg-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title text-center">Return List</h4>
+        {% comment %} <p class="card-description "> Add class <code>.table-striped</code> {% endcomment %}
+        </p>
+        <table class="table table-striped text-center">
+          <thead class="text-center">
+            <tr class="">
+              <th> Id </th>
+              <th> Customer</th>
+              <th> Product </th>
+              <th> Address </th>
+              <th> Date </th>
+              <th> Refund Amount </th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+          
+            {% for return in return_orders %}
+            <tr>
+              <td> {{return.pk}} </td>
+              <td> {{return.user.customer.name}} </td>
+              <td> {{return.product.product.brand}} {{return.product.product.title}} <br> ({{return.product.variant_name}})</td>
+              <td> <p>{{return.address.name}} <br> {{return.address.phone}}</p> </td>
+              <td>{{return.created_at |date:"d-m-Y" }}</td>
+              <td>{{return.amount_to_refund}}</td>
+              <td>{{ return.get_return_status_display }}</td>
+              
+               <td>
+                <form action="{% url "change_return_status" return.pk %}" method="post" onsubmit="return confirm('Are you sure you want to change the status?');">
+                  {% csrf_token %}
+                {% if return.return_status == 1 %}
+                
+                <button value="5" name ="status" type="submit" class="btn btn-danger"> Return</button>
+                {% else %}
+                <style>
+                  #returned {
+                      cursor: not-allowed;
+                      opacity: 0.6;
+                      pointer-events: none;
+                  }
+              </style>
+              
+                <button id="returned" value="" name="status" class="btn btn-danger" onclick="return false;">Returned</button>
+
+                {% endif %}
+                {% comment %} <button value="-2" name = "status" type="submit" class="btn btn-danger">Cancel</button> {% endcomment %}
+
+              </form>
+            </td> 
+              {% endfor %}
+         
+
+            </tr>
+            
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

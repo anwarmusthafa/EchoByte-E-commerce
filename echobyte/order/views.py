@@ -193,13 +193,27 @@ def return_order(request,pk):
         user = request.user
         product = order.product
         amount = order.amount
+        address = order.address
         reason = request.POST.get('reason')
-        return_obj = ReturnOrder.objects.create(user=user,product=product,amount_to_refund=amount,reason=reason)
+        return_obj = ReturnOrder.objects.create(user=user,product=product,amount_to_refund=amount,reason=reason,address=address, order = order)
         order.order_status = 4
         order.save
         return redirect('order_details', pk=pk)
     context = {'order':order}
     return render(request, 'return-order.html', context)
+def return_list(request):
+    return_orders = ReturnOrder.objects.all().order_by('return_status')
+    context = {'return_orders':return_orders} 
+    return render(request,'return-list.html', context)
+def change_return_status(request,pk):
+    return_request_item = ReturnOrder.objects.get(pk=pk)
+    return_request_item.return_status = 2
+    return_request_item.save()
+    order = return_request_item.order
+    order.order_status = 5
+    order.save()
+    return redirect('return_list')
+
 
 
 

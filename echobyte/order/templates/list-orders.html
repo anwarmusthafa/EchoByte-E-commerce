@@ -27,7 +27,7 @@
             <tr>
               <td> {{order.pk}} </td>
               <td> {{order.order.owner.username}} </td>
-              <td> {{order.product.product.brand}} {{order.product.product.title}} ({{order.product.variant_name}})</td>
+              <td> {{order.product.product.brand}} {{order.product.product.title}} <br>({{order.product.variant_name}})</td>
               <td> <p>{{order.address.name}}<br> {{order.address.phone}}</p> </td>
               <td>{{order.created_at |date:"d-m-Y" }}</td>
               <td>{{order.amount}}</td>
@@ -37,8 +37,13 @@
                 <form action="{% url 'change_order_status' order.pk %}" method="post" onsubmit="return confirm('Are you sure you want to change the status?');">
                   {% csrf_token %}
                 {% if order.order_status == 1 %}
-                <button value="2" name = "status" class="btn btn-success"> Ship Order </button>
-                <button value="-2" name = "status" type="submit" class="btn btn-danger">Cancel Order</button>
+                <button value="2" name="status" class="btn btn-success">Ship</button>
+                <button value="-2" name="status" type="submit" class="btn btn-danger">Cancel</button>
+
+<script>
+// Add event listeners to handle both buttons
+</script>
+
 
                 {% endif %}
               </form>

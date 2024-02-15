@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect , get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required , user_passes_test
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.models import User
 from customer.models import Customer
 @never_cache
+# @user_passes_test(lambda u: u.is_authenticated and u.is_staff)
 def admin_login(request):
     error_message = None
     try:
@@ -12,7 +13,7 @@ def admin_login(request):
             username = request.POST.get('username')
             password = request.POST.get('password')
             user = authenticate(request, username=username, password=password)
-            
+    
             if user and user.is_staff:
                 login(request, user)
                 return redirect('admin_home')

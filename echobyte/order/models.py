@@ -71,6 +71,8 @@ class ReturnOrder(models.Model):
         (RETURNED,'Returned'))
     user = models.ForeignKey(User,on_delete=models.SET_NULL, null = True, blank = True)
     product = models.ForeignKey(ProductVariant,on_delete=models.SET_NULL, blank = True, null = True)
+    order = models.ForeignKey(OrderItem,on_delete=models.SET_NULL, null = True)
+    address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True)
     reason = models.TextField()
     amount_to_refund = models.DecimalField( max_digits=10, decimal_places=2)
     return_status = models.IntegerField(choices=STATUS_CHOICES, default=RETURN_REQUESTED)

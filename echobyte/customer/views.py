@@ -17,8 +17,6 @@ from django.contrib import messages
 def signin(request):
     if request.user.is_authenticated and not request.user.is_staff:
         return redirect('home')  # Redirect to the home page if the user is already authenticated and is not staff
-
-
     error_message = None
     success_message = None
     if request.method == 'POST':
@@ -48,7 +46,6 @@ def signin(request):
                 error_message = "Invalid Credentials"
     context = {"error_message": error_message, "success_message": success_message}
     return render(request, 'signin.html', context)
-
 
 @never_cache
 def signup(request):

@@ -37,8 +37,8 @@
                 <form action="{% url 'change_order_status' order.pk %}" method="post" onsubmit="return confirm('Are you sure you want to change the status?');">
                   {% csrf_token %}
                 
-                <button value="3" name = "status" class="btn btn-success"> Deliver Order </button>
-                <button value="-2" name = "status" type="submit" class="btn btn-danger">Cancel Order</button>
+                <button value="3" name = "status" class="btn btn-success"> Deliver</button>
+                <button value="-2" name = "status" type="submit" class="btn btn-danger">Cancel</button>
 
               </form>
             </td> 

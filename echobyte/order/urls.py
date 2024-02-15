@@ -16,6 +16,9 @@ urlpatterns = [
     path('cancel_order/<pk>/', views.cancel_order, name= "cancel_order"),
     path('delivery_list/', views.delivery_list, name= "delivery_list"),
     path('return_order/<pk>/', views.return_order, name= "return_order"),
+    path('return_list/', views.return_list, name= "return_list"),
+    path('change_return_status/<pk>/', views.change_return_status, name= "change_return_status"),
+    
 
     ]
 

@@ -1,12 +1,12 @@
 from django.shortcuts import render , redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Cart,CartItems,Order,OrderItem, ReturnOrder
-from customer.models import Address, Customer
+from customer.models import Address, Customer , Wallet
 from product.models import Product, ProductVariant, ProductImage
 from .models import Cart,CartItems
 from decimal import Decimal
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import JsonResponse
+from django.http import HttpResponseServerError, JsonResponse
 from django.contrib import messages
 from django.urls import reverse
 from django.db import transaction
@@ -173,14 +173,25 @@ def order_details(request,pk):
     order = OrderItem.objects.get(pk = pk)
     context = {'order':order}
     return render(request, 'order-details.html', context)
+@transaction.atomic
 def cancel_order(request, pk):
-    order = OrderItem.objects.get(pk=pk)
-    order.order_status = -1
-    order.save()
-    #update the stock if order is cancelled
-    product = order.product
-    product.stock += order.quantity
-    product.save()
+    try:
+        order = OrderItem.objects.select_for_update().get(pk=pk)  # Lock the selected row for update
+        order.order_status = -1
+        order.save()
+
+        # Update the stock if the order is cancelled
+        product = order.product
+        product.stock += order.quantity
+        product.save()
+
+        wallet = Wallet.objects.select_for_update().get(user=request.user)  # Lock the selected row for update
+        wallet.balance += order.amount
+        wallet.save()
+    except (OrderItem.DoesNotExist, Wallet.DoesNotExist) as e:
+        # Handle the case where OrderItem or Wallet does not exist
+        # You might want to log the error or return an appropriate response
+        return HttpResponseServerError("An error occurred: {}".format(str(e)))
     # Redirect to the order details page after canceling the order
     return redirect('order_details', pk=pk)
 def delivery_list(request):
@@ -197,7 +208,8 @@ def return_order(request,pk):
         reason = request.POST.get('reason')
         return_obj = ReturnOrder.objects.create(user=user,product=product,amount_to_refund=amount,reason=reason,address=address, order = order)
         order.order_status = 4
-        order.save
+        order.save()
+        print(order.order_status)
         return redirect('order_details', pk=pk)
     context = {'order':order}
     return render(request, 'return-order.html', context)
@@ -205,13 +217,29 @@ def return_list(request):
     return_orders = ReturnOrder.objects.all().order_by('return_status')
     context = {'return_orders':return_orders} 
     return render(request,'return-list.html', context)
-def change_return_status(request,pk):
-    return_request_item = ReturnOrder.objects.get(pk=pk)
-    return_request_item.return_status = 2
-    return_request_item.save()
-    order = return_request_item.order
-    order.order_status = 5
-    order.save()
+@transaction.atomic
+def change_return_status(request, pk):
+    try:
+        return_request_item = ReturnOrder.objects.select_for_update().get(pk=pk) # Lock the selected row for update
+        return_request_item.return_status = 2
+        return_request_item.save()
+
+        order = return_request_item.order
+        order.order_status = 5
+        order.save()
+
+        product = return_request_item.product
+        product.stock += order.quantity
+        product.save() 
+
+        wallet = Wallet.objects.select_for_update().get(user=return_request_item.user) # Lock the selected row for update
+        wallet.balance += order.amount
+        wallet.save()
+    except (ReturnOrder.DoesNotExist, Wallet.DoesNotExist) as e:
+        # Handle the case where ReturnOrder or Wallet does not exist
+        # You might want to log the error or return an appropriate response
+        return HttpResponseServerError("An error occurred: {}".format(str(e)))
+
     return redirect('return_list')
 
 

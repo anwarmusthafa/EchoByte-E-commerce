@@ -17,6 +17,7 @@
               <th> Address </th>
               <th> Date </th>
               <th> Refund Amount </th>
+              <th>Reason</th>
               <th>Status</th>
               <th>Action</th>
             </tr>
@@ -31,6 +32,7 @@
               <td> <p>{{return.address.name}} <br> {{return.address.phone}}</p> </td>
               <td>{{return.created_at |date:"d-m-Y" }}</td>
               <td>{{return.amount_to_refund}}</td>
+              <td>{{return.reason}}</td>
               <td>{{ return.get_return_status_display }}</td>
               
                <td>
@@ -43,12 +45,11 @@
                 <style>
                   #returned {
                       cursor: not-allowed;
-                      opacity: 0.6;
                       pointer-events: none;
                   }
               </style>
               
-                <button id="returned" value="" name="status" class="btn btn-danger" onclick="return false;">Returned</button>
+                <button id="returned" value="" name="status" class="btn btn-success" onclick="return false;">Returned</button>
 
                 {% endif %}
                 {% comment %} <button value="-2" name = "status" type="submit" class="btn btn-danger">Cancel</button> {% endcomment %}

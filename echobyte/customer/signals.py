@@ -23,4 +23,10 @@ def send_otp(user):
         from_email = "echobyte24@gmail.com"
         to_email = [user.user.username]
         send_mail(subject,message,from_email,to_email)
+
+@receiver(post_save, sender=User)
+def create_user_wallet(sender, instance, created, **kwargs):
+    if created:
+        Wallet.objects.create(user=instance)
+
      

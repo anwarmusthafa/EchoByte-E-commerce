@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.models import User
-from .models import Customer, Address
+from .models import Customer, Address, Wallet
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect
@@ -194,3 +194,9 @@ def add_address(request):
             # Log the error or handle it as per your application's needs
             return HttpResponseServerError("An error occurred: {}".format(str(e)))
     return render(request, 'add-address.html')
+def wallet(request):
+    wallet = Wallet.objects.get(user = request.user)
+    context = {
+        'wallet': wallet
+    }
+    return render(request, 'wallet.html', context)

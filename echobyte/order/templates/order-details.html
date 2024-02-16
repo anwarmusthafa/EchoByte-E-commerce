@@ -78,16 +78,20 @@
                                                         <span class="manage-o__text">Standard</span></div>
                                                 </div>
                                                 {% if order.order_status == -1 %}
-                                                <div class="alert alert-danger col-6 mx-auto" role="alert">
+                                                <div class="alert alert-danger col-4 mx-auto" role="alert">
                                                     <h2 class="text-center">Order Cancelled</h2>
                                                 </div>
                                             {% elif order.order_status == -2 %}
-                                                <div class="alert alert-danger col-6 mx-auto" role="alert">
+                                                <div class="alert alert-danger col-4 mx-auto" role="alert">
                                                     <h2 class="text-center">Seller Cancelled Order</h2>
                                                 </div>
                                                 {% elif order.order_status == 4 %}
-                                                <div class="alert alert-danger col-6 mx-auto" role="alert">
+                                                <div class="alert alert-danger col-4 mx-auto" role="alert">
                                                     <h2 class="text-center">Return Requested</h2>
+                                                </div>
+                                                {% elif order.order_status == 5 %}
+                                                <div class="alert alert-danger col-4 mx-auto" role="alert">
+                                                    <h2 class="text-center">Returned</h2>
                                                 </div>
                                             {% else %}
                                                  
@@ -183,15 +187,15 @@
                                                     <h2 class="dash__h2 u-s-m-b-8">Total Summary</h2>
                                                     <div class="dash-l-r u-s-m-b-8">
                                                         <div class="manage-o__text-2 u-c-secondary">Subtotal</div>
-                                                        <div class="manage-o__text-2 u-c-secondary">$16.00</div>
+                                                        <div class="manage-o__text-2 u-c-secondary">₹{{order.amount}}</div>
                                                     </div>
                                                     <div class="dash-l-r u-s-m-b-8">
                                                         <div class="manage-o__text-2 u-c-secondary">Shipping Fee</div>
-                                                        <div class="manage-o__text-2 u-c-secondary">$16.00</div>
+                                                        <div class="manage-o__text-2 u-c-secondary">₹0.00</div>
                                                     </div>
                                                     <div class="dash-l-r u-s-m-b-8">
                                                         <div class="manage-o__text-2 u-c-secondary">Total</div>
-                                                        <div class="manage-o__text-2 u-c-secondary">$30.00</div>
+                                                        <div class="manage-o__text-2 u-c-secondary">₹{{order.amount}}</div>
                                                     </div>
 
                                                     <span class="dash__text-2">Paid by Cash on Delivery</span>

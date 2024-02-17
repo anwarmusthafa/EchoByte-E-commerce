@@ -3,8 +3,7 @@ from django.contrib.auth.decorators import login_required
 from .models import Cart,CartItems,Order,OrderItem, ReturnOrder
 from customer.models import Address, Customer , Wallet
 from product.models import Product, ProductVariant, ProductImage
-from .models import Cart,CartItems
-from decimal import Decimal
+from .models import Cart,CartItems, Wishlist
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseServerError, JsonResponse
 from django.contrib import messages
@@ -12,7 +11,9 @@ from django.urls import reverse
 from django.db import transaction
 import uuid
 from django.db.models import Q
-
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import Wishlist
 
 # Create your views here.
 @login_required(login_url='signin')
@@ -241,6 +242,31 @@ def change_return_status(request, pk):
         return HttpResponseServerError("An error occurred: {}".format(str(e)))
 
     return redirect('return_list')
+def wishlist(request):
+    wishlist_items = Wishlist.objects.filter(user=request.user)
+    context = {'wishlist_items': wishlist_items}
+    return render(request,'wishlist.html', context)
+
+@csrf_exempt
+def add_to_wishlist(request):
+    if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        # Assuming you have some way to identify the current user
+        user = request.user
+        # Get the product ID from the AJAX request
+        product_id = request.POST.get('product_id')
+        product = ProductVariant.objects.get(pk=product_id) 
+        wishlist_item = Wishlist.objects.create(user=request.user, product=product)
+        return JsonResponse({'message': 'Product added to wishlist'}, status=200)
+    else:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+def remove_from_wishlist(request,pk):
+    wishlist_item = Wishlist.objects.get(pk=pk)
+    wishlist_item.delete()
+    return redirect('wishlist')
+
+
+
+
 
 
 

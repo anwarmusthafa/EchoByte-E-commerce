@@ -4,7 +4,8 @@ from category.models import Brand,Category
 from product.models import Product,ProductVariant, ProductImage
 from django.core.paginator import Paginator
 from django.core.exceptions import ObjectDoesNotExist
-from order.models import CartItems, Cart
+from order.models import CartItems, Cart,Wishlist
+
 
 # Create your views here.
 def all_products(request):
@@ -20,6 +21,7 @@ def all_products(request):
     Q(product__category__is_listed=False) |
     Q(is_listed=False)
 )
+        wishlist_product_pks = list(Wishlist.objects.filter(user=request.user).values_list('product__pk', flat=True))
         # Apply sorting
         if sort_by == 'latest':
             variants = variants.order_by('-product__created_at')
@@ -43,7 +45,8 @@ def all_products(request):
             'variants': page_obj,
             'query': query,
             'sort_by': sort_by,
-            'category': category
+            'category': category,
+            'wishlist_product_pks':wishlist_product_pks
         }
     except ObjectDoesNotExist as e:
         context = {

@@ -2922,6 +2922,7 @@ input::-ms-clear {
     font-size: 14px;
     text-decoration: line-through; }
   .w-r__link {
+    color :#000000;
     font-size: 12px;
     font-weight: 600;
     display: inline-block;

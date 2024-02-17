@@ -77,7 +77,10 @@ class ReturnOrder(models.Model):
     amount_to_refund = models.DecimalField( max_digits=10, decimal_places=2)
     return_status = models.IntegerField(choices=STATUS_CHOICES, default=RETURN_REQUESTED)
     created_at = models.DateTimeField(auto_now_add=True)
-
+class Wishlist(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    product = models.ForeignKey(ProductVariant,on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
      
 
 

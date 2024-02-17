@@ -2,14 +2,19 @@
 {% load static %}
 {% block title%}All Products {% endblock %}
 {% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
 <style>
     .selected-category {
         color: red;
     }
+    
 </style>
         <!--====== App Content ======-->
         <div class="app-content">
-
+           
+            
             <!--====== Section 1 ======-->
             <div class="u-s-p-y-90">
                 <div class="container">
@@ -413,52 +418,50 @@
                                 </div>
                                 <div class="shop-p__collection">
                                     {% for variant in variants %}
+                                    
                                     <div class="row is-list-active">
-                                        
-                                       
                                         <div class="col-lg-4 col-md-6 col-sm-6">
                                             <div class="product-m">
-                                                
                                                 <div class="product-m__thumb">
-
                                                     <a class="aspect aspect--bg-grey aspect--square u-d-block" href="{% url "product_detail" variant.id %}">
-                                                        {% if  variant.product.images.all %}
+                                                        {% if variant.product.images.all %}
                                                         <img class="aspect__img" src="{% if variant.product.images.all %}{{ variant.product.images.first.image.url }}{% endif %}" alt="product image">
-                                                    {% endif %}
-                                                <div class="product-m__quick-look">
-
-                                                        <a class="fas fa-search" data-modal="modal" data-modal-id="#quick-look" data-tooltip="tooltip" data-placement="top" title="Quick Look"></a></div>
-                                                    {% comment %} <div class="product-m__add-cart">
-
-                                                        <a class="btn--e-brand" data-modal="modal" data-modal-id="#add-to-cart">Add to Cart</a></div> {% endcomment %}
+                                                        {% endif %}
+                                                    </a>
+                                                    <div class="product-m__quick-look">
+                                                        <a class="fas fa-search" data-modal="modal" data-modal-id="#quick-look" data-tooltip="tooltip" data-placement="top" title="Quick Look"></a>
+                                                    </div>
                                                 </div>
                                                 <div class="product-m__content">
                                                     <div class="product-m__category">
-
-                                                        <a href="shop-side-version-2.html">{{variant.product.category | title}}</a></div>
+                                                        <a href="shop-side-version-2.html">{{variant.product.category | title}}</a>
+                                                    </div>
                                                     <div class="product-m__name">
-
-                                                        <a href="{% url "product_detail" variant.id %}">{{variant.product.brand}} {{variant.product.title}} ({{variant.variant_name}}) </a></div>
+                                                        <a href="{% url "product_detail" variant.id %}">{{variant.product.brand}} {{variant.product.title}} ({{variant.variant_name}}) </a>
+                                                    </div>
                                                     <div class="product-m__rating gl-rating-style"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i><i class="far fa-star"></i><i class="far fa-star"></i>
-
-                                                        <span class="product-m__review">(23)</span></div>
+                                                        <span class="product-m__review">(23)</span>
+                                                    </div>
                                                     <div class="product-m__price">{{ variant.selling_price|floatformat:"0" }}
-
-                                                        <span class="product-m__discount">{{variant.original_price}}</span></div>
+                                                        <span class="product-m__discount">{{variant.original_price}}</span>
+                                                    </div>
                                                     <div class="product-m__hover">
-                                                        {% comment %} <div class="product-m__preview-description">
-
-                                                            <span>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</span></div> {% endcomment %}
-                                                            <ul style="color : black">
-                                                                <li>{{variant.ram}} RAM | {{variant.storage}} ROM </li>
-                                                                <li>{{variant.product.display}} Display</li>
-                                                                <li>{{variant.product.back_camera}} | {{variant.product.front_camera}} Front Camera</li>
-                                                                <li>{{ variant.product.processor_brand}} {{variant.product.processor}} Processor</li>
-                                                                <li>{{variant.product.battery_capacity}} mAh</li>
-                                                              </ul>
+                                                        <ul style="color : black">
+                                                            <li>{{variant.ram}} RAM | {{variant.storage}} ROM </li>
+                                                            <li>{{variant.product.display}} Display</li>
+                                                            <li>{{variant.product.back_camera}} | {{variant.product.front_camera}} Front Camera</li>
+                                                            <li>{{ variant.product.processor_brand}} {{variant.product.processor}} Processor</li>
+                                                            <li>{{variant.product.battery_capacity}} mAh</li>
+                                                        </ul>
                                                         <div class="product-m__wishlist">
-
-                                                            <a class="far fa-heart" href="#" data-tooltip="tooltip" data-placement="top" title="Add to Wishlist"></a></div>
+                                                            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                                                            <input id="product-id" type="hidden" name="product_id" value="{{variant.pk}}">
+                                                            {% if variant.pk in wishlist_product_pks %}
+                                                            <button class="add-to-wishlist-btn fas fa-heart" data-tooltip="tooltip" data-placement="top" style="color: red; background: none; border: none;" title="Remove from Wishlist"></button>
+                                                        {% else %}
+                                                            <button class="add-to-wishlist-btn far fa-heart" data-tooltip="tooltip" data-placement="top" style="color: red; background: none; border: none;" title="Add to Wishlist"></button>
+                                                        {% endif %}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -504,6 +507,41 @@
                 window.location.href = newUrl;
             });
         </script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Make sure jQuery is included -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            jQuery(document).ready(function($) {
+                $('.add-to-wishlist-btn').click(function(e) {
+                    e.preventDefault();
+                    var $button = $(this); // Reference to the button clicked
+                    var productId = $button.siblings('#product-id').val();
+                    $.ajax({
+                        type: 'POST',
+                        url: '{% url "add_to_wishlist" %}',
+                        data: {
+                            'csrfmiddlewaretoken': '{{ csrf_token }}',
+                            'product_id': productId
+                        },
+                        success: function(response) {
+                            // Add a class to show the notification
+                            
+                            // Disable the button after successful request
+                            $button.addClass('fas fa-heart ')
+                            $button.prop('disabled', true);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error(xhr.responseText);
+                        }
+                    });
+                });
         
+                // Close button for the notification
+                $('.wishlist-notification .close-btn').click(function() {
+                    $('#wishlist-notification').removeClass('show');
+                });
+            });
+        </script>
+        
+ 
         {% endblock content %}
 

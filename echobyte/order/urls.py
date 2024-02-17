@@ -18,6 +18,10 @@ urlpatterns = [
     path('return_order/<pk>/', views.return_order, name= "return_order"),
     path('return_list/', views.return_list, name= "return_list"),
     path('change_return_status/<pk>/', views.change_return_status, name= "change_return_status"),
+    path('add_to_wishlist/', views.add_to_wishlist, name= "add_to_wishlist"),
+    path('wishlist/', views.wishlist, name= "wishlist"),
+    path('remove_from_wishlist/<pk>/', views.remove_from_wishlist, name= "remove_from_wishlist"),
+    
     
 
     ]

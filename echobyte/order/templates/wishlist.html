@@ -62,12 +62,12 @@
                                         <div class="w-r__wrap-1">
                                             <div class="w-r__img-wrap">
 
-                                                <img class="u-img-fluid" src="{{ wishlist_item.product.product.images.first.image.url }}" alt=""></div>
+                                                <a href="{% url "product_detail" wishlist_item.product.pk %}"><img class="u-img-fluid" src="{{ wishlist_item.product.product.images.first.image.url }}" alt=""> </a></div>
                                             <div class="w-r__info">
 
                                                 <span class="w-r__name">
 
-                                                    <a href="product-detail.html">{{wishlist_item.product.product.brand}} {{wishlist_item.product.product.title}} ({{wishlist_item.product.variant_name}}) </a></span>
+                                                    <a href="{% url "product_detail" wishlist_item.product.pk %}">{{wishlist_item.product.product.brand}} {{wishlist_item.product.product.title}} ({{wishlist_item.product.variant_name}}) </a></span>
 
                                                 <span class="w-r__category">
 
@@ -79,9 +79,9 @@
                                         </div>
                                         <div class="w-r__wrap-2">
 
-                                            <a class="w-r__link btn--e-brand-b-2" data-modal="modal" data-modal-id="#add-to-cart">ADD TO CART</a>
+                                            {% comment %} <a class="w-r__link btn--e-brand-b-2" data-modal="modal" data-modal-id="#add-to-cart">ADD TO CART</a> {% endcomment %}
 
-                                            <a class="w-r__link btn--e-transparent-platinum-b-2" href="product-detail.html">VIEW</a>
+                                            {% comment %} <a class="w-r__link btn--e-transparent-platinum-b-2" href="product-detail.html">VIEW</a> {% endcomment %}
 
                                             <a class="w-r__link btn--e-transparent-platinum-b-2" href="{% url "remove_from_wishlist" wishlist_item.pk %}">REMOVE</a></div>
                                     </div>
@@ -90,7 +90,7 @@
                                 
                                 <!--====== End - Wishlist Product ======-->
                             </div>
-                            <div class="col-lg-12">
+                            {% comment %} <div class="col-lg-12">
                                 <div class="route-box">
                                     <div class="route-box__g">
 
@@ -103,7 +103,7 @@
 
                                             <span>CLEAR WISHLIST</span></a></div>
                                 </div>
-                            </div>
+                            </div> {% endcomment %}
                         </div>
                     </div>
                 </div>

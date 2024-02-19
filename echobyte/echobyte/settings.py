@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'banner',
     'user_home',
     'category',
+    'coupon',
 
 ]
 

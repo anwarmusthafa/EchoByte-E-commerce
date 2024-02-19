@@ -14,6 +14,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import Wishlist
+from coupon.models import Coupon
 
 # Create your views here.
 @login_required(login_url='signin')
@@ -76,7 +77,6 @@ def checkout(request):
     cart = get_object_or_404(Cart, owner=user)
     cart_items = CartItems.objects.filter(cart=cart).order_by('-created_at')
     address = Address.objects.filter(user=user)
-    
     if request.method == 'POST':
         address_id = request.POST.get('address')
         amount = request.POST.get('amount')
@@ -129,10 +129,16 @@ def checkout(request):
             print(e)
             # Handle any other exceptions, such as database errors
             error_message = "An error occurred while processing your order. Please try again later."
+            
+            return render(request, 'checkout.html', {'cart': cart, 'cart_items': cart_items, 'address': address, 'error_message': error_message })
+    context = {
+        'cart': cart,
+        'cart_items': cart_items, 
+        'address': address , 
+        'discount_percentage': request.session.get('discount_percentage'),
+        'coupon_code' : request.session.get('applied_coupon_code') }
 
-            return render(request, 'checkout.html', {'cart': cart, 'cart_items': cart_items, 'address': address, 'error_message': error_message})
-
-    return render(request, 'checkout.html', {'cart': cart, 'cart_items': cart_items, 'address': address})
+    return render(request, 'checkout.html', context)
 @login_required(login_url='signin')
 def order_success(request):
     return render(request,'order_success.html')
@@ -263,6 +269,7 @@ def remove_from_wishlist(request,pk):
     wishlist_item = Wishlist.objects.get(pk=pk)
     wishlist_item.delete()
     return redirect('wishlist')
+
 
 
 

@@ -1,6 +1,6 @@
 {% load each_cart_item_price %}
 {% load sub_total_of_cart %}
-<!DOCTYPE html><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -8,6 +8,8 @@
   <title>Checkout Page</title>
   <!-- Bootstrap CSS -->
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
   <style>
     body {
       background-color: #f8f9fa;
@@ -47,126 +49,161 @@
       max-width: 80px;
       max-height: 80px;
     }
+    .remove-icon {
+      color: red;
+  }
   </style>
 </head>
 <body>
   <div class="container mt-5">
-    <form method="post" action="{% url "checkout" %}">
-      {% csrf_token %}
     <h2 class="text-center mb-4">Checkout</h2>
+
     {% if error_message %}
         <div class="alert alert-danger text-center" role="alert">
-          {{ error_message }}
+            {{ error_message }}
         </div>
-        {% endif %}
+    {% endif %}
+
+    <!-- Coupon Section -->
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+              <div class="card-header">
+                {% if discount_percentage %}
+                    Applied Coupon: {{ coupon_code }}
+                    <a href="" style="color: inherit; text-decoration: none;"> <!-- Override anchor tag styles -->
+                        <i class="fas fa-times-circle fa-lg remove-icon"></i>
+                        <!-- Example remove icon, you can use your own -->
+                    </a>
+                {% else %}
+                    Apply Coupon
+                {% endif %}
+            </div>
+            
+                <div class="card-body">
+                    {% if not discount_percentage %}
+                        <form action="{% url 'apply_coupon' %}" method="post" class="needs-validation" novalidate>
+                            {% csrf_token %}
+                            <div class="input-group">
+                                <input type="text" name='coupon-code' class="form-control" placeholder="Enter coupon code" required>
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" type="submit">Apply</button>
+                                </div>
+                                <div class="invalid-feedback">
+                                    Please enter a coupon code.
+                                </div>
+                            </div>
+                        </form>
+                    {% endif %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="text-danger alert alert-{{ message.tags }}" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Address Section -->
     <div class="row">
-      
+        <form method="post" action="{% url "checkout" %}">
+            {% csrf_token %}
 
-      <div class="col-md-6 mb-4">
-        <div class="card">
-          <div class="card-header">
-            Select Address
-          </div>
-          <div class="card-body">
-            <div class="row">
-              
-              <!-- Address  -->
-              {% for address in address %}
-              <div class="col-md-6">
-                <div class="">
-                  <input type="radio" value="{{ address.pk }}" id="add{{ address.pk }}" name="address">
-                  <label class="" for="add{{ address.pk }}">
-                    <div class="address-box">
-                      <p>{{ address.name }}, {{ address.phone }}, {{ address.address }}, {{ address.city }}, {{ address.pincode }}, {{ address.state }}</p>
+            <div class="col-md-12 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        Select Address
                     </div>
-                  </label>
+                    <div class="card-body col-lg-12">
+                        <div class="row">
+                            <!-- Address  -->
+                            {% for address in address %}
+                            <div class="col-md-6">
+                                <div class="">
+                                    <input type="radio" value="{{ address.pk }}" id="add{{ address.pk }}" name="address">
+                                    <label class="" for="add{{ address.pk }}">
+                                        <div class="address-box">
+                                            <p>{{ address.name }}, {{ address.phone }}, {{ address.address }}, {{ address.city }}, {{ address.pincode }}, {{ address.state }}</p>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <!-- Add more address options as needed -->
+                        <a href="{% url 'add_address' %}"> <p class="text-center">Add New Address</p></a>
+                    </div>
                 </div>
-              </div>
-              {% endfor %}
             </div>
-            <!-- Add more address options as needed -->
-            <a href="{% url 'add_address' %}"> <p class="text-center">Add New Address</p></a>
-          </div>
-        </div>
-      </div>
-      <!-- Coupon Section -->
-      <div class="col-md-6 mb-4">
-        <div class="card">
-          <div class="card-header">
-            Apply Coupon
-          </div>
-          <div class="card-body">
-            <div class="input-group mb-3">
-              <input type="text" class="form-control" placeholder="Enter coupon code">
-              <div class="input-group-append">
-                <button class="btn btn-outline-secondary" type="button">Apply</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+            <!-- Coupon Section -->
+        </form>
     </div>
+
     <!-- Product Information Section -->
     <div class="card mb-4">
-      <div class="card-header">
-        Product Information
-      </div>
-      <div class="card-body" id="product-info">
-        {% for cart_item in  cart_items %}
-        <!-- Product 1 -->
-        <div class="row mb-2">
-          <div class="col-md-2">
-            <img src="{{ cart_item.product.product.images.first.image.url }}" alt="Product Image" class="img-fluid product-img">
-          </div>
-          <div class="col-md-4">
-            <p>{{cart_item.product.product.brand}} {{cart_item.product.product.title}} {{cart_item.product.variant_name}}</p> <!-- Product Name -->
-          </div>
-          <div class="col-md-2">
-            <p> {% with total_price=cart_item.product.selling_price|each_cart_item_price:cart_item.quantity %}
-              {{ total_price }}
-            {% endwith %}</p> <!-- Product Price -->
-          </div>
-          <div class="col-md-2">
-            <p>{{cart_item.quantity}}</p> <!-- Product Quantity -->
-          </div>
+        <div class="card-header">
+            Product Information
         </div>
-        {% endfor %}
-      </div>
+        <div class="card-body" id="product-info">
+            {% for cart_item in  cart_items %}
+            <!-- Product 1 -->
+            <div class="row mb-2">
+                <div class="col-md-2">
+                    <img src="{{ cart_item.product.product.images.first.image.url }}" alt="Product Image" class="img-fluid product-img">
+                </div>
+                <div class="col-md-4">
+                    <p>{{cart_item.product.product.brand}} {{cart_item.product.product.title}} {{cart_item.product.variant_name}}</p> <!-- Product Name -->
+                </div>
+                <div class="col-md-2">
+                    <p> {% with total_price=cart_item.product.selling_price|each_cart_item_price:cart_item.quantity %}
+                        {{ total_price }}
+                    {% endwith %}</p> <!-- Product Price -->
+                </div>
+                <div class="col-md-2">
+                    <p>{{cart_item.quantity}}</p> <!-- Product Quantity -->
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
+
     <!-- Payment Section -->
     <div class="row">
-      <div class="col-md-6 offset-md-3">
-        <div class="card">
-          <div class="card-header">
-            Payment Options
-          </div>
-          <div class="card-body">
-            <!-- Total Price -->
-            <p>Total: <span id="total-price">₹{{ cart|sub_total_of_cart }}</span></p>
-            <input type="hidden" name="amount" value="{{ cart|sub_total_of_cart }}">
-            <!-- Cash on Delivery Option -->
-            <div class="custom-control custom-radio mb-3">
-              <input  value="cod" type="radio" id="cashOnDelivery" name="paymentOption" class="custom-control-input" checked>
-              <label class="custom-control-label" for="cashOnDelivery">Cash on Delivery</label>
+        <div class="col-md-6 offset-md-3">
+            <div class="card">
+                <div class="card-header">
+                    Payment Options
+                </div>
+                <div class="card-body">
+                    <!-- Total Price -->
+                    <p>Total: <span id="total-price">₹{{ cart|sub_total_of_cart }}</span></p>
+                    <input type="hidden" name="amount" value="{{ cart|sub_total_of_cart }}">
+                    <!-- Cash on Delivery Option -->
+                    <div class="custom-control custom-radio mb-3">
+                        <input  value="cod" type="radio" id="cashOnDelivery" name="paymentOption" class="custom-control-input" checked>
+                        <label class="custom-control-label" for="cashOnDelivery">Cash on Delivery</label>
+                    </div>
+                    <!-- Razorpay Option (Placeholder) -->
+                    <div class="custom-control custom-radio">
+                        <input value="online" type="radio" id="razorpay" name="paymentOption" class="custom-control-input">
+                        <label class="custom-control-label" for="razorpay">Razorpay</label>
+                    </div>
+                </div>
             </div>
-            <!-- Razorpay Option (Placeholder) -->
-            <div class="custom-control custom-radio">
-              <input value="online" type="radio" id="razorpay" name="paymentOption" class="custom-control-input">
-              <label class="custom-control-label" for="razorpay">Razorpay</label>
-            </div>
-          </div>
         </div>
-      </div>
     </div>
+
     <!-- Proceed to Checkout Button -->
     <div class="row mt-4">
-      <div class="col-md-6 offset-md-3">
-        <button class="btn btn-success btn-block">Place Order</button>
-      </div>
+        <div class="col-md-6 offset-md-3">
+            <button class="btn btn-success btn-block">Place Order</button>
+        </div>
     </div>
-  </form>
   </div>
+
   <!-- Bootstrap JS -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>

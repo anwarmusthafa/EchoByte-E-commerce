@@ -17,22 +17,18 @@
               <th> Address </th>
               <th> Date </th>
               <th> Amount </th>
-              <th>Status</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
-          
             {% for order in orders %}
             <tr>
               <td> {{order.pk}} </td>
-              <td> {{order.order.owner.username}} </td>
-              <td> {{order.product.product.brand}} {{order.product.product.title}} ({{order.product.variant_name}})</td>
+              <td> {{order.order.owner.customer.name}} </td>
+              <td> {{order.product.product.brand}} {{order.product.product.title}} <br> ({{order.product.variant_name}})</td>
               <td> <p>{{order.address.name}} <br> {{order.address.phone}}</p> </td>
               <td>{{order.created_at |date:"d-m-Y" }}</td>
               <td>{{order.amount}}</td>
-              <td>{{ order.get_order_status_display }}</td>
-              
                <td>
                 <form action="{% url 'change_order_status' order.pk %}" method="post" onsubmit="return confirm('Are you sure you want to change the status?');">
                   {% csrf_token %}
@@ -43,10 +39,7 @@
               </form>
             </td> 
               {% endfor %}
-         
-
             </tr>
-            
           </tbody>
         </table>
       </div>

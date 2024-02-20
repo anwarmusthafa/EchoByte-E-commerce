@@ -53,6 +53,26 @@
     .remove-icon {
       color: red;
   }
+  .card {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.copy-button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.copy-button:hover {
+    background-color: #0056b3;
+}
+.icon {
+    margin-right: 8px;
+}
   </style>
 </head>
 <body>
@@ -95,6 +115,18 @@
                                 </div>
                             </div>
                         </form>
+                        {% for coupon in coupons %}
+    <div class="coupon-container" style="display: inline-block;">
+        <p class="coupon-title" style="display: inline-block; margin: 0;">{{ coupon.title }} : </p>
+        <p class="coupon-code" style="display: inline-block; margin: 0;">{{ coupon.code }}</p>
+        <button class="copy-button" style="display: inline-block;">
+            <i class="icon fas fa-copy"></i>
+        </button>
+    </div>
+    <br>
+    <br>
+{% endfor %}
+                        
                     {% endif %}
                     {% if messages %}
                         {% for message in messages %}
@@ -217,5 +249,32 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <!-- Your custom JavaScript can go here -->
+
+  <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+
+  <script>
+    var copyButtons = document.querySelectorAll('.copy-button');
+    copyButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            var couponContainer = this.closest('.coupon-container');
+            var textToCopy = couponContainer.querySelector('.coupon-code').innerText;
+            navigator.clipboard.writeText(textToCopy)
+                .then(function() {
+                    var copyIcon = couponContainer.querySelector('.icon');
+                    copyIcon.classList.remove('fa-copy');
+                    copyIcon.classList.add('fa-check');
+                    copyIcon.style.color = 'green';
+                    setTimeout(function() {
+                        copyIcon.classList.remove('fa-check');
+                        copyIcon.classList.add('fa-copy');
+                        copyIcon.style.color = '';
+                    }, 2000); // Reset to copy icon after 2 seconds
+                })
+                .catch(function(err) {
+                    console.error('Could not copy text: ', err);
+                });
+        });
+    });
+</script>
 </body>
 </html>

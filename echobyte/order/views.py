@@ -79,6 +79,7 @@ def checkout(request):
     cart = get_object_or_404(Cart, owner=user)
     cart_items = CartItems.objects.filter(cart=cart).order_by('-created_at')
     address = Address.objects.filter(user=user)
+    coupons = Coupon.objects.filter(is_active = True)
     
     if request.method == 'POST':
         address_id = request.POST.get('address')
@@ -146,6 +147,7 @@ def checkout(request):
         'cart': cart,
         'cart_items': cart_items, 
         'address': address , 
+        'coupons':coupons,
         'discount_percentage': request.session.get('discount_percentage'),
         'coupon_code' : request.session.get('applied_coupon_code') }
 

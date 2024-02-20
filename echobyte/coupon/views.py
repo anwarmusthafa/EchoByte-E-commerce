@@ -18,10 +18,18 @@ def apply_coupon(request):
         return redirect('checkout')
     else:
         return HttpResponse('Method not allowed', status=405)
+    
+def remove_coupon(request):
+    if 'discount_percentage' in request.session:
+        del request.session['discount_percentage']
+    if 'applied_coupon_code' in request.session:
+        del request.session['applied_coupon_code']
+    return redirect('checkout')
 def clear_session(request):
     # Clear all session data
     request.session.flush()
     return HttpResponse("Session cleared successfully!")
+
 
 
 

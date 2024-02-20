@@ -1,5 +1,6 @@
 {% load each_cart_item_price %}
 {% load sub_total_of_cart %}
+{% load calculate_discount_amount %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -71,7 +72,7 @@
               <div class="card-header">
                 {% if discount_percentage %}
                     Applied Coupon: {{ coupon_code }}
-                    <a href="" style="color: inherit; text-decoration: none;"> <!-- Override anchor tag styles -->
+                    <a href="{% url "remove_coupon" %}" style="color: inherit; text-decoration: none;"> <!-- Override anchor tag styles -->
                         <i class="fas fa-times-circle fa-lg remove-icon"></i>
                         <!-- Example remove icon, you can use your own -->
                     </a>
@@ -139,7 +140,7 @@
                 </div>
             </div>
             <!-- Coupon Section -->
-        </form>
+        
     </div>
 
     <!-- Product Information Section -->
@@ -180,7 +181,12 @@
                 <div class="card-body">
                     <!-- Total Price -->
                     <p>Total: <span id="total-price">₹{{ cart|sub_total_of_cart }}</span></p>
-                    <input type="hidden" name="amount" value="{{ cart|sub_total_of_cart }}">
+                   {% if discount_percentage %} <p>Coupon Discount: <span id="total-price">₹{{ cart|calculate_discount_amount:discount_percentage }}</span></p>
+                    <p>Sub Total: <span id="total-price">₹{{ cart|sub_total_of_cart:discount_percentage }}</span></p> 
+                    <input type="hidden" name="amount" value="{{ cart|sub_total_of_cart:discount_percentage  }}">
+                    {% else %}
+                    <input type="hidden" name="amount" value="{{ cart|sub_total_of_cart}}">
+                    {% endif %}
                     <!-- Cash on Delivery Option -->
                     <div class="custom-control custom-radio mb-3">
                         <input  value="cod" type="radio" id="cashOnDelivery" name="paymentOption" class="custom-control-input" checked>
@@ -194,6 +200,7 @@
                 </div>
             </div>
         </div>
+    
     </div>
 
     <!-- Proceed to Checkout Button -->
@@ -203,6 +210,7 @@
         </div>
     </div>
   </div>
+</form>
 
   <!-- Bootstrap JS -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

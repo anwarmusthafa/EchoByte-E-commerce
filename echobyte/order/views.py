@@ -15,6 +15,8 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import Wishlist
 from coupon.models import Coupon
+import decimal
+from django.db.models import Case, When, Value, IntegerField
 
 # Create your views here.
 @login_required(login_url='signin')
@@ -77,6 +79,7 @@ def checkout(request):
     cart = get_object_or_404(Cart, owner=user)
     cart_items = CartItems.objects.filter(cart=cart).order_by('-created_at')
     address = Address.objects.filter(user=user)
+    
     if request.method == 'POST':
         address_id = request.POST.get('address')
         amount = request.POST.get('amount')
@@ -113,7 +116,11 @@ def checkout(request):
                         return int(unique_id_str)
                     unique_order_id = generate_unique_integer_id(length=8)
                     amount = cart_item.quantity * cart_item.product.selling_price
-                    OrderItem.objects.create(id=unique_order_id,order=order, product=cart_item.product, address=address_obj, quantity=cart_item.quantity, amount=amount)
+                    discount_percentage = request.session.get('discount_percentage')
+                    if discount_percentage:
+                        coupon_discount = decimal.Decimal(amount) * decimal.Decimal(discount_percentage) / decimal.Decimal(100)
+                        amount -= coupon_discount
+                    OrderItem.objects.create(id=unique_order_id,order=order, product=cart_item.product, address=address_obj, quantity=cart_item.quantity, amount= float(amount))
                     product = cart_item.product
                     product.stock -= cart_item.quantity
                     product.save()
@@ -121,6 +128,10 @@ def checkout(request):
                 # clear the cart after successful checkout
                 cart_items.delete()
                 cart.delete()
+                if 'discount_percentage' in request.session:
+                    del request.session['discount_percentage']
+                if 'applied_coupon_code' in request.session:
+                    del request.session['applied_coupon_code']
 
             # Redirect to the order success page or any other page
             return redirect('order_success')  # Replace 'order_success' with your actual URL name
@@ -144,7 +155,14 @@ def order_success(request):
     return render(request,'order_success.html')
 @login_required(login_url='admin_login')
 def list_orders(request):
-    orders = OrderItem.objects.all().order_by('-created_at')
+    orders = OrderItem.objects.annotate(
+    custom_order=Case(
+        When(order_status=0, then=Value(0)),
+        When(order_status=1, then=Value(0)),
+        default=Value(1),
+        output_field=IntegerField(),
+    )
+).order_by('custom_order', '-order_status')
     context = {'orders':orders}
     return render(request, 'list-orders.html', context)
 def change_order_status(request, pk):

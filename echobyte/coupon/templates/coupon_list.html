@@ -17,6 +17,7 @@
                             <th>Code</th>
                             <th>Discount Percentage</th>
                             <th>Status</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -26,6 +27,9 @@
                         <td>{{coupon.code}}</td>
                         <td>{{coupon.discount_percentage}}</td>
                         <td>{{coupon.is_active}}</td>
+                        <td>
+                            <button class="btn btn-danger mr-2 delete-btn" data-coupon-id="{{ coupon.pk }}">Delete</button>
+                        </td>
 
                         </tr>
                         {% endfor %}
@@ -35,5 +39,34 @@
         </div>
     </div>
 </div>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<!-- JavaScript to trigger SweetAlert -->
+<script>
+    // Add event listener to the delete buttons
+    document.querySelectorAll('.delete-btn').forEach(function(button) {
+        button.addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent the default action of submitting the form
+            
+            // Get the coupon ID from the data attribute
+            var couponId = button.getAttribute('data-coupon-id');
+
+            // Show SweetAlert
+            swal({
+                title: "Are you sure?",
+                text: "Once deleted, you will not be able to recover this coupon!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+                    // If user confirms deletion, navigate to the delete URL
+                    window.location.href = "{% url 'delete_coupon' 0 %}".replace('0', couponId);
+                }
+            });
+        });
+    });
+</script>
+
 
 {% endblock %}

@@ -2,18 +2,19 @@ from django.shortcuts import render
 from django.shortcuts import redirect, HttpResponse
 from django.contrib import messages
 from .models import *
-from datetime import date
-
-# Create your views here
+from django.utils import timezone
 
 def apply_coupon(request):
     if request.method == 'POST':
         coupon_code = request.POST.get('coupon-code')
         try:
-            today = date.today()
+            today = timezone.now().date()
+            print(today)
             coupon = Coupon.objects.get(code=coupon_code, is_active=True)
+            print(coupon.valid_from)
+            print(coupon.valid_to)
             
-            if coupon.valid_from and coupon.valid_to:
+            if coupon.valid_from or coupon.valid_to:
                 if today < coupon.valid_from or today > coupon.valid_to:
                     messages.error(request, 'Coupon is not valid yet or has expired.')
                     return redirect('checkout')
@@ -29,6 +30,7 @@ def apply_coupon(request):
         return redirect('checkout')
     else:
         return HttpResponse('Method not allowed', status=405)
+
 
     
 def remove_coupon(request):
@@ -48,9 +50,13 @@ def add_coupon(request):
         valid_from = request.POST.get('valid_from')
         valid_to = request.POST.get('valid_to')
         discount_percentage = request.POST.get('discount_percentage')
-        coupon = Coupon.objects.create(title=title,code=code,valid_from=valid_from,discount_percentage=discount_percentage)
+        coupon = Coupon.objects.create(title=title,code=code,valid_from=valid_from,valid_to = valid_to,discount_percentage=discount_percentage)
         return redirect('coupon_list') 
     return render(request, 'add_coupon.html')
+def delete_coupon(request,pk):
+    coupon = Coupon.objects.get(pk=pk)
+    coupon.delete()
+    return redirect('coupon_list')
 
 
 

@@ -155,7 +155,7 @@ EMAIL_HOST_PASSWORD = 'dhsg jhvv zehv irne'
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR,"media")
 
-razor_pay_key_id = 'rzp_test_re35YCBbgVK2VO'
-key_secret = 'ODOPSVkkHlfiybJ1y0E2r8f0'
+RAZORPAY_API_KEY = 'rzp_test_re35YCBbgVK2VO'
+RAZORPAY_API_SECRET = 'ODOPSVkkHlfiybJ1y0E2r8f0'
 
 

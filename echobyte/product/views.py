@@ -14,6 +14,8 @@ def all_products(request):
         query = request.GET.get('search')
         category = request.GET.get('category')
         sort_by = request.GET.get('sort')
+        min_price = request.GET.get('min-price')
+        max_price = request.GET.get('max-price')
         # Base queryset
         variants = ProductVariant.objects.exclude(
     Q(product__delete_status=0) |
@@ -37,6 +39,13 @@ def all_products(request):
         # Apply category filter
         if category:
             variants = variants.filter(product__category__name=category)
+        if min_price:
+                print(min_price)
+                variants = variants.filter(selling_price__gte=min_price)
+        if max_price:
+                variants = variants.filter(selling_price__lte=max_price)
+
+        
         # Paginate the queryset
         paginator = Paginator(variants, 4)
         page_number = request.GET.get('page', 1)
@@ -46,6 +55,8 @@ def all_products(request):
             'query': query,
             'sort_by': sort_by,
             'category': category,
+            'min_price' : min_price,
+            'max_price' : max_price,
             'wishlist_product_pks':wishlist_product_pks
         }
     except ObjectDoesNotExist as e:

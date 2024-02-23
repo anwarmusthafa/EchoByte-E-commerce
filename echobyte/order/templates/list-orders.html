@@ -8,6 +8,7 @@
         <h4 class="card-title text-center">Order List</h4>
         {% comment %} <p class="card-description "> Add class <code>.table-striped</code> {% endcomment %}
         </p>
+        <div style="overflow-x: auto;">
         <table class="table table-striped text-center">
           <thead class="text-center">
             <tr class="">
@@ -17,6 +18,7 @@
               <th> Address </th>
               <th> Date </th>
               <th> Amount </th>
+              <th>Pay Status</th>
               <th>Status</th>
             <th>Action</th> 
             </tr>
@@ -31,6 +33,7 @@
               <td> <p>{{order.address.name}}<br> {{order.address.phone}}</p> </td>
               <td>{{order.created_at |date:"d-m-Y" }}</td>
               <td>{{order.amount}}</td>
+              <td>{{order.is_paid}}</td>
               <td>{{ order.get_order_status_display }}</td>
               
                <td>
@@ -55,6 +58,7 @@
             
           </tbody>
         </table>
+      </div>
       </div>
     </div>
   </div>

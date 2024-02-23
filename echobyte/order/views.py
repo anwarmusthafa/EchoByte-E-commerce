@@ -85,23 +85,30 @@ def checkout(request):
         address_id = request.POST.get('address')
         amount = request.POST.get('amount')
         payment_method = request.POST.get('payment_method')
+        razorpay_payment_id = request.POST.get('razorpay_payment_id')
         
         if not address_id:
             # Address not selected, return an error message
             error_message = "Please select an address."
-            return render(request, 'checkout.html', {'cart': cart, 'cart_items': cart_items, 'address': address, 'error_message': error_message})
+            context = {'cart': cart, 'cart_items': cart_items, 'address': address, 'error_message': error_message}
+            return render(request, 'checkout.html')
         
         try:
             address_obj = Address.objects.get(pk=address_id)
         except Address.DoesNotExist:
             # Address not found, return an error message
             error_message = "The selected address does not exist."
-            return render(request, 'checkout.html', {'cart': cart, 'cart_items': cart_items, 'address': address, 'error_message': error_message})
+            context = {'cart': cart, 'cart_items': cart_items, 'address': address, 'error_message': error_message}
+            return render(request, 'checkout.html')
         
         try:
             # Create the order transactionally
             with transaction.atomic():
                 order = Order.objects.create(owner=user, cart=cart, amount=amount, payment_method=payment_method)
+                if payment_method == 'online':
+                        order.is_paid = True
+                        order.razor_pay_id = razorpay_payment_id
+                        order.save()
                 print('created order')
                 for cart_item in cart_items:
                     def generate_unique_integer_id(length=8):
@@ -121,7 +128,17 @@ def checkout(request):
                     if discount_percentage:
                         coupon_discount = decimal.Decimal(amount) * decimal.Decimal(discount_percentage) / decimal.Decimal(100)
                         amount -= coupon_discount
-                    OrderItem.objects.create(id=unique_order_id,order=order, product=cart_item.product, address=address_obj, quantity=cart_item.quantity, amount= float(amount))
+                    new_order_item = OrderItem.objects.create(id=unique_order_id,
+                                             order=order,
+                                            product=cart_item.product,
+                                            address=address_obj,
+                                            quantity=cart_item.quantity,
+                                            payment_method = payment_method,
+                                            amount= float(amount))
+                    if payment_method == 'online':
+                        new_order_item.is_paid = True
+                        new_order_item.razor_pay_id = razorpay_payment_id
+                        new_order_item.save()
                     product = cart_item.product
                     product.stock -= cart_item.quantity
                     product.save()
@@ -141,8 +158,8 @@ def checkout(request):
             print(e)
             # Handle any other exceptions, such as database errors
             error_message = "An error occurred while processing your order. Please try again later."
-            
-            return render(request, 'checkout.html', {'cart': cart, 'cart_items': cart_items, 'address': address, 'error_message': error_message })
+            context = {'cart': cart, 'cart_items': cart_items, 'address': address, 'error_message': error_message }
+            return render(request, 'checkout.html')
     context = {
         'cart': cart,
         'cart_items': cart_items, 

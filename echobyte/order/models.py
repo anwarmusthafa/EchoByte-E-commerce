@@ -31,6 +31,8 @@ class Order(models.Model):
     products = models.ManyToManyField(ProductVariant, through='OrderItem')
     amount =  models.DecimalField( max_digits=10, decimal_places=2)
     payment_method = models.CharField(max_length=50)
+    razor_pay_id = models.CharField(max_length=50, null = True, blank =True)
+    is_paid = models.BooleanField(default = False,null = True, blank =True)
     order_status = models.IntegerField(choices=ORDER_STATUS_CHOICES, default=ORDER_CONFIRMED)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -58,12 +60,13 @@ class OrderItem(models.Model):
     product = models.ForeignKey(ProductVariant, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
     amount = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_method = models.CharField(max_length=50,null = True, blank =True)
+    razor_pay_id = models.CharField(max_length=50, null = True, blank =True)
     order_status = models.IntegerField(choices=ORDER_STATUS_CHOICES, default=ORDER_CONFIRMED)
     address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True)
-    
+    is_paid = models.BooleanField(default = False,null = True, blank =True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True)
-
 
 class ReturnOrder(models.Model):
     RETURN_REQUESTED = 1

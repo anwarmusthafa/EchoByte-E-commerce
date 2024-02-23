@@ -225,6 +225,8 @@
             </div>
             <div class="form-check">
                 <input class="form-check-input" value="online" type="radio" name="payment_method" id="paymentMethodOnline" value="online">
+                <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id" value="">
+
                 <label class="form-check-label" for="paymentMethodOnline">
                     Pay with Razorpay
                 </label>
@@ -349,6 +351,7 @@
       "description": "Thanks for buying from us",
       "image": "https://your-company-logo.png",
       "handler": function (response){
+        document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
         document.getElementById('payment-form').submit();
         // You can perform any additional actions here after successful payment
       },

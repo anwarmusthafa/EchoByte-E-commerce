@@ -84,7 +84,7 @@ def checkout(request):
     if request.method == 'POST':
         address_id = request.POST.get('address')
         amount = request.POST.get('amount')
-        payment_method = request.POST.get('paymentOption','cod')
+        payment_method = request.POST.get('payment_method')
         
         if not address_id:
             # Address not selected, return an error message

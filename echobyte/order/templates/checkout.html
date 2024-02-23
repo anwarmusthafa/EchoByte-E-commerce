@@ -177,6 +177,11 @@
         
     </div>
 
+    
+
+
+
+
     <!-- Product Information Section -->
     <div class="card mb-4">
         <div class="card-header">
@@ -202,6 +207,28 @@
                 </div>
             </div>
             {% endfor %}
+        </div>
+    </div>
+
+<!-- Payment Method Section -->
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Payment Method
+        </div>
+        <div class="card-body">
+            <div class="form-check">
+                <input class="form-check-input" value="cod" type="radio" name="payment_method" id="paymentMethodCOD" value="cod" checked>
+                <label class="form-check-label" for="paymentMethodCOD">
+                    Cash On Delivery
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" value="online" type="radio" name="payment_method" id="paymentMethodOnline" value="online">
+                <label class="form-check-label" for="paymentMethodOnline">
+                    Pay with Razorpay
+                </label>
+            </div>
         </div>
     </div>
 
@@ -232,10 +259,7 @@
     <!-- Proceed to Checkout Button -->
     <div class="row mt-4">
         <div class="col-md-6 offset-md-3 mb-3">
-            <button  class="btn btn-success btn-block">Cash On Delivery</button>
-        </div>
-        <div class="col-md-6 offset-md-3 mb-3">
-            <button id="payButton" class="btn btn-primary btn-block">Pay with Razorpay</button>
+            <button id="placeOrderButton" class="btn btn-success btn-block">Place Order</button>
         </div>
     </div>
   </div>
@@ -272,6 +296,44 @@
                 });
         });
     });
+</script>
+
+<script>
+    // Function to handle payment method selection
+    function handlePaymentMethod() {
+        var paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+        if (paymentMethod === "cod") {
+            document.getElementById('payment-form').submit(); // Submit the form for COD
+        } else if (paymentMethod === "online") {
+            // Open Razorpay payment modal
+            var rzp = new Razorpay(options);
+            rzp.open();
+        }
+    }
+
+    document.getElementById('placeOrderButton').onclick = function(event) {
+        event.preventDefault();
+        // Check if an address is selected
+        var selectedAddress = document.querySelector('input[name="address"]:checked');
+        if (!selectedAddress) {
+            document.getElementById('errorText').innerText = "Please select an address.";
+            window.scrollTo(0, 0);
+            return;
+        } else {
+            document.getElementById('errorText').innerText = ""; // Clear error message if an address is selected
+        }
+        // Check if a payment method is selected
+        var selectedPaymentMethod = document.querySelector('input[name="payment_method"]:checked');
+        if (!selectedPaymentMethod) {
+            document.getElementById('errorText').innerText = "Please select a payment method.";
+            window.scrollTo(0, 0);
+            return;
+        } else {
+            document.getElementById('errorText').innerText = ""; // Clear error message if a payment method is selected
+        }
+        // Handle the selected payment method
+        handlePaymentMethod();
+    };
 </script>
 
 

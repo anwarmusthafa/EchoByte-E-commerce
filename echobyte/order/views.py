@@ -198,6 +198,8 @@ def change_order_status(request, pk):
         
         # Update the order status and save
         order.order_status = status
+        if status == 3 and order.payment_method == 'cod':
+            order.is_paid = True
         order.save()
         #update the stock if order is cancelled by seller
         if status == -2:
@@ -228,10 +230,10 @@ def cancel_order(request, pk):
         product = order.product
         product.stock += order.quantity
         product.save()
-
-        wallet = Wallet.objects.select_for_update().get(user=request.user)  # Lock the selected row for update
-        wallet.balance += order.amount
-        wallet.save()
+        if order.is_paid == True:
+            wallet = Wallet.objects.select_for_update().get(user=request.user)  # Lock the selected row for update
+            wallet.balance += order.amount
+            wallet.save()
     except (OrderItem.DoesNotExist, Wallet.DoesNotExist) as e:
         # Handle the case where OrderItem or Wallet does not exist
         # You might want to log the error or return an appropriate response

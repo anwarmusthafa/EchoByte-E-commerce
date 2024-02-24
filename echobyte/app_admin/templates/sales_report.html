@@ -1,0 +1,77 @@
+{% extends 'admin_base.html' %}
+{% load static%}
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col">
+            <h2>Sales Report</h2>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <div class="form-group">
+                <form action="{% url "sales_report" %}" method="post">
+                    {% csrf_token %}
+                    <label for="startDate">Start Date:</label>
+                    <input type="date" name="start-date" id="startDate" class="form-control">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="endDate">End Date:</label>
+                <input type="date" name='end-date' id="endDate" class="form-control">
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col">
+            <button id="generateReport" type="submit" class="btn btn-primary">Generate Report</button>
+        </div>
+    </form>
+    </div>
+</div>
+{% if sales %}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Order ID</th>
+            <th scope="col">Customer</th>
+            <th scope="col">Product</th>
+            <th scope="col">Qty</th>
+            <th scope="col">Amount</th>
+            <th scope="col">Order Status</th>
+            <th scope="col">Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for sale in sales  %}
+        <tr>
+            <td>{{sale.id}}</td>
+            <td>{{sale.order.owner.customer.name}}</td>
+            <td>{{sale.product.product.brand}} {{sale.product.product.title}} <br>({{sale.product.variant_name}})</td>
+            <td>{{sale.quantity}}</td>
+            <td>{{sale.amount}}</td>
+            <td>{{ sale.get_order_status_display }}</td>
+            <td>{{sale.created_at}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="container">
+    <div class="row mt-3">
+        <div class="col">
+            <button id="downloadPDF" class="btn btn-success">Download PDF</button>
+            <button id="downloadExcel" class="btn btn-success">Download Excel</button>
+        </div>
+    </div>
+</div>
+{% endif %}
+  
+{% endblock content %}
+
+{% block thispagelinks %}
+
+
+{% endblock  %}

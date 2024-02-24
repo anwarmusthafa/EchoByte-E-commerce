@@ -6,6 +6,8 @@ from django.contrib.auth.models import User
 from customer.models import *
 from order.models import *
 from django.db.models import Q, Sum
+from datetime import datetime
+from django.utils import timezone
 @never_cache
 # @user_passes_test(lambda u: u.is_authenticated and u.is_staff)
 def admin_login(request):
@@ -84,5 +86,16 @@ def delete_status(request, pk):
             user.delete_status = 1
         user.save()
     return redirect('customers_list')
+def sales_report(request):
+    sales = None
+    if request.method == 'POST':
+        start_date = request.POST.get('start-date')
+        end_date = request.POST.get('end-date')
+        # Convert string dates to datetime objects
+        start_date = timezone.make_aware(datetime.strptime(start_date, '%Y-%m-%d'))
+        end_date = timezone.make_aware(datetime.strptime(end_date, '%Y-%m-%d'))
+        sales = OrderItem.objects.filter(order_status=3,created_at__range=[start_date, end_date])
+    context = {'sales':sales}
+    return render(request,'sales_report.html', context)
 
     

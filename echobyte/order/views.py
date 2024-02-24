@@ -86,6 +86,8 @@ def checkout(request):
         amount = request.POST.get('amount')
         payment_method = request.POST.get('payment_method')
         razorpay_payment_id = request.POST.get('razorpay_payment_id')
+        discount_amount = request.POST.get('discount_amount', None)
+        print(discount_amount)
         
         if not address_id:
             # Address not selected, return an error message
@@ -104,7 +106,7 @@ def checkout(request):
         try:
             # Create the order transactionally
             with transaction.atomic():
-                order = Order.objects.create(owner=user, cart=cart, amount=amount, payment_method=payment_method)
+                order = Order.objects.create(owner=user, cart=cart, amount=amount, payment_method=payment_method, discount_amount = discount_amount)
                 if payment_method == 'online':
                         order.is_paid = True
                         order.razor_pay_id = razorpay_payment_id

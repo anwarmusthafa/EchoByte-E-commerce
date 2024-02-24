@@ -435,10 +435,7 @@
       $("#visit-sale-chart-legend-dark").html(myChart.generateLegend());
     }
     if ($("#traffic-chart").length) {
-      var gradientStrokeBlue = ctx.createLinearGradient(0, 0, 0, 181);
-      gradientStrokeBlue.addColorStop(0, 'rgba(54, 215, 232, 1)');
-      gradientStrokeBlue.addColorStop(1, 'rgba(177, 148, 250, 1)');
-      var gradientLegendBlue = 'linear-gradient(to right, rgba(54, 215, 232, 1), rgba(177, 148, 250, 1))';
+      
 
       var gradientStrokeRed = ctx.createLinearGradient(0, 0, 0, 50);
       gradientStrokeRed.addColorStop(0, 'rgba(255, 191, 150, 1)');
@@ -452,24 +449,24 @@
 
       var trafficChartData = {
         datasets: [{
-          data: [30, 30, 40],
+          data: [30, 50],
           backgroundColor: [
-            gradientStrokeBlue,
+
             gradientStrokeGreen,
             gradientStrokeRed
           ],
           hoverBackgroundColor: [
-            gradientStrokeBlue,
+          
             gradientStrokeGreen,
             gradientStrokeRed
           ],
           borderColor: [
-            gradientStrokeBlue,
+            
             gradientStrokeGreen,
             gradientStrokeRed
           ],
           legendColor: [
-            gradientLegendBlue,
+            
             gradientLegendGreen,
             gradientLegendRed
           ]

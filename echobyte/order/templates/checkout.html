@@ -246,6 +246,7 @@
                     <p>Total: <span id="total-price">₹{{ cart|sub_total_of_cart }}</span></p>
                     {% if discount_percentage %}
                     <p>Coupon Discount: <span>₹{{ cart|calculate_discount_amount:discount_percentage }}</span></p>
+                    <input type="hidden" name="discount_amount" value="{{ cart|calculate_discount_amount:discount_percentage }}">
                     <p>Sub Total: <span id="sub-total">₹{{ cart|sub_total_of_cart:discount_percentage }}</span></p> 
                     <input type="hidden" name="amount" id="amount" value="{{ cart|sub_total_of_cart:discount_percentage }}">
                 {% else %}

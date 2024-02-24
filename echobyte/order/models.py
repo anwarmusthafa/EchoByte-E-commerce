@@ -3,7 +3,6 @@ from django.contrib.auth.models import User
 from product.models import Product, ProductVariant
 from customer.models import Address
 
-
 # Create your models here.
 class Cart(models.Model):
     owner = models.OneToOneField(User,on_delete=models.CASCADE)
@@ -30,6 +29,7 @@ class Order(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.SET_NULL, null=True, blank=True)
     products = models.ManyToManyField(ProductVariant, through='OrderItem')
     amount =  models.DecimalField( max_digits=10, decimal_places=2)
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, null = True, blank = True)
     payment_method = models.CharField(max_length=50)
     razor_pay_id = models.CharField(max_length=50, null = True, blank =True)
     is_paid = models.BooleanField(default = False,null = True, blank =True)

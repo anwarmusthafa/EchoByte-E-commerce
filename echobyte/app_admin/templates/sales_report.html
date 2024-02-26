@@ -62,8 +62,8 @@
 <div class="container">
     <div class="row mt-3">
         <div class="col">
-            <button id="downloadPDF" class="btn btn-success">Download PDF</button>
-            <button id="downloadExcel" class="btn btn-success">Download Excel</button>
+           <a href=""> <button  id="downloadPDF" class="btn btn-success">Download PDF</button></a>
+            <a href="{% url "download_excel" %}"><button id="downloadExcel" class="btn btn-success">Download Excel</button></a>
         </div>
     </div>
 </div>

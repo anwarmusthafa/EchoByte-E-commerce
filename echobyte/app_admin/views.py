@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect , get_object_or_404
 from django.contrib.auth import authenticate, login, logout
+from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required , user_passes_test
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.models import User
@@ -8,6 +9,8 @@ from order.models import *
 from django.db.models import Q, Sum
 from datetime import datetime
 from django.utils import timezone
+import xlwt
+from django.utils.timezone import make_naive
 @never_cache
 # @user_passes_test(lambda u: u.is_authenticated and u.is_staff)
 def admin_login(request):
@@ -91,11 +94,56 @@ def sales_report(request):
     if request.method == 'POST':
         start_date = request.POST.get('start-date')
         end_date = request.POST.get('end-date')
+        request.session['start_date'] = start_date
+        request.session['end_date'] = end_date
         # Convert string dates to datetime objects
         start_date = timezone.make_aware(datetime.strptime(start_date, '%Y-%m-%d'))
         end_date = timezone.make_aware(datetime.strptime(end_date, '%Y-%m-%d'))
         sales = OrderItem.objects.filter(order_status=3,created_at__range=[start_date, end_date])
     context = {'sales':sales}
     return render(request,'sales_report.html', context)
+
+def download_excel(request):
+    start_date = request.session.get('start_date')
+    end_date = request.session.get('end_date')
+    start_date = timezone.make_aware(datetime.strptime(start_date, '%Y-%m-%d'))
+    end_date = timezone.make_aware(datetime.strptime(end_date, '%Y-%m-%d'))
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="sales_report.xls"'
+
+    # Create a new workbook and add a worksheet
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('Sales Report')
+
+    # Write header row
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+    columns = ['Order id', 'Customer', 'Product', 'Qty', 'Amount', 'Date']
+    for col_num, column_title in enumerate(columns):
+        ws.write(0, col_num, column_title, font_style)
+
+    # Write data rows
+    rows = OrderItem.objects.filter(order_status=3,created_at__range=[start_date, end_date])
+    for row_num, row in enumerate(rows, start=1):
+        ws.write(row_num, 0, row.id)
+        ws.write(row_num, 1, row.order.owner.customer.name )
+        ws.write(row_num, 2, f"{row.product.product.brand} {row.product.product.title} {row.product.variant_name}")
+        ws.write(row_num, 3, row.quantity)
+        ws.write(row_num, 4, row.amount)
+        created_at_naive = make_naive(row.created_at)
+        formatted_date = created_at_naive.strftime('%d/%m/%Y')
+        ws.write(row_num, 5, formatted_date)
+
+    # Save the workbook content to the HttpResponse object
+    wb.save(response)
+    
+    return response
+
+
+
+
+
+
+
 
     

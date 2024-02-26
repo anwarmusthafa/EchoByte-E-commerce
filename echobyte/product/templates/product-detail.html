@@ -116,9 +116,9 @@
                                 <div class="u-s-m-b-15">
                                     <div class="pd-detail__inline">
 
-                                        <span class="pd-detail__stock">{{product.stock}} in stock</span>
+                                        <span class="pd-detail__stock ml-4">{{product.stock}} in stock</span>
 
-                                        <span class="pd-detail__left">{{product.stock}} left</span></div>
+                                        {% comment %} <span class="pd-detail__left">{{product.stock}} left</span></div> {% endcomment %}
                                 </div>
                                 <ul style="color : black">
                                     <li>{{product.ram}} RAM | {{product.storage}} ROM </li>
@@ -167,7 +167,7 @@
                                             <a class="s-insta--color-hover" href="#"><i class="fab fa-instagram"></i></a></li>
                                         <li>
 
-                                            <a class="s-wa--color-hover" href="#"><i class="fab fa-whatsapp"></i></a></li>
+                                            <a id="whatsapp-share-button" class="s-wa--color-hover" href=""><i class="fab fa-whatsapp"></i></a>
                                         <li>
 
                                             <a class="s-gplus--color-hover" href="#"><i class="fab fa-google-plus-g"></i></a></li>
@@ -883,9 +883,11 @@
             <!--====== End - Section 1 ======-->
         </div>
         <!--====== End - App Content ======-->
+        
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+        <!--====== Add to cart script ======-->
         <script>
             jQuery.noConflict();
             jQuery(document).ready(function($) {
@@ -916,10 +918,19 @@
                 });
             });
         </script>
-        
+         <!--====== End Add to cart script ======-->
 
-     
+
+        <!--====== whatsapp share link ======-->
+        <script>
             
-        
+            document.getElementById("whatsapp-share-button").addEventListener("click", function() {
+                var currentURL = encodeURIComponent(window.location.href);
+                var whatsappURL = "https://api.whatsapp.com/send?text=" + currentURL;
+                window.open(whatsappURL, "_blank");
+            });
+            </script>
+        <!--====== whatsapp share link ======-->
+
         {% endblock %}
 

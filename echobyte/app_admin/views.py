@@ -11,6 +11,8 @@ from datetime import datetime
 from django.utils import timezone
 import xlwt
 from django.utils.timezone import make_naive
+import io
+from reportlab.pdfgen import canvas
 @never_cache
 # @user_passes_test(lambda u: u.is_authenticated and u.is_staff)
 def admin_login(request):
@@ -138,6 +140,76 @@ def download_excel(request):
     wb.save(response)
     
     return response
+from decimal import Decimal
+
+def download_pdf(request):
+    start_date = request.session.get('start_date')
+    end_date = request.session.get('end_date')
+    start_date = timezone.make_aware(datetime.strptime(start_date, '%Y-%m-%d'))
+    end_date = timezone.make_aware(datetime.strptime(end_date, '%Y-%m-%d'))
+
+    # Create a PDF buffer
+    buffer = io.BytesIO()
+    p = canvas.Canvas(buffer)
+
+    # Set up PDF
+    p.setFont("Helvetica-Bold", 16)  # Set title font to bold and increase font size
+    p.drawString(200, 750, "EchoByte Sales Report")  # Position the title
+    p.setFont("Helvetica", 12)  # Set regular font size for content
+
+    # Write PDF content
+    orders = OrderItem.objects.filter(order_status=3, created_at__range=[start_date, end_date])
+
+    # Define column widths
+    col_widths = [70, 70, 250, 30, 50, 60]  # Adjust as needed
+
+    # Initialize starting y-coordinate
+    y = 700
+
+    # Write header row
+    header = ['Order id', 'Customer', 'Product', 'Qty', 'Amount', 'Date']
+    x = 50
+    for i, col in enumerate(header):
+        p.drawString(x, y, col)
+        x += col_widths[i]  # Move x-coordinate to the start of next column
+    y -= 20  # Move y-coordinate to start the content below the header
+
+    # Write data rows
+    total_amount = Decimal(0)
+    for order in orders:
+        x = 50
+        p.drawString(x, y, str(order.id))
+        x += col_widths[0]
+        p.drawString(x, y, str(order.order.owner.customer.name))
+        x += col_widths[1]
+        product_info = f"{order.product.product.brand} {order.product.product.title} {order.product.variant_name}"
+        p.drawString(x, y, product_info)
+        x += col_widths[2]
+        p.drawString(x, y, str(order.quantity))
+        x += col_widths[3]
+        p.drawString(x, y, str(order.amount))
+        total_amount += order.amount  # Add order amount to total
+        x += col_widths[4]
+        created_at_naive = make_naive(order.created_at)
+        formatted_date = created_at_naive.strftime('%d/%m/%Y')
+        p.drawString(x, y, formatted_date)
+        y -= 20  # Move y-coordinate to the next row
+
+    # Write total amount
+    p.drawString(400, y - 40, f"Total Amount: {total_amount}")
+
+    # Close PDF
+    p.showPage()
+    p.save()
+
+    # Get PDF content from the buffer and return as response
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="sales_report.pdf"'
+    return response
+
+
+
 
 
 

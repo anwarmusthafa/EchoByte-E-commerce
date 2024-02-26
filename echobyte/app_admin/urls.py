@@ -9,4 +9,5 @@ urlpatterns = [
     path('delete_status/<pk>/', views.delete_status, name='delete_status'),
     path('sales_report/', views.sales_report, name= "sales_report"),
     path('download_excel/', views.download_excel, name= "download_excel"),
+    path('download_pdf/', views.download_pdf, name= "download_pdf"),
 ]

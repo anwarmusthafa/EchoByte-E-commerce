@@ -161,14 +161,14 @@ def download_pdf(request):
     orders = OrderItem.objects.filter(order_status=3, created_at__range=[start_date, end_date])
 
     # Define column widths
-    col_widths = [70, 70, 250, 30, 50, 60]  # Adjust as needed
+    col_widths = [70, 70, 250, 30, 70, 60]  # Adjust as needed
 
     # Initialize starting y-coordinate
     y = 700
 
     # Write header row
     header = ['Order id', 'Customer', 'Product', 'Qty', 'Amount', 'Date']
-    x = 50
+    x = 20
     for i, col in enumerate(header):
         p.drawString(x, y, col)
         x += col_widths[i]  # Move x-coordinate to the start of next column
@@ -177,12 +177,12 @@ def download_pdf(request):
     # Write data rows
     total_amount = Decimal(0)
     for order in orders:
-        x = 50
+        x = 20
         p.drawString(x, y, str(order.id))
         x += col_widths[0]
         p.drawString(x, y, str(order.order.owner.customer.name))
         x += col_widths[1]
-        product_info = f"{order.product.product.brand} {order.product.product.title} {order.product.variant_name}"
+        product_info = f"{order.product.product.brand} {order.product.product.title} ({order.product.variant_name})"
         p.drawString(x, y, product_info)
         x += col_widths[2]
         p.drawString(x, y, str(order.quantity))

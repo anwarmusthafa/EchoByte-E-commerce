@@ -23,7 +23,12 @@ def all_products(request):
     Q(product__category__is_listed=False) |
     Q(is_listed=False)
 )
-        wishlist_product_pks = list(Wishlist.objects.filter(user=request.user).values_list('product__pk', flat=True))
+        if request.user.is_authenticated:
+            wishlist_product_pks = list(Wishlist.objects.filter(user=request.user).values_list('product__pk', flat=True))
+        else:
+            wishlist_product_pks = None
+
+
         # Apply sorting
         if sort_by == 'latest':
             variants = variants.order_by('-product__created_at')

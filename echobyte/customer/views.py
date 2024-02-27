@@ -40,7 +40,6 @@ def signin(request):
                         login(request, user)
                         return redirect('home')
                 else:
-                    print("customer is not verified")
                     messages.error(request, "Verify your email")
                     send_otp(user.customer)
                     return redirect('otp_verification', pk=user.customer.pk)

@@ -83,7 +83,6 @@ def customers_list(request):
 def delete_status(request, pk):
     if request.POST:
         delete_status = int(request.POST.get('delete_status'))
-        print(delete_status)
         user = get_object_or_404(Customer,user_id=pk)
         if delete_status == 0:
             user.delete_status = 0

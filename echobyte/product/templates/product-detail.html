@@ -901,23 +901,31 @@
                         processData: false,
                         contentType: false,
                         success: function(response) {
-                            // Check if the response contains a redirect URL
-                            if (response.redirect_url) {
-                                // Redirect to the signin page
-                                window.location.href = response.redirect_url;
-                            } else {
-                                // Handle success response (if needed)
+                            // Check if the response contains a success message
+                            if (response.success_message) {
+                                // Handle success message (if needed)
+                                // Reload the page or perform other actions as needed
                                 window.location.reload();
+                            } else {
+                                window.location.href = '/signin/';
                             }
                         },
                         error: function(xhr, status, error) {
                             // Handle errors here
-                            console.error(xhr.responseText);
+                            if (xhr.status == 302) {
+                                // Redirect to the signin page
+                                window.location.href = xhr.getResponseHeader("Location");
+                            } else {
+                                
+                                console.error(xhr.responseText);
+                            }
                         }
                     });
                 });
             });
         </script>
+        
+        
          <!--====== End Add to cart script ======-->
 
 

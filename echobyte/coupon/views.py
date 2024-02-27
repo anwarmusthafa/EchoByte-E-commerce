@@ -9,11 +9,7 @@ def apply_coupon(request):
         coupon_code = request.POST.get('coupon-code')
         try:
             today = timezone.now().date()
-            print(today)
             coupon = Coupon.objects.get(code=coupon_code, is_active=True)
-            print(coupon.valid_from)
-            print(coupon.valid_to)
-            
             if coupon.valid_from or coupon.valid_to:
                 if today < coupon.valid_from or today > coupon.valid_to:
                     messages.error(request, 'Coupon is not valid yet or has expired.')

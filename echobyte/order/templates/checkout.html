@@ -359,7 +359,7 @@
           document.getElementById('payment-form').submit();
         } else {
           // Payment failed or was canceled by the user
-          alert("Payment failed or canceled. Please try again.");
+          window.location.href = "{% url 'payment_failure' %}";
         }
       },
       "prefill": {

@@ -30,6 +30,11 @@ def cart(request):
         context = {'cart_items': None} 
     return render(request, 'cart.html', context)
 
+from django.http import JsonResponse
+from django.urls import reverse
+from django.contrib.auth.decorators import login_required
+
+@login_required(login_url='signin')
 @login_required(login_url='signin')
 def add_to_cart(request):
     if request.method == 'POST':
@@ -43,8 +48,13 @@ def add_to_cart(request):
         success_message = 'Product added to cart successfully.'
         return JsonResponse({'success_message': success_message})
     else:
-        # If it's not a POST request, return a JSON response indicating the need to sign in
-        return JsonResponse({'redirect_url': reverse('signin')})
+        if not request.user.is_authenticated:
+            # If user is not authenticated, return a JSON response indicating the need to sign in
+            return JsonResponse('user not authenticated')
+        else:
+            # Handle other cases where it's not a POST request
+            return JsonResponse({'error': 'Method not allowed'})
+
 @login_required(login_url='signin')
 def delete_cart_item(request,pk):
     if request.user.is_authenticated:
@@ -307,6 +317,8 @@ def remove_from_wishlist(request,pk):
     wishlist_item = Wishlist.objects.get(pk=pk)
     wishlist_item.delete()
     return redirect('wishlist')
+def payment_failure(request):
+    return render(request,'payment_failure.html')
 
 
 

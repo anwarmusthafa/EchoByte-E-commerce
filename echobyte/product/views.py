@@ -45,10 +45,11 @@ def all_products(request):
         if category:
             variants = variants.filter(product__category__name=category)
         if min_price:
-                print(min_price)
                 variants = variants.filter(selling_price__gte=min_price)
         if max_price:
                 variants = variants.filter(selling_price__lte=max_price)
+        
+        product_count = variants.count()
 
         
         # Paginate the queryset
@@ -62,7 +63,8 @@ def all_products(request):
             'category': category,
             'min_price' : min_price,
             'max_price' : max_price,
-            'wishlist_product_pks':wishlist_product_pks
+            'wishlist_product_pks':wishlist_product_pks,
+            'product_count':product_count,
         }
     except ObjectDoesNotExist as e:
         context = {
@@ -144,7 +146,7 @@ def add_product(request):
     if request.method == 'POST':
         try:
             brand_id = request.POST.get('brand')
-            category_id = request.POST.get('category')  # Corrected typo in 'category'
+            category_id = request.POST.get('category') 
             title = request.POST.get('title')
             processor = request.POST.get('processor')
             display = request.POST.get('display')
@@ -152,11 +154,9 @@ def add_product(request):
             back_camera = request.POST.get('back-camera')
             priority = request.POST.get('priority')
             battery_capacity = request.POST.get('battery')
-            print(battery_capacity)
-            description = request.POST.get('description')  # Corrected typo in 'description'
-            print("category id",category_id)
+            description = request.POST.get('description')  # Corrected typo in 'description
 
-            # Get Brand and ProcessorBrand instances
+            # Get Brand and category instances
             brand_to_add = Brand.objects.get(pk=brand_id) if brand_id else None
             category_to_add = Category.objects.get(pk=category_id) if category_id else None
 

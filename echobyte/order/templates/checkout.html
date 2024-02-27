@@ -169,7 +169,7 @@
                             {% endfor %}
                         </div>
                         <!-- Add more address options as needed -->
-                        <a href="{% url 'add_address' %}"> <p class="text-center">Add New Address</p></a>
+                        <a href="{% url 'add_address' %}?source=checkout"> <p class="text-center">Add New Address</p></a>
                     </div>
                 </div>
             </div>
@@ -352,9 +352,15 @@
       "description": "Thanks for buying from us",
       "image": "https://your-company-logo.png",
       "handler": function (response){
-        document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
-        document.getElementById('payment-form').submit();
-        // You can perform any additional actions here after successful payment
+        // Check if payment is successful
+        if(response.razorpay_payment_id) {
+          // Payment successful, proceed with further actions if needed
+          document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+          document.getElementById('payment-form').submit();
+        } else {
+          // Payment failed or was canceled by the user
+          alert("Payment failed or canceled. Please try again.");
+        }
       },
       "prefill": {
         "name": "Customer Name",

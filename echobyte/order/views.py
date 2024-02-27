@@ -87,7 +87,6 @@ def checkout(request):
         payment_method = request.POST.get('payment_method')
         razorpay_payment_id = request.POST.get('razorpay_payment_id')
         discount_amount = request.POST.get('discount_amount', None)
-        print(discount_amount)
         
         if not address_id:
             # Address not selected, return an error message
@@ -111,7 +110,6 @@ def checkout(request):
                         order.is_paid = True
                         order.razor_pay_id = razorpay_payment_id
                         order.save()
-                print('created order')
                 for cart_item in cart_items:
                     def generate_unique_integer_id(length=8):
                         """
@@ -257,7 +255,6 @@ def return_order(request,pk):
         return_obj = ReturnOrder.objects.create(user=user,product=product,amount_to_refund=amount,reason=reason,address=address, order = order)
         order.order_status = 4
         order.save()
-        print(order.order_status)
         return redirect('order_details', pk=pk)
     context = {'order':order}
     return render(request, 'return-order.html', context)

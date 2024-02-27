@@ -12,6 +12,8 @@ from .signals import send_otp
 from django.http import HttpResponseServerError
 from order.models import *
 from django.contrib import messages
+from django.urls import reverse
+from django.db import transaction
 
 @never_cache
 def signin(request):
@@ -75,29 +77,29 @@ def signup(request):
             return redirect('signup')
 
         try:
-            # Check if the email is already in use
-            User.objects.get(username=email)
-            request.session['signup_last_typed_values'] = last_typed_values
-            request.session['signup_error_message'] = 'Email address is already in use'
-            return redirect('signup')
+            with transaction.atomic():
+                # Check if the email is already in use
+                User.objects.get(username=email)
+                request.session['signup_last_typed_values'] = last_typed_values
+                request.session['signup_error_message'] = 'Email address is already in use'
+                return redirect('signup')
         except User.DoesNotExist:
-            # If the user does not exist, create a new user and log them in
-            user = User.objects.create_user(username=email, password=password1)
-            user1 = Customer.objects.create(user=user, name=name, phone=phone)
-
-            return redirect('otp_verification',user1.id )
-        except Exception as e:
-            request.session['signup_last_typed_values'] = last_typed_values
-            request.session['signup_error_message'] = f'Error during signup: {str(e)}'
-            return redirect('signup')
+            try:
+                with transaction.atomic():
+                    # If the user does not exist, create a new user and log them in
+                    user = User.objects.create_user(username=email, password=password1)
+                    user1 = Customer.objects.create(user=user, name=name, phone=phone)
+                    return redirect('otp_verification', user1.id)
+            except Exception as e:
+                request.session['signup_last_typed_values'] = last_typed_values
+                request.session['signup_error_message'] = f'Error during signup: {str(e)}'
+                return redirect('signup')
 
     context = {
         'last_typed_values': last_typed_values,
         'error_message': error_message,
         'success_message': success_message
     }
-    print(f"Success message: {success_message}")
-    print(f"Error message: {error_message}")
     return render(request, 'signup.html', context)
 
 @never_cache
@@ -121,20 +123,19 @@ def otp_verification(request, pk):
             
                 if  user_otp == str(db_otp):
                     if tb_user.is_verified:
-                        print("user is verified")
                         return render(request, 'signin',{'pk':pk})
                     else:
-                        print(tb_user.otp , user_otp)
                         tb_user.is_verified = True
                         tb_user.save()
                         success_message = "Registration Successfull Please Login Now"
-                        return redirect('signin')
+                        return render(request, 'signin.html', {'pk': pk, 'success_message': success_message})
                 else:
                     messages.error(request,"Invalid otp Try again!")
                     return redirect('otp_verification',pk = pk,)
     except Exception as e:
         print(e)
-    context={ 'pk':pk,'success_message' : success_message}
+    context={ 'pk':pk,
+             'success_message' : success_message}
     return render(request, 'otp_verification.html', context)
 @login_required(login_url='signin')
 def profile(request):
@@ -171,6 +172,7 @@ def add_address(request):
             state = request.POST.get('state')
             city = request.POST.get('town')
             pincode = request.POST.get('pincode')
+            source = request.POST.get('source', None)
 
             # Wrap database operation in a try-except block
             try:
@@ -183,7 +185,10 @@ def add_address(request):
                     city=city,
                     state=state
                 )
-                return redirect('address')
+                if source == 'checkout':
+                    return redirect('checkout')
+                else:
+                    return redirect('address')
             except Exception as e:
                 # Log the error or handle it as per your application's needs
                 return HttpResponseServerError("Failed to create address: {}".format(str(e)))

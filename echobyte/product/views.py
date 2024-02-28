@@ -32,11 +32,11 @@ def all_products(request):
         # Apply sorting
         if sort_by == 'latest':
             variants = variants.order_by('-product__created_at')
-        elif sort_by == 'lowest-price':
+        if sort_by == 'lowest-price':
             variants = variants.order_by('selling_price')
-        elif sort_by == 'highest-price':
+        if sort_by == 'highest-price':
             variants = variants.order_by('-selling_price')
-        elif sort_by == 'relevance':
+        if sort_by == 'relevance':
             variants = variants.order_by('-product__priority')
         # Apply search filter
         if query:

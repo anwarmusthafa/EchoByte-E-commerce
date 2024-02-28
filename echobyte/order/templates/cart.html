@@ -79,12 +79,18 @@
                                  </div>
                               </td>
                               <td>
-                                 <span class="table-p__price">
+                                <span class="table-p__price">{{cart_item.product.selling_price}}
+                    
+                                </span>
+                             <td>
+                              <td>
+                                 <span class="table-p__price " style="color: #ff4500;">
                                  {% with total_price=cart_item.product.selling_price|each_cart_item_price:cart_item.quantity %}
                                  {{ total_price }}
                                  {% endwith %}
                                  </span>
                               <td>
+                                
                                  <div class="table-p__input-counter-wrap">
                                     <!--====== Input Counter ======-->
                                     <div class="input-counter">

@@ -343,7 +343,7 @@
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
     var amountInput = document.getElementById('amount');
-    var amount = parseFloat(amountInput.value) * 100;
+    var amount = amountInput.value * 100;
     var options = {
       "key": "rzp_test_NhgG1kQ1czt0q6",
       "amount": amount, // amount in the smallest currency unit

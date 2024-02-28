@@ -93,7 +93,7 @@ def checkout(request):
     
     if request.method == 'POST':
         address_id = request.POST.get('address')
-        amount = request.POST.get('amount')
+        amount = float(request.POST.get('amount'))
         payment_method = request.POST.get('payment_method')
         razorpay_payment_id = request.POST.get('razorpay_payment_id')
         discount_amount = request.POST.get('discount_amount', None)
@@ -101,16 +101,20 @@ def checkout(request):
         if not address_id:
             # Address not selected, return an error message
             error_message = "Please select an address."
-            context = {'cart': cart, 'cart_items': cart_items, 'address': address, 'error_message': error_message}
-            return render(request, 'checkout.html')
+            context = {'cart': cart, 'cart_items': cart_items, 'address': address, 'error_message': error_message,'coupons':coupons,}
+            return render(request, 'checkout.html',context)
+        if amount > 1000 and payment_method == 'cod':
+            error_message = "Payment above 1000 can't accept in cash on delivery"
+            context = {'cart': cart, 'cart_items': cart_items, 'address': address, 'error_message': error_message,'coupons':coupons,}
+            return render(request, 'checkout.html',context)
         
         try:
             address_obj = Address.objects.get(pk=address_id)
         except Address.DoesNotExist:
             # Address not found, return an error message
             error_message = "The selected address does not exist."
-            context = {'cart': cart, 'cart_items': cart_items, 'address': address, 'error_message': error_message}
-            return render(request, 'checkout.html')
+            context = {'cart': cart, 'cart_items': cart_items, 'address': address, 'error_message': error_message,'coupons':coupons,}
+            return render(request, 'checkout.html',context)
         
         try:
             # Create the order transactionally
@@ -168,7 +172,7 @@ def checkout(request):
             print(e)
             # Handle any other exceptions, such as database errors
             error_message = "An error occurred while processing your order. Please try again later."
-            context = {'cart': cart, 'cart_items': cart_items, 'address': address, 'error_message': error_message }
+            context = {'cart': cart, 'cart_items': cart_items, 'address': address, 'error_message': error_message,'coupons':coupons, }
             return render(request, 'checkout.html')
     context = {
         'cart': cart,

@@ -11,5 +11,4 @@ def sub_total_of_cart(cart, discount_percentage=None):
     if discount_percentage:
         discount_amount = total * (Decimal(discount_percentage) / Decimal('100'))  # Convert discount_percentage to Decimal
         total -= discount_amount
-        
-    return round(total)
+    return float(total)

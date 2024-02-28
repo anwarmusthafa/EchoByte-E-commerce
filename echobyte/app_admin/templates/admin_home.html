@@ -131,7 +131,7 @@
                 </td>
                 <td> {{order.product.product.brand}} {{order.product.product.title}} <br> {{order.product.variant_name}} </td>
                 <td>
-                  <label class="text-center badge badge-gradient-{% if order.order_status == 1 %}primary{% elif order.order_status == 2 %}secondary{% elif order.order_status == 3 %}success {% elif order.order_status == 4 %}warning {% elif order.order_status == 5 %}danger{% endif %}">{% if order.order_status == 1 %}Confirmed{% elif order.order_status == 2 %}Shipped{% elif order.order_status == 3 %}Delivered{% elif order.order_status == 4 %}Return Requested{% elif order.order_status == 5 %}Returned{% endif %}</label>
+                  <label class="text-center badge badge-gradient-{% if order.order_status == 1 %}primary{% elif order.order_status == 2 %}secondary{% elif order.order_status == 3 %}success {% elif order.order_status == 4 %}warning {% elif order.order_status == 5 %}danger {% else %}danger{% endif %}">{% if order.order_status == 1 %}Confirmed{% elif order.order_status == 2 %}Shipped{% elif order.order_status == 3 %}Delivered{% elif order.order_status == 4 %}Return Requested{% elif order.order_status == 5 %}Returned {% elif order.order_status == -1  %} Cancelled {% elif order.order_status == -2 %}Seller Cancelled{% endif %}</label>
                 </td>
                 <td> {{order.updated_at}}</td>
                 <td>{{order.id}}</td>

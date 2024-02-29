@@ -409,6 +409,7 @@
                                                     <div class="product-m__rating gl-rating-style"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i><i class="far fa-star"></i><i class="far fa-star"></i>
                                                         <span class="product-m__review">(23)</span>
                                                     </div>
+                                                    
                                                     <div class="product-m__price">{{ variant.selling_price|floatformat:"0" }}
                                                         <span class="product-m__discount">{{variant.original_price}}</span>
                                                     </div>
@@ -424,7 +425,7 @@
                                                             <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
                                                             <input id="product-id" type="hidden" name="product_id" value="{{variant.pk}}">
                                                             {% if variant.pk in wishlist_product_pks %}
-                                                            <button class="add-to-wishlist-btn fas fa-heart" data-tooltip="tooltip" data-placement="top" style="color: red; background: none; border: none;" title="Remove from Wishlist"></button>
+                                                            <button class="add-to-wishlist-btn fas fa-heart" data-tooltip="tooltip" data-placement="top" style="color: red; background: none; border: none;" title="" disabled></button>
                                                         {% else %}
                                                             <button class="add-to-wishlist-btn far fa-heart" data-tooltip="tooltip" data-placement="top" style="color: red; background: none; border: none;" title="Add to Wishlist"></button>
                                                         {% endif %}
@@ -476,8 +477,10 @@
                 window.location.href = newUrl;
             });
         </script>
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Make sure jQuery is included -->
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+        
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
+        <!-- Add to wishlist Script -->
         <script>
             jQuery(document).ready(function($) {
                 $('.add-to-wishlist-btn').click(function(e) {

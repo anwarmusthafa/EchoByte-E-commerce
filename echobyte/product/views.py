@@ -65,6 +65,7 @@ def all_products(request):
             'max_price' : max_price,
             'wishlist_product_pks':wishlist_product_pks,
             'product_count':product_count,
+            
         }
     except ObjectDoesNotExist as e:
         context = {
@@ -77,15 +78,27 @@ def all_products(request):
     return render(request, 'all_products.html', context)
 
 
+from django.core.exceptions import ObjectDoesNotExist
+
 def product_detail(request, pk):
     cart_item = None
+    wishlist = None  # Initialize wishlist to None
+    
     try:
         # Retrieve the product variant with the provided primary key
         product = get_object_or_404(ProductVariant, id=pk)
-
-        # Check if there is a logged-in user
+        
+        # Check if the user is authenticated
         if request.user.is_authenticated:
-            # Retrieve cart item if user is logged in
+            # Attempt to retrieve the wishlist entry
+            try:
+                wishlist = Wishlist.objects.get(user=request.user, product=product)
+            except Wishlist.DoesNotExist:
+                # Handle the case where no wishlist entry is found
+                pass
+        
+        # Retrieve cart item if user is logged in
+        if request.user.is_authenticated:
             cart_item = CartItems.objects.filter(cart__owner=request.user, product=product)
 
         # Retrieve variants of the same product that are listed and ordered by selling price
@@ -100,6 +113,7 @@ def product_detail(request, pk):
             'product_images': product_images,
             'variants': variants,
             'cart_item': cart_item,
+            'wishlist': wishlist,
         }
 
     except ObjectDoesNotExist as e:
@@ -115,6 +129,7 @@ def product_detail(request, pk):
         }
 
     return render(request, 'product-detail.html', context)
+
 
 
 def list_product(request):

@@ -66,7 +66,10 @@ def delete_cart_item(request,pk):
 def add_cart_item_quantity(request,pk):
     if request.user.is_authenticated:
         cart_item = CartItems.objects.get(pk=pk)
-        if cart_item.quantity >= 4:
+        product_stock = cart_item.product.stock
+        if cart_item.quantity == product_stock:
+            messages.error(request, "Stock is not availabe")
+        elif cart_item.quantity >= 4:
             messages.error(request, "Only 4 item can buy one order")
         else: 
             cart_item.quantity += 1

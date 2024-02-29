@@ -92,23 +92,60 @@ def delete_status(request, pk):
     return redirect('customers_list')
 def sales_report(request):
     sales = None
+    message = None
+    if 'start_date' in request.session:
+        del request.session['start_date']
+    if 'end_date' in request.session:
+        del request.session['end_date']
+    if 'month' in request.session:
+        del request.session['month']
     if request.method == 'POST':
-        start_date = request.POST.get('start-date')
-        end_date = request.POST.get('end-date')
-        request.session['start_date'] = start_date
-        request.session['end_date'] = end_date
-        # Convert string dates to datetime objects
-        start_date = timezone.make_aware(datetime.strptime(start_date, '%Y-%m-%d'))
-        end_date = timezone.make_aware(datetime.strptime(end_date, '%Y-%m-%d'))
-        sales = OrderItem.objects.filter(order_status=3,created_at__range=[start_date, end_date])
-    context = {'sales':sales}
-    return render(request,'sales_report.html', context)
+        start_date_str = request.POST.get('start-date')
+        end_date_str = request.POST.get('end-date')
+        month = int(request.POST.get('month'))
+        year = datetime.now().year
+        if month > 0:
+            start_date_str = f"{year}-{month:02d}-01"
+            if month == 12:
+                end_date_str = f"{year + 1}-01-01"
+            else:
+                end_date_str = f"{year}-{month + 1:02d}-01"
+
+        if start_date_str and end_date_str:  # Check if both start and end dates are provided
+            request.session['start_date'] = start_date_str
+            request.session['end_date'] = end_date_str
+            request.session['month'] = month
+
+            # Parse start and end dates from strings to datetime objects
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+
+            # Convert start and end dates to timezone-aware datetime objects
+            start_date = timezone.make_aware(start_date)
+            end_date = timezone.make_aware(end_date)
+
+            # Filter sales based on the provided date range
+            sales = OrderItem.objects.filter(order_status=3, created_at__range=[start_date, end_date])
+            if not sales:
+                message = "No sales in these dates"
+        else:
+            message = "Please provide both start and end dates."
+
+    context = {'sales': sales, 'message': message}
+    return render(request, 'sales_report.html', context)
 
 def download_excel(request):
     start_date = request.session.get('start_date')
     end_date = request.session.get('end_date')
-    start_date = timezone.make_aware(datetime.strptime(start_date, '%Y-%m-%d'))
-    end_date = timezone.make_aware(datetime.strptime(end_date, '%Y-%m-%d'))
+    month = request.session.get('month',0)
+    year = datetime.now().year
+    if month > 0:
+        start_date = timezone.make_aware(datetime(year, month, 1))
+        if month == 12:
+            end_date = timezone.make_aware(datetime(year + 1, 1, 1))
+        else:
+            end_date = timezone.make_aware(datetime(year, month + 1, 1))
+
     response = HttpResponse(content_type='application/ms-excel')
     response['Content-Disposition'] = 'attachment; filename="sales_report.xls"'
 
@@ -119,25 +156,27 @@ def download_excel(request):
     # Write header row
     font_style = xlwt.XFStyle()
     font_style.font.bold = True
-    columns = ['Order id', 'Customer', 'Product', 'Qty', 'Amount', 'Date']
+    columns = ['Order id', 'Customer', 'Product', 'Qty', 'Total Amount', 'Discount Amount', 'Net Amount', 'Date']
     for col_num, column_title in enumerate(columns):
         ws.write(0, col_num, column_title, font_style)
 
     # Write data rows
-    rows = OrderItem.objects.filter(order_status=3,created_at__range=[start_date, end_date])
+    rows = OrderItem.objects.filter(order_status=3, created_at__range=[start_date, end_date])
     for row_num, row in enumerate(rows, start=1):
         ws.write(row_num, 0, row.id)
-        ws.write(row_num, 1, row.order.owner.customer.name )
+        ws.write(row_num, 1, row.order.owner.customer.name)
         ws.write(row_num, 2, f"{row.product.product.brand} {row.product.product.title} {row.product.variant_name}")
         ws.write(row_num, 3, row.quantity)
-        ws.write(row_num, 4, row.amount)
+        ws.write(row_num, 4, row.total_amount)
+        ws.write(row_num, 5, row.discount_amount)
+        ws.write(row_num, 6, row.amount)
         created_at_naive = make_naive(row.created_at)
         formatted_date = created_at_naive.strftime('%d/%m/%Y')
-        ws.write(row_num, 5, formatted_date)
+        ws.write(row_num, 7, formatted_date)
 
     # Save the workbook content to the HttpResponse object
     wb.save(response)
-    
+
     return response
 from decimal import Decimal
 

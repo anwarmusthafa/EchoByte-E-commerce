@@ -59,6 +59,8 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
     product = models.ForeignKey(ProductVariant, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
+    total_amount = amount = models.DecimalField(max_digits=10, decimal_places=2, null = True, blank = True)
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, null = True, blank = True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_method = models.CharField(max_length=50,null = True, blank =True)
     razor_pay_id = models.CharField(max_length=50, null = True, blank =True)
@@ -67,6 +69,7 @@ class OrderItem(models.Model):
     is_paid = models.BooleanField(default = False,null = True, blank =True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True)
+
 
 class ReturnOrder(models.Model):
     RETURN_REQUESTED = 1

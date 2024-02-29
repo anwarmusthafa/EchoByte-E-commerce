@@ -151,6 +151,8 @@ def checkout(request):
                                             address=address_obj,
                                             quantity=cart_item.quantity,
                                             payment_method = payment_method,
+                                            total_amount = cart_item.product.selling_price * cart_item.quantity,
+                                            discount_amount = coupon_discount,
                                             amount= float(amount))
                     if payment_method == 'online':
                         new_order_item.is_paid = True
@@ -176,7 +178,7 @@ def checkout(request):
             # Handle any other exceptions, such as database errors
             error_message = "An error occurred while processing your order. Please try again later."
             context = {'cart': cart, 'cart_items': cart_items, 'address': address, 'error_message': error_message,'coupons':coupons, }
-            return render(request, 'checkout.html')
+            return render(request, 'checkout.html',context)
     context = {
         'cart': cart,
         'cart_items': cart_items, 

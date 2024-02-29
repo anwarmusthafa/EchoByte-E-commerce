@@ -8,31 +8,13 @@
         <div class="app-content">
 
             <!--====== Section 1 ======-->
-            <div class="u-s-p-y-60">
+          
 
-                <!--====== Section Content ======-->
-                <div class="section__content">
-                    <div class="container">
-                        <div class="breadcrumb">
-                            <div class="breadcrumb__wrap">
-                                <ul class="breadcrumb__list">
-                                    <li class="has-separator">
 
-                                        <a href="index.html">Home</a></li>
-                                    <li class="is-marked">
-
-                                        <a href="dash-manage-order.html">My Account</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!--====== End - Section 1 ======-->
 
 
             <!--====== Section 2 ======-->
-            <div class="u-s-p-b-60">
+            <div class="u-s-p-b-60"> <br>
 
                 <!--====== Section Content ======-->
                 <div class="section__content">
@@ -52,7 +34,7 @@
                                         <div class="dash__pad-2">
                                             <div class="dash-l-r">
                                                 <div>
-                                                    <div class="manage-o__text-2 u-c-secondary">Order {{order.pk}}</div>
+                                                    <div class="manage-o__text-2 u-c-secondary">Order id {{order.pk}}</div>
                                                     <div class="manage-o__text u-c-silver">Placed on {{order.created_at}}</div>
                                                 </div>
                                                 <div>
@@ -156,6 +138,11 @@
                                         </div>
                                     </div>
                                     <div class="text-center u-s-m-b-30">
+                                        {% if order.is_paid == False %} 
+                                        <a href="">
+                                            <button class="btn btn-success">Make Payment</button>
+                                        </a>
+                                        {% endif %}
                                         {% if order.order_status > 0 and order.order_status < 3 %}
                                             <a href="{% url 'cancel_order' order.pk %}">
                                                 <button class="btn btn-danger">Cancel Order</button>

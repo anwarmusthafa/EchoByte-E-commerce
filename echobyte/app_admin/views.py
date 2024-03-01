@@ -93,39 +93,47 @@ def delete_status(request, pk):
 def sales_report(request):
     sales = None
     message = None
+    
     if 'start_date' in request.session:
         del request.session['start_date']
     if 'end_date' in request.session:
         del request.session['end_date']
     if 'month' in request.session:
         del request.session['month']
+    if 'year' in request.session:
+        del request.session['year']
+        
     if request.method == 'POST':
         start_date_str = request.POST.get('start-date')
         end_date_str = request.POST.get('end-date')
         month = int(request.POST.get('month'))
+        year_wise = int(request.POST.get('year',0))
         year = datetime.now().year
+        
         if month > 0:
             start_date_str = f"{year}-{month:02d}-01"
             if month == 12:
                 end_date_str = f"{year + 1}-01-01"
             else:
                 end_date_str = f"{year}-{month + 1:02d}-01"
+        elif year_wise > 0:
+            start_date_str = f"{year_wise}-01-01"
+            end_date_str = f"{year_wise + 1}-01-01"
+            request.session['year'] = year_wise
 
-        if start_date_str and end_date_str:  # Check if both start and end dates are provided
+        if start_date_str and end_date_str:  
             request.session['start_date'] = start_date_str
             request.session['end_date'] = end_date_str
             request.session['month'] = month
 
-            # Parse start and end dates from strings to datetime objects
             start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
             end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
 
-            # Convert start and end dates to timezone-aware datetime objects
             start_date = timezone.make_aware(start_date)
             end_date = timezone.make_aware(end_date)
 
-            # Filter sales based on the provided date range
-            sales = OrderItem.objects.filter(order_status=3, created_at__range=[start_date, end_date])
+            sales = OrderItem.objects.filter(order_status=3, created_at__range=[start_date, end_date]).order_by('created_at')
+            
             if not sales:
                 message = "No sales in these dates"
         else:
@@ -134,17 +142,22 @@ def sales_report(request):
     context = {'sales': sales, 'message': message}
     return render(request, 'sales_report.html', context)
 
+
 def download_excel(request):
     start_date = request.session.get('start_date')
     end_date = request.session.get('end_date')
-    month = request.session.get('month',0)
-    year = datetime.now().year
+    month = request.session.get('month', 0)
+    year = request.session.get('year', datetime.now().year)
+
     if month > 0:
         start_date = timezone.make_aware(datetime(year, month, 1))
         if month == 12:
             end_date = timezone.make_aware(datetime(year + 1, 1, 1))
         else:
             end_date = timezone.make_aware(datetime(year, month + 1, 1))
+    elif year > 0:
+        start_date = timezone.make_aware(datetime(year, 1, 1))
+        end_date = timezone.make_aware(datetime(year + 1, 1, 1))
 
     response = HttpResponse(content_type='application/ms-excel')
     response['Content-Disposition'] = 'attachment; filename="sales_report.xls"'
@@ -161,7 +174,7 @@ def download_excel(request):
         ws.write(0, col_num, column_title, font_style)
 
     # Write data rows
-    rows = OrderItem.objects.filter(order_status=3, created_at__range=[start_date, end_date])
+    rows = OrderItem.objects.filter(order_status=3, created_at__range=[start_date, end_date]).order_by('created_at')
     for row_num, row in enumerate(rows, start=1):
         ws.write(row_num, 0, row.id)
         ws.write(row_num, 1, row.order.owner.customer.name)
@@ -178,6 +191,7 @@ def download_excel(request):
     wb.save(response)
 
     return response
+
 from decimal import Decimal
 
 def download_pdf(request):
@@ -196,7 +210,8 @@ def download_pdf(request):
     p.setFont("Helvetica", 12)  # Set regular font size for content
 
     # Write PDF content
-    orders = OrderItem.objects.filter(order_status=3, created_at__range=[start_date, end_date])
+    orders = OrderItem.objects.filter(order_status=3, created_at__range=[start_date, end_date]).order_by('created_at')
+
 
     # Define column widths
     col_widths = [70, 70, 250, 30, 70, 60]  # Adjust as needed

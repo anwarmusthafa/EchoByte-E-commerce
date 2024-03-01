@@ -7,8 +7,10 @@
 
 <style>
     .selected-category {
-        color: red;
-    }
+    font-weight: bold;
+    color: red;
+    /* Add any other styling you want for the selected category */
+}
     
 </style>
         <!--====== App Content ======-->
@@ -33,14 +35,21 @@
                                                 <span class="fas fa-minus shop-w__toggle" data-target="#s-category" data-toggle="collapse"></span>
                                             </div>
                                            
-                                            
                                             <div class="shop-w__wrap collapse show" id="s-category">
                                                 <ul class="shop-w__category-list gl-scroll">
-                                                    <li class="text-dark{% if category == 'Andriod' %} selected-category{% endif %}"><a href="?category=Andriod">Andriod</a></li>
-                                                    <li class="text-dark{% if category == 'IOS' %} selected-category{% endif %}"><a href="?category=IOS">IOS</a></li>
-                                                    <li class="text-dark{% if category == 'Feature' %} selected-category{% endif %}"><a href="?category=Feature">Feature</a></li>
+                                                    <li class="text-dark{% if category == 'Andriod' %} selected-category{% endif %}">
+                                                        <a href="?category=Andriod{% if min_price %}&min-price={{ min_price }}{% endif %}{% if max_price %}&max-price={{ max_price }}{% endif %}">Andriod</a>
+                                                    </li>
+                                                    <li class="text-dark{% if category == 'IOS' %} selected-category{% endif %}">
+                                                        <a href="?category=IOS{% if min_price %}&min-price={{ min_price }}{% endif %}{% if max_price %}&max-price={{ max_price }}{% endif %}">IOS</a>
+                                                    </li>
+                                                    <li class="text-dark{% if category == 'Feature' %} selected-category{% endif %}">
+                                                        <a href="?category=Feature{% if min_price %}&min-price={{ min_price }}{% endif %}{% if max_price %}&max-price={{ max_price }}{% endif %}">Feature</a>
+                                                    </li>
                                                 </ul>
                                             </div>
+                                            
+                                            
                                             
                                             
                                         </div>
@@ -132,6 +141,8 @@
 
                                                             <input class="input-text input-text--primary-style" value="{{max_price}}" type="number" name="max-price" placeholder="Max"></div>
                                                         <div>
+                                                            <input type="hidden" name="category" value="{{ request.GET.category }}">
+
 
                                                             <button class="btn btn--icon fas fa-angle-right btn--e-transparent-platinum-b-2" type="submit"></button></div>
                                                     </div>

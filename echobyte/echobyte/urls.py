@@ -28,6 +28,7 @@ urlpatterns = [
     path('',include('category.urls')),
     path('',include('order.urls')),
     path('',include('coupon.urls')),
+    path('',include('banner.urls')),
 
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) 

@@ -255,6 +255,12 @@
               <i class="mdi mdi mdi-account menu-icon"></i>
           </a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link {% if request.resolver_match.url_name == 'banners' %}active{% endif %}" href="{% url 'banners' %}">
+            <span class="menu-title">Banners</span>
+            <i class="mdi mdi mdi-account menu-icon"></i>
+        </a>
+    </li>
           
             <li class="nav-item">
               <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">

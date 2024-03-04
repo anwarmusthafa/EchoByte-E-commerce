@@ -23,6 +23,7 @@ urlpatterns = [
     path('remove_from_wishlist/<pk>/', views.remove_from_wishlist, name= "remove_from_wishlist"),
     path('payment_failure/', views.payment_failure, name= "payment_failure"),
     path('download_invoice/<pk>/', views.download_invoice, name= "download_invoice"),
+    path('make_payment/<int:pk>/', views.make_payment, name='make_payment'),
     
     
 

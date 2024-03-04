@@ -140,7 +140,8 @@
                                     <div class="text-center u-s-m-b-30">
                                         {% if order.is_paid == False %} 
                                         <a href="">
-                                            <button class="btn btn-success">Make Payment</button>
+                                            <button id="payButton" class="btn btn-success">Make Payment</button>
+
                                         </a>
                                         {% endif %}
                                         {% if order.order_status > 0 and order.order_status < 3 %}
@@ -174,15 +175,16 @@
                                                     <h2 class="dash__h2 u-s-m-b-8">Total Summary</h2>
                                                     <div class="dash-l-r u-s-m-b-8">
                                                         <div class="manage-o__text-2 u-c-secondary">Subtotal</div>
-                                                        <div class="manage-o__text-2 u-c-secondary">₹{{order.amount}}</div>
+                                                        <div class="manage-o__text-2 u-c-secondary">₹{{order.total_amount}}</div>
                                                     </div>
                                                     <div class="dash-l-r u-s-m-b-8">
-                                                        <div class="manage-o__text-2 u-c-secondary">Shipping Fee</div>
-                                                        <div class="manage-o__text-2 u-c-secondary">₹0.00</div>
+                                                        <div class="manage-o__text-2 u-c-secondary">Discount</div>
+                                                        <div class="manage-o__text-2 u-c-secondary">₹ {% if order.discount_amount %}{{order.discount_amount}}{% else %}0.00{% endif %}</div>
                                                     </div>
                                                     <div class="dash-l-r u-s-m-b-8">
                                                         <div class="manage-o__text-2 u-c-secondary">Total</div>
                                                         <div class="manage-o__text-2 u-c-secondary">₹{{order.amount}}</div>
+                                                        <input  type="hidden" id="amount"  value="{{order.amount}}">
                                                     </div>
 
                                                     <span class="dash__text-2">Paid by {{order.payment_method}}</span>
@@ -190,7 +192,7 @@
                                                 {% if order.order_status > 2 %}
                                                 <div class="col-auto">
                                                     <!-- Button with the btn-success class -->
-                                                    <a href="{% url "download_invoice" order.id%}"><button class="btn btn-success">Download Invoice</button></a>
+                                                    <a href="{% url "download_invoice" order.id %}"><button class="btn btn-success">Download Invoice</button></a>
                                                 </div>
                                                 {% endif %}
 
@@ -239,6 +241,47 @@
             
             
         </script>
+
+        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    var amountInput = document.getElementById('amount');
+    var amount = amountInput.value * 100;
+    var options = {
+      "key": "rzp_test_NhgG1kQ1czt0q6",
+      "amount": amount, // amount in the smallest currency unit
+      "currency": "INR",
+      "name": "Echobyte",
+      "description": "Thanks for buying from us",
+      "image": "https://your-company-logo.png",
+      "handler": function (response){
+        // Check if payment is successful
+        if(response.razorpay_payment_id) {
+          // Payment successful, proceed with further actions if needed
+          var paymentId = response.razorpay_payment_id;
+          window.location.href = "{% url 'make_payment' order.pk %}?razorpay_payment_id=" + paymentId;
+
+          
+        } else {
+          // Payment failed or was canceled by the user
+          window.location.href = "{% url 'payment_failure' %}";
+        }
+      },
+      "prefill": {
+        "name": "Customer Name",
+        "email": "customer@example.com",
+        "contact": "9999999999"
+      },
+      "theme": {
+        "color": "#F37254"
+      }
+    };
+  
+    document.getElementById('payButton').onclick = function(){
+      event.preventDefault();
+      var rzp = new Razorpay(options);
+      rzp.open();
+    };
+</script>
         
 
 

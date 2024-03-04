@@ -416,9 +416,17 @@ def download_invoice(request, pk):
     
     # Close the PDF
     pdf.save()
-    
     return response
-
+def make_payment(request, pk):
+    # Process the payment and update order status
+    payment_id = request.GET.get('razorpay_payment_id')
+    order = OrderItem.objects.get(pk=pk)
+    order.payment_method = 'online'
+    order.is_paid = True
+    order.razor_pay_id = payment_id  # Assuming you can retrieve payment ID from Razorpay response
+    order.save()
+    context = {'order_id':pk}
+    return render(request, 'payment_success.html',context)
 
 
 

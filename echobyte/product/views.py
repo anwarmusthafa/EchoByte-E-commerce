@@ -6,7 +6,6 @@ from django.core.paginator import Paginator
 from django.core.exceptions import ObjectDoesNotExist
 from order.models import CartItems, Cart,Wishlist
 
-
 # Create your views here.
 def all_products(request):
     try:
@@ -76,9 +75,6 @@ def all_products(request):
             'error_message': f"An error occurred: {str(e)}"
         }
     return render(request, 'all_products.html', context)
-
-
-from django.core.exceptions import ObjectDoesNotExist
 
 def product_detail(request, pk):
     cart_item = None

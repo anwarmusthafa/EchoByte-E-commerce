@@ -17,6 +17,10 @@ from .models import Wishlist
 from coupon.models import Coupon
 import decimal
 from django.db.models import Case, When, Value, IntegerField
+from reportlab.pdfgen import canvas
+from django.http import HttpResponse
+from reportlab.lib.pagesizes import letter
+
 
 # Create your views here.
 @login_required(login_url='signin')
@@ -93,6 +97,7 @@ def checkout(request):
     cart_items = CartItems.objects.filter(cart=cart).order_by('-created_at')
     address = Address.objects.filter(user=user)
     coupons = Coupon.objects.filter(is_active = True)
+    coupon_discount = None
     
     if request.method == 'POST':
         address_id = request.POST.get('address')
@@ -328,6 +333,92 @@ def remove_from_wishlist(request,pk):
     return redirect('wishlist')
 def payment_failure(request):
     return render(request,'payment_failure.html')
+
+def download_invoice(request, pk):
+    # Retrieve the order item
+    order_item = get_object_or_404(OrderItem, pk=pk)
+    
+    # Create a PDF document
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="invoice_{order_item.order_id}.pdf"'
+    
+    # Create a PDF canvas
+    pdf = canvas.Canvas(response, pagesize=letter)
+    
+    # Set font
+    pdf.setFont("Helvetica-Bold", 14)
+    
+    # Draw Tax Invoice heading
+    pdf.drawCentredString(300, 750, "Tax Invoice")
+    
+    # Set font size and style for company info
+    pdf.setFont("Helvetica", 10)
+    
+    # Draw Company Name and GST Number
+    pdf.drawString(50, 730, "EchoByte")
+    pdf.drawString(50, 715, "GSTIN: 33BGHS74151ZM")  # Assuming you have a gst_number field in your Company model
+    
+    # Draw Invoice Number
+    pdf.drawRightString(550, 730, f"Invoice Number: {order_item.id}")
+    
+    # Draw a line under company info
+    pdf.line(50, 710, 550, 710)
+    
+    # Set font size for order details
+    pdf.setFont("Helvetica-Bold", 12)
+    
+    # Draw Order ID and Date
+    pdf.drawString(50, 690, f"Order ID: {order_item.pk}")
+    pdf.drawString(300, 690, f"Date: {order_item.created_at.strftime('%Y-%m-%d')}")  # Assuming created_at is a DateTimeField
+    
+    # Draw Shipping Address
+    pdf.drawString(50, 670, f"Bill To: {order_item.address.name}")
+    pdf.drawString(50, 650, f"Shipping Address: {order_item.address.address}")
+    
+    # Draw a line under order details
+    pdf.line(50, 630, 550, 630)
+    
+    # Set font size for table header
+    pdf.setFont("Helvetica-Bold", 10)
+    
+    # Draw table headers
+    pdf.drawString(50, 610, "Product")
+    pdf.drawString(200, 610, "Quantity")
+    pdf.drawString(300, 610, "Amount")
+    pdf.drawString(400, 610, "Discount")
+    pdf.drawString(500, 610, "Total Amount")
+    
+    # Draw a line under table header
+    pdf.line(50, 600, 550, 600)
+    
+    # Set font size for table data
+    pdf.setFont("Helvetica", 10)
+    
+    # Draw table data
+    y = 580
+    pdf.drawString(50, y, f"{order_item.product.product.brand} - {order_item.product.product.title} ({order_item.product.variant_name})")
+    pdf.drawString(200, y, str(order_item.quantity))
+    pdf.drawString(300, y, str(order_item.total_amount))
+    pdf.drawString(400, y, str(order_item.discount_amount))
+    pdf.drawString(500, y, str(order_item.amount))
+    y -= 20
+    
+    # Draw a line under table data
+    pdf.line(50, y, 550, y)
+    
+    # Draw Total Price
+    pdf.drawString(400, y - 20, "Total Price:")
+    pdf.drawString(500, y - 20, str(order_item.amount))  # Assuming this is the total price
+    
+    # Set font size and style for company signature
+    pdf.setFont("Helvetica-Bold", 12)
+    pdf.drawString(50, y - 40, "Thank you for your purchase from EchoByte!")
+    
+    # Close the PDF
+    pdf.save()
+    
+    return response
+
 
 
 

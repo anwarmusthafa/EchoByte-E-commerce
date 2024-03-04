@@ -185,8 +185,15 @@
                                                         <div class="manage-o__text-2 u-c-secondary">₹{{order.amount}}</div>
                                                     </div>
 
-                                                    <span class="dash__text-2">Paid by Cash on Delivery</span>
+                                                    <span class="dash__text-2">Paid by {{order.payment_method}}</span>
                                                 </div>
+                                                {% if order.order_status > 2 %}
+                                                <div class="col-auto">
+                                                    <!-- Button with the btn-success class -->
+                                                    <a href="{% url "download_invoice" order.id%}"><button class="btn btn-success">Download Invoice</button></a>
+                                                </div>
+                                                {% endif %}
+
                                             </div>
                                         </div>
                                     </div>

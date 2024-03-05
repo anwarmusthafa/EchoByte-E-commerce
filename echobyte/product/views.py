@@ -42,7 +42,8 @@ def all_products(request):
             variants = variants.filter(Q(product__title__icontains=query) | Q(product__brand__brand__icontains=query))
         # Apply category filter
         if category:
-            variants = variants.filter(product__category__name=category)
+            categories = category.split(',')
+            variants = variants.filter(product__category__name__in=categories)
         if min_price:
                 variants = variants.filter(selling_price__gte=min_price)
         if max_price:
@@ -56,16 +57,16 @@ def all_products(request):
         page_number = request.GET.get('page', 1)
         page_obj = paginator.get_page(page_number)
         context = {
-            'variants': page_obj,
-            'query': query,
-            'sort_by': sort_by,
-            'category': category,
-            'min_price' : min_price,
-            'max_price' : max_price,
-            'wishlist_product_pks':wishlist_product_pks,
-            'product_count':product_count,
-            
-        }
+    'variants': page_obj,
+    'query': query,
+    'sort_by': sort_by,
+    'categories': category.split(',') if category else [],  # Convert category string to list
+    'min_price': min_price,
+    'max_price': max_price,
+    'wishlist_product_pks': wishlist_product_pks,
+    'product_count': product_count,
+}
+
     except ObjectDoesNotExist as e:
         context = {
             'error_message': f"Object does not exist: {str(e)}"

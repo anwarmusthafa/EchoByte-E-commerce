@@ -417,16 +417,22 @@ def download_invoice(request, pk):
     # Close the PDF
     pdf.save()
     return response
+@transaction.atomic
 def make_payment(request, pk):
-    # Process the payment and update order status
-    payment_id = request.GET.get('razorpay_payment_id')
-    order = OrderItem.objects.get(pk=pk)
-    order.payment_method = 'online'
-    order.is_paid = True
-    order.razor_pay_id = payment_id  # Assuming you can retrieve payment ID from Razorpay response
-    order.save()
-    context = {'order_id':pk}
-    return render(request, 'payment_success.html',context)
+    try:
+        # Process the payment and update order status
+        payment_id = request.GET.get('razorpay_payment_id')
+        order = get_object_or_404(OrderItem, pk=pk)
+        order.payment_method = 'online'
+        order.is_paid = True
+        order.razor_pay_id = payment_id  # Assuming you can retrieve payment ID from Razorpay response
+        order.save()
+        context = {'order_id': pk}
+        return render(request, 'payment_success.html', context)
+    except Exception as e:
+        # Rollback transaction in case of any exception
+        transaction.set_rollback(True)
+        return HttpResponseServerError("An error occurred while processing the payment.")
 
 
 

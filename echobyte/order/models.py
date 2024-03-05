@@ -70,7 +70,6 @@ class OrderItem(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-
 class ReturnOrder(models.Model):
     RETURN_REQUESTED = 1
     RETURNED = 2

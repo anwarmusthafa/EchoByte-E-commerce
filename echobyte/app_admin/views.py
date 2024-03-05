@@ -13,6 +13,8 @@ import xlwt
 from django.utils.timezone import make_naive
 import io
 from reportlab.pdfgen import canvas
+from datetime import datetime
+from django.db.models.functions import ExtractMonth
 @never_cache
 # @user_passes_test(lambda u: u.is_authenticated and u.is_staff)
 def admin_login(request):
@@ -43,7 +45,7 @@ def admin_home(request):
     ).aggregate(
     total_amount=Sum('amount')
     )
-    total_discount = Order.objects.aggregate(total_discount=Sum('discount_amount'))
+    total_discount = OrderItem.objects.filter(order_status__gt=0, order_status__lt=5).aggregate(total_discount=Sum('discount_amount'))
     pending_shipping_count = OrderItem.objects.filter(order_status = 1).count()
     pending_delivery_count =  OrderItem.objects.filter(order_status = 2).count()
     pending_return_request = OrderItem.objects.filter(order_status = 4).count()
@@ -55,8 +57,17 @@ def admin_home(request):
     payment_percentage = [cod_percentage,online_percentage]
 
     recent_orders = OrderItem.objects.order_by('-created_at')[:10]
-   
+    sales_2022 = OrderItem.objects.filter(order_status__gt=0, order_status__lt=5, created_at__year=2022).count()
+    sales_2023 = OrderItem.objects.filter(order_status__gt=0, order_status__lt=5, created_at__year=2023).count()
+    sales_2024 = OrderItem.objects.filter(order_status__gt=0, order_status__lt=5, created_at__year=2024).count()
+    sales_2025 = OrderItem.objects.filter(order_status__gt=0, order_status__lt=5, created_at__year=2025).count()
+    sales_2026 = OrderItem.objects.filter(order_status__gt=0, order_status__lt=5, created_at__year=2026).count()
 
+    year_wise_sales = [sales_2022,sales_2023,sales_2024,sales_2025,sales_2026]
+
+    monthly_sales_2024 = [0] * 12
+    for month in range(1, 13):
+        monthly_sales_2024[month - 1] = OrderItem.objects.filter(order_status__gt=0, order_status__lt=5, created_at__year=2024, created_at__month=month).count()
 
     context = {'total_order_count':total_order_count,
                'total_amount': total_amount['total_amount'],
@@ -65,7 +76,9 @@ def admin_home(request):
                'pending_delivery_count': pending_delivery_count,
                'pending_return_request':pending_return_request,
                'payment_percentage':payment_percentage,
-               'recent_orders':recent_orders}
+               'recent_orders':recent_orders,
+               'year_wise_sales':year_wise_sales,
+                'monthly_sales_2024':monthly_sales_2024}
     return render(request, 'admin_home.html',context)
 
 @never_cache

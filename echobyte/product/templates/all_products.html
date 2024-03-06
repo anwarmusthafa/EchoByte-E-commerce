@@ -205,22 +205,18 @@
                   <ul class="shop-p__pagination">
                      <!-- Previous page link -->
                      {% if variants.has_previous %}
-    <li><a href="?page={{ variants.previous_page_number }}{% if sort_by %}&sort={{ sort_by }}{% endif %}{% if query %}&query={{ query }}{% endif %} {% if min_price %}&min-price={{ min_price }}{% endif %} {% if max_price %}&max-price={{ max_price }}{% endif %}{% if category %}&category={{ category }}{% endif %}">Previous</a></li>
-{% endif %}
-
-<!-- Page links -->
-{% for num in variants.paginator.page_range %}
-    <li class="{% if num == variants.number %}is-active{% endif %}">
-        <a href="?page={{ num }}{% if sort_by %}&sort={{ sort_by }}{% endif %}{% if query %}&query={{ query }}{% endif %} {% if min_price %}&min-price={{ min_price }}{% endif %} {% if max_price %}&max-price={{ max_price }}{% endif %}{% if category %}&category={{ category }}{% endif %}">{{ num }}</a>
-    </li>
-{% endfor %}
-
-<!-- Next page link -->
-{% if variants.has_next %}
-    <li><a href="?page={{ variants.next_page_number }}{% if sort_by %}&sort={{ sort_by }}{% endif %}{% if query %}&query={{ query }}{% endif %} {% if min_price %}&min-price={{ min_price }}{% endif %} {% if max_price %}&max-price={{ max_price }}{% endif %}{% if category %}&category={{ category }}{% endif %}">Next</a></li>
-{% endif %}
-
-
+                     <li><a href="?page={{ variants.previous_page_number }}{% if sort_by %}&sort={{ sort_by }}{% endif %}{% if query %}&query={{ query }}{% endif %} {% if min_price %}&min-price={{ min_price }}{% endif %} {% if max_price %}&max-price={{ max_price }}{% endif %}{% if category %}&category={{ category }}{% endif %}">Previous</a></li>
+                     {% endif %}
+                     <!-- Page links -->
+                     {% for num in variants.paginator.page_range %}
+                     <li class="{% if num == variants.number %}is-active{% endif %}">
+                        <a href="?page={{ num }}{% if sort_by %}&sort={{ sort_by }}{% endif %}{% if query %}&query={{ query }}{% endif %} {% if min_price %}&min-price={{ min_price }}{% endif %} {% if max_price %}&max-price={{ max_price }}{% endif %}{% if category %}&category={{ category }}{% endif %}">{{ num }}</a>
+                     </li>
+                     {% endfor %}
+                     <!-- Next page link -->
+                     {% if variants.has_next %}
+                     <li><a href="?page={{ variants.next_page_number }}{% if sort_by %}&sort={{ sort_by }}{% endif %}{% if query %}&query={{ query }}{% endif %} {% if min_price %}&min-price={{ min_price }}{% endif %} {% if max_price %}&max-price={{ max_price }}{% endif %}{% if category %}&category={{ category }}{% endif %}">Next</a></li>
+                     {% endif %}
                   </ul>
                </div>
             </div>

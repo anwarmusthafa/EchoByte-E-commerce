@@ -16,7 +16,7 @@ from reportlab.pdfgen import canvas
 from datetime import datetime
 from django.db.models.functions import ExtractMonth
 @never_cache
-# @user_passes_test(lambda u: u.is_authenticated and u.is_staff)
+@user_passes_test(lambda u: u.is_authenticated and u.is_staff)
 def admin_login(request):
     error_message = None
     try:
@@ -37,7 +37,7 @@ def admin_login(request):
     return render(request, 'admin_login.html', context)
 
 @never_cache
-@login_required(login_url='admin_login')
+@user_passes_test(lambda u: u.is_authenticated and u.is_staff)
 def admin_home(request):
     total_order_count = OrderItem.objects.filter().count()
     total_amount = OrderItem.objects.filter(

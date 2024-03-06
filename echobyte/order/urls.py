@@ -24,8 +24,7 @@ urlpatterns = [
     path('payment_failure/', views.payment_failure, name= "payment_failure"),
     path('download_invoice/<pk>/', views.download_invoice, name= "download_invoice"),
     path('make_payment/<int:pk>/', views.make_payment, name='make_payment'),
+    path('make_payment_failure/<int:pk>/', views.make_payment_failure, name='make_payment_failure'),
     
-    
-
     ]
 

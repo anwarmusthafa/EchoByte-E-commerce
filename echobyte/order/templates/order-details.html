@@ -263,7 +263,7 @@
           
         } else {
           // Payment failed or was canceled by the user
-          window.location.href = "{% url 'payment_failure' %}";
+          window.location.href = "{% url 'make_payment_failure' order.pk %}";
         }
       },
       "prefill": {

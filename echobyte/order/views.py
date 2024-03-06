@@ -1,5 +1,5 @@
 from django.shortcuts import render , redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required,user_passes_test
 from .models import Cart,CartItems,Order,OrderItem, ReturnOrder
 from customer.models import Address, Customer , Wallet
 from product.models import Product, ProductVariant, ProductImage
@@ -38,7 +38,7 @@ from django.http import JsonResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
-@login_required(login_url='signin')
+
 @login_required(login_url='signin')
 def add_to_cart(request):
     if request.method == 'POST':
@@ -196,7 +196,7 @@ def checkout(request):
 @login_required(login_url='signin')
 def order_success(request):
     return render(request,'order_success.html')
-@login_required(login_url='admin_login')
+@user_passes_test(lambda u: u.is_authenticated and u.is_staff)
 def list_orders(request):
     orders = OrderItem.objects.annotate(
     custom_order=Case(
@@ -208,6 +208,8 @@ def list_orders(request):
 ).order_by('custom_order', '-order_status')
     context = {'orders':orders}
     return render(request, 'list-orders.html', context)
+
+@user_passes_test(lambda u: u.is_authenticated and u.is_staff)
 def change_order_status(request, pk):
     # Retrieve the order object or return a 404 error if not found
     order = get_object_or_404(OrderItem, pk=pk)
@@ -232,12 +234,14 @@ def change_order_status(request, pk):
             product.save()
     # Redirect to the list_orders view after processing
     return redirect(request.META.get('HTTP_REFERER', '/'))
+
 @login_required(login_url='signin')
 def my_orders(request):
     user = request.user
     orders = OrderItem.objects.filter(order__owner = user).order_by('-created_at')
     context = {'orders': orders}
     return render(request, 'my-order.html', context)
+
 @login_required(login_url='signin')
 def order_details(request,pk):
     order = OrderItem.objects.get(pk = pk)
@@ -264,10 +268,14 @@ def cancel_order(request, pk):
         return HttpResponseServerError("An error occurred: {}".format(str(e)))
     # Redirect to the order details page after canceling the order
     return redirect('order_details', pk=pk)
+
+@user_passes_test(lambda u: u.is_authenticated and u.is_staff)
 def delivery_list(request):
     orders = OrderItem.objects.filter(order_status = 2) 
     context = {'orders':orders}
     return render(request, 'delivery-list.html', context)
+
+@login_required(login_url='signin')
 def return_order(request,pk):
     order = OrderItem.objects.get(pk = pk)
     if request.POST:
@@ -282,6 +290,8 @@ def return_order(request,pk):
         return redirect('order_details', pk=pk)
     context = {'order':order}
     return render(request, 'return-order.html', context)
+
+@user_passes_test(lambda u: u.is_authenticated and u.is_staff)
 def return_list(request):
     return_orders = ReturnOrder.objects.all().order_by('return_status')
     context = {'return_orders':return_orders} 
@@ -310,12 +320,15 @@ def change_return_status(request, pk):
         return HttpResponseServerError("An error occurred: {}".format(str(e)))
 
     return redirect('return_list')
+
+@login_required(login_url='signin')
 def wishlist(request):
     wishlist_items = Wishlist.objects.filter(user=request.user)
     context = {'wishlist_items': wishlist_items}
     return render(request,'wishlist.html', context)
 
 @csrf_exempt
+@login_required(login_url='signin')
 def add_to_wishlist(request):
     if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         # Assuming you have some way to identify the current user
@@ -327,13 +340,18 @@ def add_to_wishlist(request):
         return JsonResponse({'message': 'Product added to wishlist'}, status=200)
     else:
         return JsonResponse({'error': 'Invalid request'}, status=400)
+
+@login_required(login_url='signin')
 def remove_from_wishlist(request,pk):
     wishlist_item = Wishlist.objects.get(pk=pk)
     wishlist_item.delete()
     return redirect('wishlist')
+
+@login_required(login_url='signin')
 def payment_failure(request):
     return render(request,'payment_failure.html')
 
+@login_required(login_url='signin')
 def download_invoice(request, pk):
     # Retrieve the order item
     order_item = get_object_or_404(OrderItem, pk=pk)
@@ -396,18 +414,20 @@ def download_invoice(request, pk):
     
     # Draw table data
     y = 580
-    pdf.drawString(50, y, f"{order_item.product.product.brand} - {order_item.product.product.title} ({order_item.product.variant_name})")
+    product_name = f"{order_item.product.product.brand} - {order_item.product.product.title}"
+    pdf.drawString(50, y, product_name)
+    pdf.drawString(50, y - 15, f"({order_item.product.variant_name})")  # Adding variant name below product name
     pdf.drawString(200, y, str(order_item.quantity))
     pdf.drawString(300, y, str(order_item.total_amount))
     pdf.drawString(400, y, str(order_item.discount_amount))
     pdf.drawString(500, y, str(order_item.amount))
-    y -= 20
-    
-    # Draw a line under table data
+    y -= 35  # Adjusting the y-coordinate for the next line
+
+# Draw a line under table data
     pdf.line(50, y, 550, y)
     
     # Draw Total Price
-    pdf.drawString(400, y - 20, "Total Price:")
+    pdf.drawString(400, y - 20, "Total Amount:")
     pdf.drawString(500, y - 20, str(order_item.amount))  # Assuming this is the total price
     
     # Set font size and style for company signature
@@ -418,6 +438,8 @@ def download_invoice(request, pk):
     pdf.save()
     return response
 @transaction.atomic
+
+@login_required(login_url='signin')
 def make_payment(request, pk):
     try:
         # Process the payment and update order status
@@ -433,6 +455,11 @@ def make_payment(request, pk):
         # Rollback transaction in case of any exception
         transaction.set_rollback(True)
         return HttpResponseServerError("An error occurred while processing the payment.")
+@login_required(login_url='signin')
+def make_payment_failure(request,pk):
+    context = {'order_id':pk}
+    return render(request,'make_payment_failure.html',context)
+    
 
 
 

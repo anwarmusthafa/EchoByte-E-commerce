@@ -109,17 +109,12 @@ def signout(request):
 
 def otp_verification(request, pk):
     success_message = None
-
-    try:
-        
+    try: 
         if pk:
-
-            
             if request.method == 'POST':
                 user_otp = request.POST['otp']
                 tb_user = get_object_or_404(Customer, pk=pk)
                 db_otp = tb_user.otp 
-            
                 if  user_otp == str(db_otp):
                     if tb_user.is_verified:
                         return render(request, 'signin',{'pk':pk})
@@ -136,12 +131,14 @@ def otp_verification(request, pk):
     context={ 'pk':pk,
              'success_message' : success_message}
     return render(request, 'otp_verification.html', context)
+
 @login_required(login_url='signin')
 def profile(request):
     user = request.user
     customer = Customer.objects.get(user__username = user)
     context = {'customer':customer}
     return render(request,'profile.html', context)
+
 @login_required(login_url='signin')
 def edit_profile(request):
     user = request.user
@@ -155,11 +152,13 @@ def edit_profile(request):
         return redirect('profile')
     context = {'customer':customer} 
     return render(request, 'edit-profile.html', context)
+
 @login_required(login_url='signin')
 def address(request):
     address = Address.objects.filter(user = request.user)
     context = {'address':address}
     return render(request, 'address.html', context )
+
 @login_required(login_url='signin')
 def add_address(request):
     if request.POST:
@@ -198,6 +197,8 @@ def add_address(request):
             # Log the error or handle it as per your application's needs
             return HttpResponseServerError("An error occurred: {}".format(str(e)))
     return render(request, 'add-address.html')
+
+@login_required(login_url='signin')
 def wallet(request):
     wallet = Wallet.objects.get(user = request.user)
     context = {

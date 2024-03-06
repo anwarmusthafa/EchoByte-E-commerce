@@ -15,8 +15,9 @@ import io
 from reportlab.pdfgen import canvas
 from datetime import datetime
 from django.db.models.functions import ExtractMonth
+from .decorators import custom_user_passes_test
+
 @never_cache
-@user_passes_test(lambda u: u.is_authenticated and u.is_staff)
 def admin_login(request):
     error_message = None
     try:
@@ -37,7 +38,7 @@ def admin_login(request):
     return render(request, 'admin_login.html', context)
 
 @never_cache
-@user_passes_test(lambda u: u.is_authenticated and u.is_staff)
+@custom_user_passes_test(lambda u: u.is_staff)
 def admin_home(request):
     total_order_count = OrderItem.objects.filter().count()
     total_amount = OrderItem.objects.filter(
@@ -87,12 +88,13 @@ def admin_logout(request):
     logout(request)
     return redirect('admin_login')
 
-@login_required(login_url='admin_login')
+@custom_user_passes_test(lambda u: u.is_staff)
 def customers_list(request):
      customers = User.objects.exclude(pk = 1)
      context = {'customers': customers}
      return render(request, 'customers_list.html', context)
-@login_required(login_url='admin_login')
+
+@custom_user_passes_test(lambda u: u.is_staff)
 def delete_status(request, pk):
     if request.POST:
         delete_status = int(request.POST.get('delete_status'))
@@ -103,6 +105,8 @@ def delete_status(request, pk):
             user.delete_status = 1
         user.save()
     return redirect('customers_list')
+
+@custom_user_passes_test(lambda u: u.is_staff)
 def sales_report(request):
     sales = None
     message = None
@@ -154,8 +158,7 @@ def sales_report(request):
 
     context = {'sales': sales, 'message': message}
     return render(request, 'sales_report.html', context)
-
-
+@custom_user_passes_test(lambda u: u.is_staff)
 def download_excel(request):
     start_date = request.session.get('start_date')
     end_date = request.session.get('end_date')
@@ -207,6 +210,7 @@ def download_excel(request):
 
 from decimal import Decimal
 
+@custom_user_passes_test(lambda u: u.is_staff)
 def download_pdf(request):
     start_date = request.session.get('start_date')
     end_date = request.session.get('end_date')

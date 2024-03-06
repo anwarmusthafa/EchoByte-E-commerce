@@ -20,6 +20,7 @@ from django.db.models import Case, When, Value, IntegerField
 from reportlab.pdfgen import canvas
 from django.http import HttpResponse
 from reportlab.lib.pagesizes import letter
+from app_admin.decorators import custom_user_passes_test
 
 
 # Create your views here.
@@ -79,6 +80,7 @@ def add_cart_item_quantity(request,pk):
             cart_item.quantity += 1
             cart_item.save()
         return redirect('cart')
+    
 @login_required(login_url='signin')
 def sub_cart_item_quantity(request, pk):
     if request.user.is_authenticated:
@@ -193,10 +195,12 @@ def checkout(request):
         'coupon_code' : request.session.get('applied_coupon_code') }
 
     return render(request, 'checkout.html', context)
+
 @login_required(login_url='signin')
 def order_success(request):
     return render(request,'order_success.html')
-@user_passes_test(lambda u: u.is_authenticated and u.is_staff)
+
+@custom_user_passes_test(lambda u: u.is_staff)
 def list_orders(request):
     orders = OrderItem.objects.annotate(
     custom_order=Case(
@@ -209,7 +213,7 @@ def list_orders(request):
     context = {'orders':orders}
     return render(request, 'list-orders.html', context)
 
-@user_passes_test(lambda u: u.is_authenticated and u.is_staff)
+@custom_user_passes_test(lambda u: u.is_staff)
 def change_order_status(request, pk):
     # Retrieve the order object or return a 404 error if not found
     order = get_object_or_404(OrderItem, pk=pk)
@@ -247,6 +251,8 @@ def order_details(request,pk):
     order = OrderItem.objects.get(pk = pk)
     context = {'order':order}
     return render(request, 'order-details.html', context)
+
+@login_required(login_url='signin')
 @transaction.atomic
 def cancel_order(request, pk):
     try:
@@ -269,7 +275,8 @@ def cancel_order(request, pk):
     # Redirect to the order details page after canceling the order
     return redirect('order_details', pk=pk)
 
-@user_passes_test(lambda u: u.is_authenticated and u.is_staff)
+
+@custom_user_passes_test(lambda u: u.is_staff)
 def delivery_list(request):
     orders = OrderItem.objects.filter(order_status = 2) 
     context = {'orders':orders}
@@ -291,11 +298,13 @@ def return_order(request,pk):
     context = {'order':order}
     return render(request, 'return-order.html', context)
 
-@user_passes_test(lambda u: u.is_authenticated and u.is_staff)
+@custom_user_passes_test(lambda u: u.is_staff)
 def return_list(request):
     return_orders = ReturnOrder.objects.all().order_by('return_status')
     context = {'return_orders':return_orders} 
     return render(request,'return-list.html', context)
+
+@custom_user_passes_test(lambda u: u.is_staff)
 @transaction.atomic
 def change_return_status(request, pk):
     try:
@@ -437,9 +446,10 @@ def download_invoice(request, pk):
     # Close the PDF
     pdf.save()
     return response
-@transaction.atomic
+
 
 @login_required(login_url='signin')
+@transaction.atomic
 def make_payment(request, pk):
     try:
         # Process the payment and update order status
@@ -455,6 +465,7 @@ def make_payment(request, pk):
         # Rollback transaction in case of any exception
         transaction.set_rollback(True)
         return HttpResponseServerError("An error occurred while processing the payment.")
+
 @login_required(login_url='signin')
 def make_payment_failure(request,pk):
     context = {'order_id':pk}

@@ -8,7 +8,6 @@ from django.utils import timezone
 
 # Create your views here.
 @never_cache
-
 def home(request):
     new_arrivals = ProductVariant.objects.exclude(
     Q(product__delete_status=0) |

@@ -5,6 +5,7 @@ from product.models import Product,ProductVariant, ProductImage
 from django.core.paginator import Paginator
 from django.core.exceptions import ObjectDoesNotExist
 from order.models import CartItems, Cart,Wishlist
+from app_admin.decorators import custom_user_passes_test
 
 # Create your views here.
 def all_products(request):
@@ -128,7 +129,7 @@ def product_detail(request, pk):
     return render(request, 'product-detail.html', context)
 
 
-
+@custom_user_passes_test(lambda u: u.is_staff)
 def list_product(request):
     products = Product.objects.all().order_by('pk')
     page = 1
@@ -138,6 +139,8 @@ def list_product(request):
     products = product_paginator.get_page(page)
     context = {'products':products}
     return render(request,'list_product.html', context)
+
+@custom_user_passes_test(lambda u: u.is_staff)
 def product_delete(request,pk):
     if request.POST:
         delete_status = int(request.POST.get('delete_status'))
@@ -149,6 +152,8 @@ def product_delete(request,pk):
             product.delete_status = 1
         product.save()
     return redirect('list_product')
+
+@custom_user_passes_test(lambda u: u.is_staff)
 def add_product(request):
     existing_brands = Brand.objects.filter(is_listed=True)
     existing_categories = Category.objects.filter(is_listed=True)
@@ -213,6 +218,7 @@ def add_product(request):
 
     return render(request, 'add_product.html', context)
 
+@custom_user_passes_test(lambda u: u.is_staff)
 def add_variant(request):
     existing_products = Product.objects.filter(delete_status=1)
     ram_choices = ProductVariant.RAM_CHOICES
@@ -261,10 +267,14 @@ def add_variant(request):
     }
 
     return render(request, 'add_variant.html', context)
+
+@custom_user_passes_test(lambda u: u.is_staff)
 def list_variants(request):
     variants = ProductVariant.objects.all
     context = {'variants': variants}
     return render(request, 'list_variants.html', context)
+
+@custom_user_passes_test(lambda u: u.is_staff)
 def  variant_block(request,pk):
     if request.POST:
         block_status = int(request.POST.get('block_status'))
@@ -276,6 +286,7 @@ def  variant_block(request,pk):
         variant.save()
     return redirect('list_variants')
 
+@custom_user_passes_test(lambda u: u.is_staff)
 def edit_product(request, pk):
     # Use get_object_or_404 to handle the case where the product does not exist
     product = get_object_or_404(Product, pk=pk)
@@ -360,6 +371,8 @@ def edit_product(request, pk):
     }
 
     return render(request, 'edit_product.html', context)
+
+@custom_user_passes_test(lambda u: u.is_staff)
 def edit_variant(request,pk):
     variant = ProductVariant.objects.get(pk=pk)
     existing_products = Product.objects.filter(delete_status=1)

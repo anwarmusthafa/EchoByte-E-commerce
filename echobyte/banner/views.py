@@ -2,12 +2,16 @@ from django.shortcuts import render
 from .models import Banner
 from django.shortcuts import redirect
 from django.contrib import messages
+from app_admin.decorators import custom_user_passes_test
 
 # Create your views here.
+@custom_user_passes_test(lambda u: u.is_staff)
 def banners(request):
     banners = Banner.objects.all()
     context = {'banners':banners}
     return render(request,'banners.html',context)
+
+@custom_user_passes_test(lambda u: u.is_staff)
 def add_banner(request):
     if request.method == 'POST':
         try:
@@ -37,6 +41,8 @@ def add_banner(request):
             messages.error(request, f"An error occurred while adding the banner: {e}")
             return render(request, 'add_banner.html')
     return render(request, 'add_banner.html')
+
+@custom_user_passes_test(lambda u: u.is_staff)
 def change_banner_status(request,pk):
     if request.POST:
         status = request.POST.get('status')
@@ -44,6 +50,8 @@ def change_banner_status(request,pk):
         banner.is_listed = status
         banner.save()
     return redirect('banners')
+
+@custom_user_passes_test(lambda u: u.is_staff)
 def delete_banner(request,pk):
     banner = Banner.objects.get(pk=pk)
     banner.delete()

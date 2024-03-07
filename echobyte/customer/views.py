@@ -15,6 +15,8 @@ from django.contrib import messages
 from django.urls import reverse
 from django.db import transaction
 from django.contrib.auth.hashers import check_password, make_password
+from django.core.mail import send_mail
+import random
 import re
 
 
@@ -24,7 +26,7 @@ def signin(request):
         return redirect('home')
     
     error_message = None
-    success_message = None
+    success_message = request.GET.get('success_message', None)
     
     if request.method == 'POST':
         login_identifier = request.POST.get('login_identifier')
@@ -115,20 +117,19 @@ def signout(request):
 def otp_verification(request, pk):
     success_message = None
     try: 
-        if pk:
-            if request.method == 'POST':
-                user_otp = request.POST['otp']
-                tb_user = get_object_or_404(Customer, pk=pk)
-                db_otp = tb_user.otp 
-                if  user_otp == str(db_otp):
-                    if tb_user.is_verified:
-                        return render(request, 'signin',{'pk':pk})
-                    else:
-                        tb_user.is_verified = True
-                        tb_user.save()
-                        success_message = "Registration Successfull Please Login Now"
-                        return render(request, 'signin.html', {'pk': pk, 'success_message': success_message})
+        if request.method == 'POST':
+            user_otp = request.POST['otp']
+            tb_user = get_object_or_404(Customer, pk=pk)
+            db_otp = tb_user.otp 
+            if  user_otp == str(db_otp):
+                if tb_user.is_verified:
+                    return render(request, 'signin',{'pk':pk})
                 else:
+                    tb_user.is_verified = True
+                    tb_user.save()
+                    success_message = "Registration Successfull Please Login Now"
+                    return render(request, 'signin.html', {'pk': pk, 'success_message': success_message})
+            else:
                     messages.error(request,"Invalid otp Try again!")
                     return redirect('otp_verification',pk = pk,)
     except Exception as e:
@@ -265,31 +266,88 @@ def change_password(request):
         current_password = request.POST.get('current_password')
         new_password_1 = request.POST.get('new_password_1')
         new_password_2 = request.POST.get('new_password_2')
-        
         if new_password_1 != new_password_2:
             error_message = "Passwords do not match"
-            return render(request, 'change_password.html', {'error_message': error_message})
-        
+            return render(request, 'change_password.html', {'error_message': error_message}) 
         user = request.user
         if not authenticate(username=user.username, password=current_password):
             error_message = "Current password is incorrect"
             return render(request, 'change_password.html', {'error_message': error_message})
-        
         # Validate new password complexity
         if not validate_password(new_password_1):
             error_message = "Password Should have One upper case, One lowercase, One digit, One Symbol and minimum lenth 6"
             return render(request, 'change_password.html', {'error_message': error_message})
-        
         # Now, update the user's password
         hashed_password = make_password(new_password_1)
         user.password = hashed_password
         user.save()
-        
         success_message = "Password has been successfully updated"
         return render(request, 'change_password.html', {'success_message': success_message})
         
     return render(request, 'change_password.html', {'error_message': error_message})
 
-                        
+def genotp():
+    return str(random.randint(1000,9999))
+
+def forgot_password(request):
+    if request.method == 'POST':
+        try:
+            email = request.POST.get('email')
+            user = User.objects.get(username=email)
+            customer = user.customer
+            def send_otp(email):
+                otp1 = genotp()
+                print(otp1)
+                otp1 = int(otp1)
+                customer.otp = otp1
+                customer.save()
+                subject = 'EchoByte otp verification'
+                message = f"Forgot password verification otp is: {otp1}"
+                from_email = "echobyte24@gmail.com"
+                to_email = [email]
+                send_mail(subject, message, from_email, to_email)
+            send_otp(email)
+            return redirect('otp_verification_forgot_password', user.pk)
+        
+        except User.DoesNotExist:
+            # Handle case when user does not exist
+            return render(request, 'forgot_password.html', {'error': 'This user is does not exist'})
+        
+        except Exception as e:
+            # Handle other exceptions
+            return render(request, 'forgot_password.html', {'error': str(e)})
+    return render(request, 'forgot_password.html')
+def otp_verification_forgot_password(request,pk):
+    error_message = None
+    if request.POST:
+        otp = int(request.POST.get('otp'))
+        user = Customer.objects.get(user__pk = pk)
+        print(user.otp)
+        user_id = user.user.pk 
+        if otp == user.otp:
+            return redirect('reset_password',user_id)
+        else:
+            error_message  = "Otp is incorrect"
+    return render(request,'otp_verification_forgot_password.html',{'error_message':error_message})
+def reset_password(request, pk):
+    if request.method == 'POST':
+        password_1 = request.POST.get('password_1')
+        password_2 = request.POST.get('password_2')
+        if password_1 != password_2:
+            error_message = "Passwords do not match"
+            return render(request, 'reset_password.html', {'error_message': error_message})
+        # Validate new password complexity
+        if not validate_password(password_1):
+            error_message = "Password should have one upper case, one lowercase, one digit, one symbol and minimum length 6"
+            return render(request, 'reset_password.html', {'error_message': error_message})
+        # Now, update the user's password
+        user = User.objects.get(pk=pk)
+        hashed_password = make_password(password_1)
+        user.password = hashed_password
+        user.save()
+        # Redirect to sign-in page with success message
+        success_message = "Password has been successfully updated. Please sign in."
+        return redirect(reverse('signin') + '?success_message=' + success_message)
+    return render(request, 'reset_password.html')
     
         

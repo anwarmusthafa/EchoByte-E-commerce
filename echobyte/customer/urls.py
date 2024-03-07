@@ -13,5 +13,8 @@ urlpatterns = [
     path('edit_address/<pk>', views.edit_address, name= "edit_address"),
     path('delete_address/<pk>', views.delete_address, name= "delete_address"),
     path('change_password/', views.change_password, name= "change_password"),
+    path('forgot_password',views.forgot_password, name="forgot_password"),
+    path('otp_verification_forgot_password/<pk>/', views.otp_verification_forgot_password, name= "otp_verification_forgot_password"),
+    path('reset_password/<pk>',views.reset_password, name="reset_password"),
     path('wallet/', views.wallet, name= "wallet"),  
 ]

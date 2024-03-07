@@ -49,24 +49,20 @@
                                                         <th>Address</th>
                                                         <th>Region</th>
                                                         <th>Phone Number</th>
-                                                        <th>Status</th>
+                                                        <th>Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {% for address in address %}
                                                     <tr>
                                                         <td>
-
-                                                            <a class="address-book-edit btn--e-transparent-platinum-b-2" href="dash-address-edit.html">Edit</a></td>
+                                                            <a class="address-book-edit btn--e-transparent-platinum-b-2" href="{% url 'edit_address' address.pk %}">Edit</a></td>
                                                         <td>{{address.name}}</td>
                                                         <td>{{address.address}}
                                                         </td>
                                                         <td>{{address.state}}</td>
                                                         <td>{{address.phone}}</td>
-                                                        {% comment %} <td>
-                                                            <div class="gl-text">Default Shipping Address</div>
-                                                            <div class="gl-text">Default Billing Address</div>
-                                                        </td> {% endcomment %}
+                                                        <td><a href="{% url 'delete_address' address.pk %}"><button class="btn btn-danger">Delete</button></td></a> 
                                                     </tr>
                                                     {% endfor %}
                                                     

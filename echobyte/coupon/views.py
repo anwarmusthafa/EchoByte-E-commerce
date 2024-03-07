@@ -62,6 +62,28 @@ def delete_coupon(request,pk):
     coupon.delete()
     return redirect('coupon_list')
 
+def category_offer(request):
+    category_offers = CategoryOffer.objects.all()
+    context = {'category_offers':category_offers}
+    return render(request,'category_offer.html',context)
+def add_category_offer(request):
+    if request.POST:
+        title = request.POST.get('title')
+        category_id = int(request.POST.get('category'))
+        offer_percentage = request.POST.get('offer_percentage')
+        category_obj = Category.objects.get(pk = category_id) 
+        category_offer_obj = CategoryOffer.objects.create(title=title,category = category_obj, offer_percentage = offer_percentage)
+        return redirect('category_offer')
+    categories = Category.objects.all()
+    context = {'categories': categories}
+    
+    return render(request,'add_category_offer.html',context)
+
+def delete_category_offer(request,pk):
+    category_offer = CategoryOffer.objects.get(pk = pk)
+    category_offer.delete()
+    return redirect('category_offer')
+
 
 
 

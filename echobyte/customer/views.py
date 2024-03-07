@@ -18,17 +18,16 @@ from django.db import transaction
 @never_cache
 def signin(request):
     if request.user.is_authenticated and not request.user.is_staff:
-        return redirect('home')  # Redirect to the home page if the user is already authenticated and is not staff
+        return redirect('home')
+    
     error_message = None
     success_message = None
+    
     if request.method == 'POST':
         login_identifier = request.POST.get('login_identifier')
         password = request.POST.get('password')
-
-        # Debugging output
-        print(f"Attempting to authenticate with: {login_identifier} / {password}")
-
         user = authenticate(request, username=login_identifier, password=password)
+        
         if user:
             if user.is_superuser:
                 error_message = "Superusers are not allowed to sign in."
@@ -40,18 +39,23 @@ def signin(request):
                         login(request, user)
                         return redirect('home')
                 else:
+                    # Use messages framework to display error message
                     messages.error(request, "Verify your email")
                     send_otp(user.customer)
                     return redirect('otp_verification', pk=user.customer.pk)
             else:
-                error_message = "Invalid Credentials"
+                error_message = "Invalid Credentials"  # This line is for non-staff users
+    
+        else:
+            error_message = "Invalid Credentials"  # This line is for when user is None (authentication failed)
+    
     context = {"error_message": error_message, "success_message": success_message}
     return render(request, 'signin.html', context)
 
 @never_cache
 def signup(request):
     if request.user.is_authenticated:
-        return redirect('home')  # Redirect to the home page if the user is already authenticated
+        return redirect('home')
 
     last_typed_values = request.session.pop('signup_last_typed_values', {})
     error_message = request.session.pop('signup_error_message', None)
@@ -77,7 +81,6 @@ def signup(request):
 
         try:
             with transaction.atomic():
-                # Check if the email is already in use
                 User.objects.get(username=email)
                 request.session['signup_last_typed_values'] = last_typed_values
                 request.session['signup_error_message'] = 'Email address is already in use'
@@ -85,7 +88,6 @@ def signup(request):
         except User.DoesNotExist:
             try:
                 with transaction.atomic():
-                    # If the user does not exist, create a new user and log them in
                     user = User.objects.create_user(username=email, password=password1)
                     user1 = Customer.objects.create(user=user, name=name, phone=phone)
                     return redirect('otp_verification', user1.id)
@@ -163,7 +165,7 @@ def address(request):
 def add_address(request):
     if request.POST:
         try:
-            user = request.user  # Directly assign the user object
+            user = request.user 
             name = request.POST.get('name')
             phone = request.POST.get('phone')
             address = request.POST.get('address')
@@ -172,7 +174,7 @@ def add_address(request):
             pincode = request.POST.get('pincode')
             source = request.POST.get('source', None)
 
-            # Wrap database operation in a try-except block
+           
             try:
                 address_obj = Address.objects.create(
                     user=user,
@@ -188,15 +190,39 @@ def add_address(request):
                 else:
                     return redirect('address')
             except Exception as e:
-                # Log the error or handle it as per your application's needs
                 return HttpResponseServerError("Failed to create address: {}".format(str(e)))
-            
-            # Optionally, you could redirect to a success page or return a success message
-            return render(request, 'add-address-success.html')
         except Exception as e:
-            # Log the error or handle it as per your application's needs
             return HttpResponseServerError("An error occurred: {}".format(str(e)))
     return render(request, 'add-address.html')
+@login_required(login_url='signin')
+def delete_address(requrest,pk):
+    address = Address.objects.get(pk=pk)
+    address.delete()
+    return redirect('address')
+
+def edit_address(request,pk):
+    address = Address.objects.get(pk =pk)
+    existing_state = address.state
+    state_options = ['Kerala', 'Tamil Nadu', 'Karnataka']
+    filtered_options = [option for option in state_options if option != existing_state]
+    if request.POST: 
+            name = request.POST.get('name')
+            phone = request.POST.get('phone')
+            given_address = request.POST.get('address')
+            state = request.POST.get('state')
+            city = request.POST.get('town')
+            pincode = request.POST.get('pincode')
+            address.name = name
+            address.phone = phone
+            address.address = given_address
+            address.state = state
+            address.city = city
+            address.pincode = pincode
+            address.save()
+            return redirect('address')
+
+    context = {'address':address, 'filtered_options':filtered_options}
+    return render(request,'edit_address.html',context)
 
 @login_required(login_url='signin')
 def wallet(request):

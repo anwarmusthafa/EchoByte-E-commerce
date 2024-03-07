@@ -138,7 +138,7 @@
                                         </div>
                                     </div>
                                     <div class="text-center u-s-m-b-30">
-                                        {% if order.is_paid == False %} 
+                                        {% if order.is_paid == False  and order_status > 1%} 
                                         <a href="">
                                             <button id="payButton" class="btn btn-success">Make Payment</button>
 

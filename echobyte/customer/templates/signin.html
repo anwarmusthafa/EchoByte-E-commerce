@@ -32,19 +32,9 @@
                                     
                                         
                                         <h1 class="gl-h1">SIGN IN</h1>
-                                        <span class="gl-text u-s-m-b-30">If you have an account with us, please log in.</span>
                                         <form class="l-f-o__form" method="post" action="">
                                             {% csrf_token %}
-                                            <div class="gl-s-api">
-                                                <div class="u-s-m-b-15">
-                                                    <button class="gl-s-api__btn gl-s-api__btn--fb" type="button"><i class="fab fa-facebook-f"></i>
-                                                        <span>Sign in with Facebook</span></button>
-                                                </div>
-                                                <div class="u-s-m-b-15">
-                                                    <button class="gl-s-api__btn gl-s-api__btn--gplus" type="button"><i class="fab fa-google"></i>
-                                                        <span>Sign in with Google</span></button>
-                                                </div>
-                                            </div>
+                                            
                                             <div class="u-s-m-b-30">
                                                 <label class="gl-label" for="login-email">E-MAIL / PHONE NUMBER *</label>
                                                 <input name="login_identifier" class="input-text input-text--primary-style" type="text" id="login-email" placeholder="Enter E-mail Or Phone Number">
@@ -61,6 +51,16 @@
                                                     <a class="gl-link" href="lost-password.html">Lost Your Password?</a>
                                                 </div>
                                             </div>
+                                            {% comment %} <div class="gl-s-api">
+                                                <div class="u-s-m-b-15">
+                                                    <button class="gl-s-api__btn gl-s-api__btn--fb" type="button"><i class="fab fa-facebook-f"></i>
+                                                        <span>Sign in with Facebook</span></button>
+                                                </div>
+                                                <div class="u-s-m-b-15">
+                                                    <button class="gl-s-api__btn gl-s-api__btn--gplus" type="button"><i class="fab fa-google"></i>
+                                                        <span>Sign in with Google</span></button>
+                                                </div>
+                                            </div> {% endcomment %}
                                             <div class="u-s-m-b-30">
                                                 <span>If you don't have an account</span>
                                                 <div class="u-s-m-b-15">

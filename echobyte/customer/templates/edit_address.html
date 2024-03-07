@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title%}Address {% endblock %}
+{% block content %}
+
+
+        <!--====== App Content ======-->
+        <div class="app-content">
+
+         
+
+            <!--====== Section 2 ======-->
+            <div class="u-s-p-b-60">
+
+                <!--====== Section Content ======-->
+                <div class="section__content">
+                    <div class="dash">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-lg-3 col-md-12">
+
+                                    <!--====== Dashboard Features ======-->
+                                   {% include 'profile-side-bar.html' %}
+                                    <!--====== End - Dashboard Features ======-->
+                                </div>
+                                <div class="col-lg-9 col-md-12">
+                                    <div class="dash__box dash__box--shadow dash__box--radius dash__box--bg-white">
+                                        <div class="dash__pad-2">
+                                            <h1 class="dash__h1 u-s-m-b-14">Edit Address</h1>
+                                            <form class="dash-address-manipulation" method="post" action="">
+                                                {% csrf_token %}
+                                                <div class="gl-inline">
+                                                    <div class="u-s-m-b-30">
+
+                                                        <label class="gl-label" for="address-fname">NAME *</label>
+
+                                                        <input name="name" value="{{address.name}}" class="input-text input-text--primary-style" type="text" id="address-fname" placeholder="Name"></div>
+                                                  
+                                                </div>
+                                                <div class="gl-inline">
+                                                    <div class="u-s-m-b-30">
+
+                                                        <label   class="gl-label" for="address-phone"> PHONE *</label>
+
+                                                        <input  name="phone" value="{{address.phone}}" class="input-text input-text--primary-style" type="text" id="address-phone" placeholder="Phone Number"></div>
+                                                    <div class="u-s-m-b-30">
+
+                                                        <label class="gl-label" for="address-street">ADDRESS *</label>
+
+                                                        <input  name="address" value="{{address.address}}" class="input-text input-text--primary-style" type="text" id="address-street" placeholder="House Name and Street"></div>
+                                                </div>
+                                                <div class="gl-inline">
+                                                    
+                                                    <div class="u-s-m-b-30">
+
+                                                        <!--====== Select Box ======-->
+
+                                                        <label class="gl-label" for="address-state">STATE/PROVINCE *</label>
+                                                        <select name="state" class="select-box select-box--primary-style" id="address-state">
+                                                            <option selected value="{{ address.state }}">{{ address.state }}</option>
+                                                            {% for option in filtered_options %}
+                                                                <option value="{{ option }}">{{ option }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        <!--====== End - Select Box ======-->
+                                                    </div>
+                                                </div>
+                                                <div class="gl-inline">
+                                                    <div class="u-s-m-b-30">
+
+                                                        <label class="gl-label" for="address-city">TOWN/CITY *</label>
+
+                                                        <input name="town" value="{{address.city}}" placeholder="Town/City Name" class="input-text input-text--primary-style" type="text" id="address-city"></div>
+                                                    <div class="u-s-m-b-30">
+
+                                                        <label class="gl-label" for="address-street">ZIP/POSTAL CODE *</label>
+
+                                                        <input name="pincode" value="{{address.pincode}}" class="input-text input-text--primary-style" type="text" id="address-postal" placeholder="Zip/Postal Code"></div>
+                                                </div>
+                                                <input type="hidden" name="source" value="{{ request.GET.source }}">
+
+                                                <button class="btn btn--e-brand-b-2" type="submit">SAVE</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--====== End - Section Content ======-->
+            </div>
+            <!--====== End - Section 2 ======-->
+        </div>
+        <!--====== End - App Content ======-->
+        {% endblock %}

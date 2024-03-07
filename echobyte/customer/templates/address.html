@@ -27,15 +27,7 @@
                                         <div class="dash__pad-2">
                                             <div class="dash__address-header">
                                                 <h1 class="dash__h1">Address Book</h1>
-                                                <div>
-
-                                                    <span class="dash__link dash__link--black u-s-m-r-8">
-
-                                                        <a href="dash-address-make-default.html">Make default shipping address</a></span>
-
-                                                    <span class="dash__link dash__link--black">
-
-                                                        <a href="dash-address-make-default.html">Make default shipping address</a></span></div>
+                                                
                                             </div>
                                         </div>
                                     </div>
@@ -44,7 +36,6 @@
                                             <table class="dash__table-2">
                                                 <thead>
                                                     <tr>
-                                                        <th>Action</th>
                                                         <th>Full Name</th>
                                                         <th>Address</th>
                                                         <th>Region</th>
@@ -55,14 +46,13 @@
                                                 <tbody>
                                                     {% for address in address %}
                                                     <tr>
-                                                        <td>
-                                                            <a class="address-book-edit btn--e-transparent-platinum-b-2" href="{% url 'edit_address' address.pk %}">Edit</a></td>
+                                                        
                                                         <td>{{address.name}}</td>
                                                         <td>{{address.address}}
                                                         </td>
                                                         <td>{{address.state}}</td>
                                                         <td>{{address.phone}}</td>
-                                                        <td><a href="{% url 'delete_address' address.pk %}"><button class="btn btn-danger">Delete</button></td></a> 
+                                                        <td><a class="address-book-edit btn--e-transparent-platinum-b-2" href="{% url 'edit_address' address.pk %}">Edit</a>  <a href="{% url 'delete_address' address.pk %}"><button class="btn btn-danger">Delete</button></td></a> 
                                                     </tr>
                                                     {% endfor %}
                                                     

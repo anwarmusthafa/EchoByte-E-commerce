@@ -14,6 +14,9 @@ from order.models import *
 from django.contrib import messages
 from django.urls import reverse
 from django.db import transaction
+from django.contrib.auth.hashers import check_password, make_password
+import re
+
 
 @never_cache
 def signin(request):
@@ -231,3 +234,62 @@ def wallet(request):
         'wallet': wallet
     }
     return render(request, 'wallet.html', context)
+
+
+def validate_password(password):
+    # Check if password length is at least 8 characters
+    if len(password) < 6:
+        return False
+    
+    # Check if password contains at least one lowercase letter
+    if not re.search(r'[a-z]', password):
+        return False
+    
+    # Check if password contains at least one uppercase letter
+    if not re.search(r'[A-Z]', password):
+        return False
+    
+    # Check if password contains at least one digit
+    if not re.search(r'\d', password):
+        return False
+    
+    # Check if password contains at least one special character
+    if not re.search(r'[!@#$%^&*()\-_=+{};:,<.>]', password):
+        return False
+    
+    return True
+
+def change_password(request):
+    error_message = None
+    if request.method == 'POST':
+        current_password = request.POST.get('current_password')
+        new_password_1 = request.POST.get('new_password_1')
+        new_password_2 = request.POST.get('new_password_2')
+        
+        if new_password_1 != new_password_2:
+            error_message = "Passwords do not match"
+            return render(request, 'change_password.html', {'error_message': error_message})
+        
+        user = request.user
+        if not authenticate(username=user.username, password=current_password):
+            error_message = "Current password is incorrect"
+            return render(request, 'change_password.html', {'error_message': error_message})
+        
+        # Validate new password complexity
+        if not validate_password(new_password_1):
+            error_message = "Password Should have One upper case, One lowercase, One digit, One Symbol and minimum lenth 6"
+            return render(request, 'change_password.html', {'error_message': error_message})
+        
+        # Now, update the user's password
+        hashed_password = make_password(new_password_1)
+        user.password = hashed_password
+        user.save()
+        
+        success_message = "Password has been successfully updated"
+        return render(request, 'change_password.html', {'success_message': success_message})
+        
+    return render(request, 'change_password.html', {'error_message': error_message})
+
+                        
+    
+        

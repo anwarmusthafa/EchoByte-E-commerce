@@ -62,10 +62,13 @@ def delete_coupon(request,pk):
     coupon.delete()
     return redirect('coupon_list')
 
+@custom_user_passes_test(lambda u: u.is_staff)
 def category_offer(request):
     category_offers = CategoryOffer.objects.all()
     context = {'category_offers':category_offers}
     return render(request,'category_offer.html',context)
+
+@custom_user_passes_test(lambda u: u.is_staff)
 def add_category_offer(request):
     if request.POST:
         title = request.POST.get('title')
@@ -76,9 +79,9 @@ def add_category_offer(request):
         return redirect('category_offer')
     categories = Category.objects.all()
     context = {'categories': categories}
-    
     return render(request,'add_category_offer.html',context)
 
+@custom_user_passes_test(lambda u: u.is_staff)
 def delete_category_offer(request,pk):
     category_offer = CategoryOffer.objects.get(pk = pk)
     category_offer.delete()

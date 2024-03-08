@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect
 from .models import Category, Brand
 from app_admin.decorators import custom_user_passes_test
 
-# Create your views here.
 @custom_user_passes_test(lambda u: u.is_staff)
 def categories(request):
     categories = Category.objects.all()

@@ -4,7 +4,6 @@ from django.shortcuts import redirect
 from django.contrib import messages
 from app_admin.decorators import custom_user_passes_test
 
-# Create your views here.
 @custom_user_passes_test(lambda u: u.is_staff)
 def banners(request):
     banners = Banner.objects.all()
@@ -21,10 +20,8 @@ def add_banner(request):
             start_price = request.POST.get('startPrice')
             start_date = request.POST.get('startDate')
             end_date = request.POST.get('endDate')
-            # Assuming you're using Django forms for image upload, handle it accordingly
             image = request.FILES.get('image')
-            
-            # Assuming Banner is your model
+        
             banner = Banner.objects.create(
                 banner_name=name,
                 banner_heading=heading,
@@ -34,10 +31,8 @@ def add_banner(request):
                 expiry_date=end_date,
                 banner_image=image
             )
-            # You might want to redirect the user to a success page or another view
             return redirect('banners')
         except Exception as e:
-            # Add an error message using Django's messaging framework
             messages.error(request, f"An error occurred while adding the banner: {e}")
             return render(request, 'add_banner.html')
     return render(request, 'add_banner.html')

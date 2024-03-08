@@ -1,13 +1,12 @@
 from django.shortcuts import render , redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required,user_passes_test
+from django.contrib.auth.decorators import login_required
 from .models import Cart,CartItems,Order,OrderItem, ReturnOrder
-from customer.models import Address, Customer , Wallet
-from product.models import Product, ProductVariant, ProductImage
+from customer.models import Address,Wallet
+from product.models import ProductVariant
 from .models import Cart,CartItems, Wishlist
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseServerError, JsonResponse
 from django.contrib import messages
-from django.urls import reverse
 from django.db import transaction
 import uuid
 from django.db.models import Q
@@ -59,10 +58,8 @@ def add_to_cart(request):
         return JsonResponse({'success_message': success_message})
     else:
         if not request.user.is_authenticated:
-            # If user is not authenticated, return a JSON response indicating the need to sign in
             return JsonResponse('user not authenticated')
         else:
-            # Handle other cases where it's not a POST request
             return JsonResponse({'error': 'Method not allowed'})
 
 @login_required(login_url='signin')
@@ -109,28 +106,24 @@ def checkout(request):
     address = Address.objects.filter(user=user)
     coupons = Coupon.objects.filter(is_active = True)
     coupon_discount = None
-    
+
     if request.method == 'POST':
         address_id = request.POST.get('address')
         amount = float(request.POST.get('amount'))
         payment_method = request.POST.get('payment_method')
         razorpay_payment_id = request.POST.get('razorpay_payment_id')
-        discount_amount = request.POST.get('discount_amount', None)
-        
+        discount_amount = request.POST.get('discount_amount', None) 
         if not address_id:
-            # Address not selected, return an error message
             error_message = "Please select an address."
             context = {'cart': cart, 'cart_items': cart_items, 'address': address, 'error_message': error_message,'coupons':coupons,}
             return render(request, 'checkout.html',context)
         if amount > 1000 and payment_method == 'cod':
             error_message = "Payment above 1000 can't accept in cash on delivery"
             context = {'cart': cart, 'cart_items': cart_items, 'address': address, 'error_message': error_message,'coupons':coupons,}
-            return render(request, 'checkout.html',context)
-        
+            return render(request, 'checkout.html',context) 
         try:
             address_obj = Address.objects.get(pk=address_id)
         except Address.DoesNotExist:
-            # Address not found, return an error message
             error_message = "The selected address does not exist."
             context = {'cart': cart, 'cart_items': cart_items, 'address': address, 'error_message': error_message,'coupons':coupons,}
             return render(request, 'checkout.html',context)
@@ -159,7 +152,6 @@ def checkout(request):
                         """
                         # Generate a UUID
                         unique_id = uuid.uuid4().int
-
                         # Truncate or pad the integer to match the desired length
                         unique_id_str = str(unique_id)[:length].zfill(length)
 
@@ -171,14 +163,14 @@ def checkout(request):
                         coupon_discount = decimal.Decimal(amount) * decimal.Decimal(discount_percentage) / decimal.Decimal(100)
                         amount -= coupon_discount
                     new_order_item = OrderItem.objects.create(id=unique_order_id,
-                                             order=order,
-                                            product=cart_item.product,
-                                            address=address_obj,
-                                            quantity=cart_item.quantity,
-                                            payment_method = payment_method,
-                                            total_amount = cart_item.product.selling_price * cart_item.quantity,
-                                            discount_amount = coupon_discount,
-                                            amount= float(amount))
+                                    order=order,
+                                    product=cart_item.product,
+                                    address=address_obj,
+                                    quantity=cart_item.quantity,
+                                    payment_method = payment_method,
+                                    total_amount = cart_item.product.selling_price * cart_item.quantity,
+                                    discount_amount = coupon_discount,
+                                    amount= float(amount))
                     if payment_method == 'online':
                         new_order_item.is_paid = True
                         new_order_item.razor_pay_id = razorpay_payment_id
@@ -198,12 +190,9 @@ def checkout(request):
                 if 'applied_coupon_code' in request.session:
                     del request.session['applied_coupon_code']
 
-            # Redirect to the order success page or any other page
-            return redirect('order_success')  # Replace 'order_success' with your actual URL name
+            return redirect('order_success') 
         
         except Exception as e:
-            print(e)
-            # Handle any other exceptions, such as database errors
             error_message = "An error occurred while processing your order. Please try again later."
             context = {'cart': cart, 'cart_items': cart_items, 'address': address, 'error_message': error_message,'coupons':coupons, }
             return render(request, 'checkout.html',context)
@@ -236,28 +225,17 @@ def list_orders(request):
 
 @custom_user_passes_test(lambda u: u.is_staff)
 def change_order_status(request, pk):
-    # Retrieve the order object or return a 404 error if not found
     order = get_object_or_404(OrderItem, pk=pk)
-    
-    # Check if the request method is POST
     if request.method == 'POST':
-        # Extract the status from the form data
         status = int(request.POST.get('status'))
-        
-        # Check if the provided status is valid (if needed)
-        # For example, you might want to check if status == -2 is a valid status
-        
-        # Update the order status and save
         order.order_status = status
         if status == 3 and order.payment_method == 'cod':
             order.is_paid = True
         order.save()
-        #update the stock if order is cancelled by seller
         if status == -2:
             product = order.product
             product.stock += order.quantity
             product.save()
-    # Redirect to the list_orders view after processing
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 @login_required(login_url='signin')
@@ -277,23 +255,18 @@ def order_details(request,pk):
 @transaction.atomic
 def cancel_order(request, pk):
     try:
-        order = OrderItem.objects.select_for_update().get(pk=pk)  # Lock the selected row for update
+        order = OrderItem.objects.select_for_update().get(pk=pk)
         order.order_status = -1
         order.save()
-
-        # Update the stock if the order is cancelled
         product = order.product
         product.stock += order.quantity
         product.save()
         if order.is_paid == True:
-            wallet = Wallet.objects.select_for_update().get(user=request.user)  # Lock the selected row for update
+            wallet = Wallet.objects.select_for_update().get(user=request.user)
             wallet.balance += order.amount
             wallet.save()
     except (OrderItem.DoesNotExist, Wallet.DoesNotExist) as e:
-        # Handle the case where OrderItem or Wallet does not exist
-        # You might want to log the error or return an appropriate response
         return HttpResponseServerError("An error occurred: {}".format(str(e)))
-    # Redirect to the order details page after canceling the order
     return redirect('order_details', pk=pk)
 
 
@@ -312,7 +285,11 @@ def return_order(request,pk):
         amount = order.amount
         address = order.address
         reason = request.POST.get('reason')
-        return_obj = ReturnOrder.objects.create(user=user,product=product,amount_to_refund=amount,reason=reason,address=address, order = order)
+        return_obj = ReturnOrder.objects.create(user=user,
+        product=product,
+        amount_to_refund=amount,
+        reason=reason,address=address,
+        order = order)
         order.order_status = 4
         order.save()
         return redirect('order_details', pk=pk)
@@ -329,7 +306,7 @@ def return_list(request):
 @transaction.atomic
 def change_return_status(request, pk):
     try:
-        return_request_item = ReturnOrder.objects.select_for_update().get(pk=pk) # Lock the selected row for update
+        return_request_item = ReturnOrder.objects.select_for_update().get(pk=pk)
         return_request_item.return_status = 2
         return_request_item.save()
 
@@ -341,14 +318,11 @@ def change_return_status(request, pk):
         product.stock += order.quantity
         product.save() 
 
-        wallet = Wallet.objects.select_for_update().get(user=return_request_item.user) # Lock the selected row for update
+        wallet = Wallet.objects.select_for_update().get(user=return_request_item.user)
         wallet.balance += order.amount
         wallet.save()
     except (ReturnOrder.DoesNotExist, Wallet.DoesNotExist) as e:
-        # Handle the case where ReturnOrder or Wallet does not exist
-        # You might want to log the error or return an appropriate response
         return HttpResponseServerError("An error occurred: {}".format(str(e)))
-
     return redirect('return_list')
 
 @login_required(login_url='signin')
@@ -361,9 +335,7 @@ def wishlist(request):
 @login_required(login_url='signin')
 def add_to_wishlist(request):
     if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        # Assuming you have some way to identify the current user
         user = request.user
-        # Get the product ID from the AJAX request
         product_id = request.POST.get('product_id')
         product = ProductVariant.objects.get(pk=product_id) 
         wishlist_item = Wishlist.objects.create(user=request.user, product=product)
@@ -383,65 +355,47 @@ def payment_failure(request):
 
 @login_required(login_url='signin')
 def download_invoice(request, pk):
-    # Retrieve the order item
     order_item = get_object_or_404(OrderItem, pk=pk)
-    
-    # Create a PDF document
+
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="invoice_{order_item.order_id}.pdf"'
-    
     # Create a PDF canvas
     pdf = canvas.Canvas(response, pagesize=letter)
-    
     # Set font
     pdf.setFont("Helvetica-Bold", 14)
-    
     # Draw Tax Invoice heading
     pdf.drawCentredString(300, 750, "Tax Invoice")
-    
     # Set font size and style for company info
     pdf.setFont("Helvetica", 10)
-    
     # Draw Company Name and GST Number
     pdf.drawString(50, 730, "EchoByte")
     pdf.drawString(50, 715, "GSTIN: 33BGHS74151ZM")  # Assuming you have a gst_number field in your Company model
-    
     # Draw Invoice Number
     pdf.drawRightString(550, 730, f"Invoice Number: {order_item.id}")
-    
     # Draw a line under company info
     pdf.line(50, 710, 550, 710)
-    
     # Set font size for order details
     pdf.setFont("Helvetica-Bold", 12)
-    
     # Draw Order ID and Date
     pdf.drawString(50, 690, f"Order ID: {order_item.pk}")
     pdf.drawString(300, 690, f"Date: {order_item.created_at.strftime('%Y-%m-%d')}")  # Assuming created_at is a DateTimeField
-    
     # Draw Shipping Address
     pdf.drawString(50, 670, f"Bill To: {order_item.address.name}")
     pdf.drawString(50, 650, f"Shipping Address: {order_item.address.address}")
-    
     # Draw a line under order details
     pdf.line(50, 630, 550, 630)
-    
     # Set font size for table header
     pdf.setFont("Helvetica-Bold", 10)
-    
     # Draw table headers
     pdf.drawString(50, 610, "Product")
     pdf.drawString(200, 610, "Quantity")
     pdf.drawString(300, 610, "Amount")
     pdf.drawString(400, 610, "Discount")
     pdf.drawString(500, 610, "Total Amount")
-    
     # Draw a line under table header
     pdf.line(50, 600, 550, 600)
-    
     # Set font size for table data
     pdf.setFont("Helvetica", 10)
-    
     # Draw table data
     y = 580
     product_name = f"{order_item.product.product.brand} - {order_item.product.product.title}"
@@ -452,18 +406,14 @@ def download_invoice(request, pk):
     pdf.drawString(400, y, str(order_item.discount_amount))
     pdf.drawString(500, y, str(order_item.amount))
     y -= 35  # Adjusting the y-coordinate for the next line
-
-# Draw a line under table data
+    # Draw a line under table data
     pdf.line(50, y, 550, y)
-    
     # Draw Total Price
     pdf.drawString(400, y - 20, "Total Amount:")
     pdf.drawString(500, y - 20, str(order_item.amount))  # Assuming this is the total price
-    
     # Set font size and style for company signature
     pdf.setFont("Helvetica-Bold", 12)
     pdf.drawString(50, y - 40, "Thank you for your purchase from EchoByte!")
-    
     # Close the PDF
     pdf.save()
     return response
@@ -473,12 +423,11 @@ def download_invoice(request, pk):
 @transaction.atomic
 def make_payment(request, pk):
     try:
-        # Process the payment and update order status
         payment_id = request.GET.get('razorpay_payment_id')
         order = get_object_or_404(OrderItem, pk=pk)
         order.payment_method = 'online'
         order.is_paid = True
-        order.razor_pay_id = payment_id  # Assuming you can retrieve payment ID from Razorpay response
+        order.razor_pay_id = payment_id
         order.save()
         context = {'order_id': pk}
         return render(request, 'payment_success.html', context)
@@ -491,24 +440,3 @@ def make_payment(request, pk):
 def make_payment_failure(request,pk):
     context = {'order_id':pk}
     return render(request,'make_payment_failure.html',context)
-    
-
-
-
-
-
-
-
-
-
-
-
-
-        
-
-
-
-
-
-
-

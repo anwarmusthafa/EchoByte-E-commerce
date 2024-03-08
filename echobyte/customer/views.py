@@ -44,15 +44,14 @@ def signin(request):
                         login(request, user)
                         return redirect('home')
                 else:
-                    # Use messages framework to display error message
                     messages.error(request, "Verify your email")
                     send_otp(user.customer)
                     return redirect('otp_verification', pk=user.customer.pk)
             else:
-                error_message = "Invalid Credentials"  # This line is for non-staff users
+                error_message = "Invalid Credentials" 
     
         else:
-            error_message = "Invalid Credentials"  # This line is for when user is None (authentication failed)
+            error_message = "Invalid Credentials"
     
     context = {"error_message": error_message, "success_message": success_message}
     return render(request, 'signin.html', context)
@@ -133,7 +132,8 @@ def otp_verification(request, pk):
                     messages.error(request,"Invalid otp Try again!")
                     return redirect('otp_verification',pk = pk,)
     except Exception as e:
-        print(e)
+        messages.error(request,f"Error{e} occured ,Try again!")
+        return redirect('otp_verification',pk = pk,)
     context={ 'pk':pk,
              'success_message' : success_message}
     return render(request, 'otp_verification.html', context)
@@ -178,7 +178,6 @@ def add_address(request):
             pincode = request.POST.get('pincode')
             source = request.POST.get('source', None)
 
-           
             try:
                 address_obj = Address.objects.create(
                     user=user,
@@ -238,26 +237,16 @@ def wallet(request):
 
 
 def validate_password(password):
-    # Check if password length is at least 8 characters
     if len(password) < 6:
         return False
-    
-    # Check if password contains at least one lowercase letter
     if not re.search(r'[a-z]', password):
         return False
-    
-    # Check if password contains at least one uppercase letter
     if not re.search(r'[A-Z]', password):
         return False
-    
-    # Check if password contains at least one digit
     if not re.search(r'\d', password):
         return False
-    
-    # Check if password contains at least one special character
     if not re.search(r'[!@#$%^&*()\-_=+{};:,<.>]', password):
         return False
-    
     return True
 
 def change_password(request):
@@ -297,7 +286,6 @@ def forgot_password(request):
             customer = user.customer
             def send_otp(email):
                 otp1 = genotp()
-                print(otp1)
                 otp1 = int(otp1)
                 customer.otp = otp1
                 customer.save()
@@ -308,27 +296,24 @@ def forgot_password(request):
                 send_mail(subject, message, from_email, to_email)
             send_otp(email)
             return redirect('otp_verification_forgot_password', user.pk)
-        
         except User.DoesNotExist:
-            # Handle case when user does not exist
             return render(request, 'forgot_password.html', {'error': 'This user is does not exist'})
-        
         except Exception as e:
-            # Handle other exceptions
             return render(request, 'forgot_password.html', {'error': str(e)})
     return render(request, 'forgot_password.html')
+
 def otp_verification_forgot_password(request,pk):
     error_message = None
     if request.POST:
         otp = int(request.POST.get('otp'))
         user = Customer.objects.get(user__pk = pk)
-        print(user.otp)
         user_id = user.user.pk 
         if otp == user.otp:
             return redirect('reset_password',user_id)
         else:
             error_message  = "Otp is incorrect"
     return render(request,'otp_verification_forgot_password.html',{'error_message':error_message})
+
 def reset_password(request, pk):
     if request.method == 'POST':
         password_1 = request.POST.get('password_1')
@@ -345,9 +330,6 @@ def reset_password(request, pk):
         hashed_password = make_password(password_1)
         user.password = hashed_password
         user.save()
-        # Redirect to sign-in page with success message
         success_message = "Password has been successfully updated. Please sign in."
         return redirect(reverse('signin') + '?success_message=' + success_message)
     return render(request, 'reset_password.html')
-    
-        

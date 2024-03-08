@@ -224,6 +224,12 @@
                 </label>
             </div>
             <div class="form-check">
+                <input class="form-check-input" value="wallet" type="radio" name="payment_method" id="paymentMethodWallet" value="wallet">
+                <label class="form-check-label" for="paymentMethodOnline">
+                    Pay using Wallet
+                </label>
+            </div>
+            <div class="form-check">
                 <input class="form-check-input" value="online" type="radio" name="payment_method" id="paymentMethodOnline" value="online">
                 <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id" value="">
 
@@ -306,8 +312,10 @@
     function handlePaymentMethod() {
         var paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
         if (paymentMethod === "cod") {
-            document.getElementById('payment-form').submit(); // Submit the form for COD
-        } else if (paymentMethod === "online") {
+            document.getElementById('payment-form').submit();
+        }else if(paymentMethod == 'wallet'){
+            document.getElementById('payment-form').submit();
+        }else if (paymentMethod === "online") {
             // Open Razorpay payment modal
             var rzp = new Razorpay(options);
             rzp.open();

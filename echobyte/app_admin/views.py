@@ -42,7 +42,7 @@ def admin_login(request):
 def admin_home(request):
     total_order_count = OrderItem.objects.filter().count()
     total_amount = OrderItem.objects.filter(
-    Q(payment_method='cod', order_status=3) | Q(payment_method ='online', order_status__lt=5)
+    Q(payment_method='cod', order_status=3) | Q(payment_method ='online', order_status__lt=5) | Q(payment_method ='wallet', order_status__lt=5)
     ).aggregate(
     total_amount=Sum('amount')
     )
@@ -52,7 +52,7 @@ def admin_home(request):
     pending_return_request = OrderItem.objects.filter(order_status = 4).count()
 
     cod_count = OrderItem.objects.filter(payment_method = 'cod').count()
-    online_count = OrderItem.objects.filter(payment_method = 'online').count()
+    online_count = OrderItem.objects.filter(payment_method__in=['online', 'wallet']).count()
     cod_percentage = (cod_count / (cod_count + online_count) * 100 )
     online_percentage = (online_count / (cod_count + online_count) * 100 )
     payment_percentage = [cod_percentage,online_percentage]

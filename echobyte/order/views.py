@@ -21,6 +21,7 @@ from reportlab.pdfgen import canvas
 from django.http import HttpResponse
 from reportlab.lib.pagesizes import letter
 from app_admin.decorators import custom_user_passes_test
+from decimal import Decimal
 
 
 # Create your views here.
@@ -28,7 +29,11 @@ from app_admin.decorators import custom_user_passes_test
 def cart(request):
     user = request.user
     try:
-        cart_items = CartItems.objects.filter(cart__owner=user).order_by('-created_at')
+        cart_items = CartItems.objects.filter(
+        cart__owner=user,
+        ).exclude(
+        Q(product__is_listed=False) | Q(product__product__is_listed=False)
+        ).order_by('-created_at')
         cart = Cart.objects.get(owner=user)
         context = {'cart_items': cart_items,'cart':cart}
     except ObjectDoesNotExist:
@@ -96,7 +101,11 @@ def sub_cart_item_quantity(request, pk):
 def checkout(request):
     user = request.user
     cart = get_object_or_404(Cart, owner=user)
-    cart_items = CartItems.objects.filter(cart=cart).order_by('-created_at')
+    cart_items = CartItems.objects.filter(
+        cart__owner=user,
+        ).exclude(
+        Q(product__is_listed=False) | Q(product__product__is_listed=False)
+        ).order_by('-created_at')
     address = Address.objects.filter(user=user)
     coupons = Coupon.objects.filter(is_active = True)
     coupon_discount = None
@@ -134,6 +143,15 @@ def checkout(request):
                         order.is_paid = True
                         order.razor_pay_id = razorpay_payment_id
                         order.save()
+                if payment_method == 'wallet':
+                    wallet = Wallet.objects.get(user=user)
+                    if amount > wallet.balance:
+                        error_message = f"Insufficient funds in your wallet. Your current balance is {wallet.balance}."
+                        context = {'cart': cart, 'cart_items': cart_items, 'address': address, 'error_message': error_message,'coupons':coupons, }
+                        return render(request, 'checkout.html',context)
+                    else:
+                        wallet.balance -= Decimal(amount)
+                        wallet.save()
                 for cart_item in cart_items:
                     def generate_unique_integer_id(length=8):
                         """
@@ -164,6 +182,9 @@ def checkout(request):
                     if payment_method == 'online':
                         new_order_item.is_paid = True
                         new_order_item.razor_pay_id = razorpay_payment_id
+                        new_order_item.save()
+                    if payment_method == 'wallet':
+                        new_order_item.is_paid = True
                         new_order_item.save()
                     product = cart_item.product
                     product.stock -= cart_item.quantity

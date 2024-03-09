@@ -53,8 +53,14 @@ def admin_home(request):
 
     cod_count = OrderItem.objects.filter(payment_method = 'cod').count()
     online_count = OrderItem.objects.filter(payment_method__in=['online', 'wallet']).count()
-    cod_percentage = (cod_count / (cod_count + online_count) * 100 )
-    online_percentage = (online_count / (cod_count + online_count) * 100 )
+    total_count = cod_count + online_count
+
+    if total_count != 0:
+        cod_percentage = (cod_count / total_count) * 100
+        online_percentage = (online_count / total_count) * 100
+    else:
+        cod_percentage = 0
+        online_percentage = 0
     payment_percentage = [cod_percentage,online_percentage]
 
     recent_orders = OrderItem.objects.order_by('-created_at')[:10]

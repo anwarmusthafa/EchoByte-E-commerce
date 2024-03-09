@@ -14,7 +14,6 @@ def send_otp_signal(sender, instance,created, **kwargs):
         send_otp(instance)          
 def send_otp(user):
         otp1 = genotp()
-        print(otp1)
         otp1 = int(otp1)
         user.otp = otp1   
         user.save()

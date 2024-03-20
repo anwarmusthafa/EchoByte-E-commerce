@@ -127,7 +127,7 @@ def otp_verification(request, pk):
                     tb_user.is_verified = True
                     tb_user.save()
                     success_message = "Registration Successfull Please Login Now"
-                    return render(request, 'signin.html', {'pk': pk, 'success_message': success_message})
+                    return render(request, 'signin.html', {'success_message': success_message})
             else:
                     messages.error(request,"Invalid otp Try again!")
                     return redirect('otp_verification',pk = pk,)

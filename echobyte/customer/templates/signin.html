@@ -12,6 +12,14 @@
         {{ success_message }}
     </div>
 {% endif %}
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-success text-center">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
 
 
         <!--====== App Content ======-->
@@ -32,7 +40,7 @@
                                     
                                         
                                         <h1 class="gl-h1">SIGN IN</h1>
-                                        <form class="l-f-o__form" method="post" action="">
+                                        <form class="l-f-o__form" method="post" action="{% url "signin" %}">
                                             {% csrf_token %}
                                             
                                             <div class="u-s-m-b-30">
@@ -47,6 +55,7 @@
                                                 <div class="u-s-m-b-30">
                                                     <button class="btn btn--e-transparent-brand-b-2" type="submit">LOGIN</button>
                                                 </div>
+                                        </form>
                                                 <div class="u-s-m-b-30">
                                                     <a class="gl-link" href="{% url 'forgot_password' %}">Forgot Your Password?</a>
                                                 </div>
@@ -67,7 +76,7 @@
                                                     <a class="l-f-o__create-link btn--e-transparent-brand-b-2" href="{% url "signup" %}">CREATE AN ACCOUNT</a>
                                                 </div>
                                             </div>
-                                        </form>
+                                        
                                     </div>
                                 </div>
                             </div>

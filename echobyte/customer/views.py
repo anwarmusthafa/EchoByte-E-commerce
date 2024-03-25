@@ -37,13 +37,17 @@ def signin(request):
             if user.is_superuser:
                 error_message = "Superusers are not allowed to sign in."
             elif not user.is_staff:
+                print("not super super")
                 if user.customer.is_verified:
+                    print("user verified")
                     if user.customer.delete_status == 0:
+                        print("not blocked")
                         error_message = "You are blocked by Admin"
                     else:
                         login(request, user)
                         return redirect('home')
                 else:
+                    print("redirect to otp else case")
                     messages.error(request, "Verify your email")
                     send_otp(user.customer)
                     return redirect('otp_verification', pk=user.customer.pk)
@@ -122,20 +126,21 @@ def otp_verification(request, pk):
             db_otp = tb_user.otp 
             if  user_otp == str(db_otp):
                 if tb_user.is_verified:
-                    return render(request, 'signin',{'pk':pk})
+                    success_message = "otp is already verified, please signin"
+                    return render(request, 'signin.html', {success_message:'success_message'})
                 else:
                     tb_user.is_verified = True
                     tb_user.save()
                     success_message = "Registration Successfull Please Login Now"
-                    return render(request, 'signin.html', {'success_message': success_message})
+                    messages.success(request, success_message)
+                    return redirect('signin')
             else:
                     messages.error(request,"Invalid otp Try again!")
                     return redirect('otp_verification',pk = pk,)
     except Exception as e:
         messages.error(request,f"Error{e} occured ,Try again!")
         return redirect('otp_verification',pk = pk,)
-    context={ 'pk':pk,
-             'success_message' : success_message}
+    context={ 'pk':pk,'success_message' : success_message}
     return render(request, 'otp_verification.html', context)
 
 @login_required(login_url='signin')

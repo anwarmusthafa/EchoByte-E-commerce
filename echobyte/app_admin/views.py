@@ -13,7 +13,7 @@ import xlwt
 from django.utils.timezone import make_naive
 import io
 from reportlab.pdfgen import canvas
-from datetime import datetime
+from datetime import datetime,timedelta
 from django.db.models.functions import ExtractMonth
 from .decorators import custom_user_passes_test
 
@@ -154,6 +154,9 @@ def sales_report(request):
 
             start_date = timezone.make_aware(start_date)
             end_date = timezone.make_aware(end_date)
+
+            # Adjust the end_date to include the full day
+            end_date = end_date + timedelta(days=1) - timedelta(seconds=1)
 
             sales = OrderItem.objects.filter(order_status=3, created_at__range=[start_date, end_date]).order_by('created_at')
             

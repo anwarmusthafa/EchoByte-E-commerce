@@ -16,15 +16,17 @@ def all_products(request):
         max_price = request.GET.get('max-price')
         # Base queryset
         variants = ProductVariant.objects.exclude(
-    Q(product__delete_status=0) |
-    Q(product__is_listed=False) |
-    Q(product__category__is_listed=False) |
-    Q(is_listed=False)
-)
+        Q(product__delete_status=0) |
+        Q(product__is_listed=False) |
+        Q(product__category__is_listed=False) |
+        Q(is_listed=False)
+        ).order_by('-product__priority')
+
         if request.user.is_authenticated:
             wishlist_product_pks = list(Wishlist.objects.filter(user=request.user).values_list('product__pk', flat=True))
         else:
             wishlist_product_pks = None
+        
         if sort_by == 'latest':
             variants = variants.order_by('-product__created_at')
         if sort_by == 'lowest-price':
@@ -33,9 +35,11 @@ def all_products(request):
             variants = variants.order_by('-selling_price')
         if sort_by == 'relevance':
             variants = variants.order_by('-product__priority')
+
         # Apply search filter
         if query:
             variants = variants.filter(Q(product__title__icontains=query) | Q(product__brand__brand__icontains=query))
+        
         if category:
             categories = category.split(',')
             variants = variants.filter(product__category__name__in=categories)
@@ -44,6 +48,7 @@ def all_products(request):
         if max_price:
                 variants = variants.filter(selling_price__lte=max_price)
         product_count = variants.count()
+
         # Paginate the queryset
         paginator = Paginator(variants, 4)
         page_number = request.GET.get('page', 1)

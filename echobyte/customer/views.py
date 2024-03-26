@@ -37,17 +37,13 @@ def signin(request):
             if user.is_superuser:
                 error_message = "Superusers are not allowed to sign in."
             elif not user.is_staff:
-                print("not super super")
                 if user.customer.is_verified:
-                    print("user verified")
                     if user.customer.delete_status == 0:
-                        print("not blocked")
                         error_message = "You are blocked by Admin"
                     else:
                         login(request, user)
                         return redirect('home')
                 else:
-                    print("redirect to otp else case")
                     messages.error(request, "Verify your email")
                     send_otp(user.customer)
                     return redirect('otp_verification', pk=user.customer.pk)
